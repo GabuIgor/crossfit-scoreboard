@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-02-26T14:03:36.558966+00:00",
+  "divisions": {
+    "BEGSCAL_F": {
+      "title": "Beginners/Scaled — Women",
+      "rows": [
+        {
+          "id": 3,
+          "full_name": "Метиса Салоха",
+          "age": 19,
+          "club": "Ава",
+          "city": "Курск",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 96
+              }
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null
+            },
+            "WOD3": {
+              "points": null,
+              "result": null
+            }
+          },
+          "total": 100.0
+        }
+      ]
+    },
+    "BEGSCAL_M": {
+      "title": "Beginners/Scaled — Men",
+      "rows": [
+        {
+          "id": 1,
+          "full_name": "Чимоненко Сережа",
+          "age": 34,
+          "club": "Байрон",
+          "city": "Владикавказ",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_M",
+          "flag": "flags/athlete_1.png",
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null
+            },
+            "WOD3": {
+              "points": null,
+              "result": null
+            }
+          },
+          "total": 0.0
+        }
+      ]
+    },
+    "INT_F": {
+      "title": "Intermediate — Women",
+      "rows": [
+        {
+          "id": 2,
+          "full_name": "Мязулян Мазуля",
+          "age": 19,
+          "club": "Чунька",
+          "city": "Чебоксары",
+          "category": "INT",
+          "division_id": "INT_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null
+            },
+            "WOD3": {
+              "points": null,
+              "result": null
+            }
+          },
+          "total": 0.0
+        }
+      ]
+    },
+    "INT_M": {
+      "title": "Intermediate — Men",
+      "rows": []
+    }
+  },
+  "scores": [
+    {
+      "id": "WOD1",
+      "title": "Комплекс 1",
+      "type": "time",
+      "time_cap_enabled": true
+    },
+    {
+      "id": "WOD2A",
+      "title": "Комплекс 2 — Зачёт 1",
+      "type": "reps",
+      "time_cap_enabled": false
+    },
+    {
+      "id": "WOD2B",
+      "title": "Комплекс 2 — Зачёт 2",
+      "type": "weight",
+      "time_cap_enabled": false
+    },
+    {
+      "id": "WOD3",
+      "title": "Комплекс 3",
+      "type": "time",
+      "time_cap_enabled": true
+    }
+  ],
+  "heats": {}
+}

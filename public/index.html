@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scoreboard (TV)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 12px; }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: 10px; }
+    h2 { margin: 0 0 8px 0; font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid #eee; padding: 6px 6px; text-align: left; }
+    .muted { color: #777; font-size: 12px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .flag { width: 20px; height: 14px; object-fit: cover; border: 1px solid #ddd; border-radius: 3px; vertical-align: middle; }
+    .scoreCell { white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="muted" id="meta">Loading...</div>
+
+  <div class="grid">
+    <div class="row">
+      <div class="box" id="BEGSCAL_F"></div>
+      <div class="box" id="INT_F"></div>
+      <div class="box" id="BEGSCAL_M"></div>
+      <div class="box" id="INT_M"></div>
+    </div>
+
+    <div class="box" id="heatsBox">
+      <h2>Заходы</h2>
+      <div class="muted">Пока каркас (добавим позже)</div>
+      <pre id="heatsPre" style="font-size:12px; white-space:pre-wrap;"></pre>
+    </div>
+  </div>
+
+<script>
+const DIV_ORDER = ["BEGSCAL_F","INT_F","BEGSCAL_M","INT_M"];
+
+function fmtPoints(p) {
+  if (p === null || p === undefined) return "—";
+  if (typeof p === "number") return p.toFixed(2).replace(/\.00$/, "");
+  return String(p);
+}
+
+function safeText(s){ return (s===null||s===undefined) ? "" : String(s); }
+
+function renderDivision(divId, divData, scores) {
+  const el = document.getElementById(divId);
+  if (!el) return;
+
+  const rows = divData.rows || [];
+  let html = `<h2>${safeText(divData.title)}</h2>`;
+  html += `<table><thead><tr>
+    <th>#</th>
+    <th>Атлет</th>
+    <th>Клуб</th>
+    <th>W1</th><th>W2A</th><th>W2B</th><th>W3</th>
+    <th>ИТОГО</th>
+  </tr></thead><tbody>`;
+
+  rows.slice(0, 16).forEach((r, idx) => {
+    const flag = r.flag ? `<img class="flag" src="${r.flag}" /> ` : "";
+    html += `<tr>
+      <td>${idx+1}</td>
+      <td>${flag}${safeText(r.full_name)}</td>
+      <td>${safeText(r.club)}</td>
+      <td class="scoreCell">${fmtPoints(r.scores?.WOD1?.points)}</td>
+      <td class="scoreCell">${fmtPoints(r.scores?.WOD2A?.points)}</td>
+      <td class="scoreCell">${fmtPoints(r.scores?.WOD2B?.points)}</td>
+      <td class="scoreCell">${fmtPoints(r.scores?.WOD3?.points)}</td>
+      <td class="scoreCell">${fmtPoints(r.total)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  el.innerHTML = html;
+}
+
+async function load() {
+  // cache busting чтобы браузер не кешировал results.json
+  const url = `results.json?ts=${Date.now()}`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  document.getElementById("meta").textContent =
+    `Обновлено: ${data.generated_at}`;
+
+  const divisions = data.divisions || {};
+  DIV_ORDER.forEach(id => {
+    if (divisions[id]) renderDivision(id, divisions[id], data.scores || []);
+  });
+
+  document.getElementById("heatsPre").textContent = JSON.stringify(data.heats || {}, null, 2);
+}
+
+load();
+setInterval(load, 5000);
+</script>
+</body>
+</html>
