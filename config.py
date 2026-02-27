@@ -2,7 +2,7 @@ from pathlib import Path
 
 # Папки проекта
 DATA_DIR = Path("data")
-PUBLIC_DIR = Path("docs")   # если мы перешли на docs
+PUBLIC_DIR = Path("public")
 PUBLISH_DIR = Path("publish")
 
 # Файлы
