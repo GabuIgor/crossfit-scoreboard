@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scoreboard (Mobile)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 12px; }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: 10px; }
+    h2 { margin: 0 0 8px 0; font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid #eee; padding: 6px 6px; text-align: left; }
+    .muted { color: #777; font-size: 12px; }
+    .flag { width: 18px; height: 12px; object-fit: cover; border: 1px solid #ddd; border-radius: 3px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <div class="muted" id="meta">Loading...</div>
+
+  <label>Таблица:
+    <select id="sel"></select>
+  </label>
+
+  <div class="box" id="content"></div>
+
+<script>
+const DIVS = ["BEGSCAL_F","BEGSCAL_M","INT_F","INT_M"];
+const DIV_NAMES = {
+  "BEGSCAL_F":"Beg/Scal — Women",
+  "BEGSCAL_M":"Beg/Scal — Men",
+  "INT_F":"Intermediate — Women",
+  "INT_M":"Intermediate — Men",
+};
+
+const sel = document.getElementById("sel");
+DIVS.forEach(id => {
+  const opt = document.createElement("option");
+  opt.value = id;
+  opt.textContent = DIV_NAMES[id] || id;
+  sel.appendChild(opt);
+});
+
+function fmt(p){ if (p===null||p===undefined) return "—"; return (typeof p==="number") ? p.toFixed(2).replace(/\.00$/,"") : String(p); }
+
+function render(divId, divData) {
+  const el = document.getElementById("content");
+  const rows = (divData.rows || []);
+  let html = `<h2>${divData.title || divId}</h2>`;
+  html += `<table><thead><tr>
+    <th>#</th><th>Атлет</th><th>W1</th><th>W2A</th><th>W2B</th><th>W3</th><th>ИТОГО</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach((r, idx) => {
+    const flag = r.flag ? `<img class="flag" src="${r.flag}" /> ` : "";
+    html += `<tr>
+      <td>${idx+1}</td>
+      <td>${flag}${r.full_name || ""}</td>
+      <td>${fmt(r.scores?.WOD1?.points)}</td>
+      <td>${fmt(r.scores?.WOD2A?.points)}</td>
+      <td>${fmt(r.scores?.WOD2B?.points)}</td>
+      <td>${fmt(r.scores?.WOD3?.points)}</td>
+      <td>${fmt(r.total)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  el.innerHTML = html;
+}
+
+let cached = null;
+
+async function load() {
+  const res = await fetch(`results.json?ts=${Date.now()}`);
+  cached = await res.json();
+  document.getElementById("meta").textContent = `Обновлено: ${cached.generated_at}`;
+  const id = sel.value;
+  render(id, cached.divisions[id]);
+}
+
+sel.addEventListener("change", () => {
+  if (!cached) return;
+  render(sel.value, cached.divisions[sel.value]);
+});
+
+load();
+setInterval(load, 5000);
+</script>
+</body>
+</html>

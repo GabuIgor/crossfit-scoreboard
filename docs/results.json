@@ -1,0 +1,336 @@
+{
+  "generated_at": "2026-02-27T11:42:46.489313+00:00",
+  "divisions": {
+    "BEGSCAL_F": {
+      "title": "Beginners/Scaled — Women",
+      "rows": [
+        {
+          "id": 4,
+          "full_name": "Воронкина Влада",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 71.43,
+              "result": {
+                "status": "ok",
+                "value": 70.0
+              }
+            },
+            "WOD2A": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 58
+              }
+            },
+            "WOD2B": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 171
+              }
+            },
+            "WOD3": {
+              "points": 85.71,
+              "result": {
+                "status": "ok",
+                "value": 385
+              }
+            }
+          },
+          "total": 357.14
+        },
+        {
+          "id": 6,
+          "full_name": "Жегулева Ксения",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 42.86,
+              "result": {
+                "status": "ok",
+                "value": 65.0
+              }
+            },
+            "WOD2A": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 58
+              }
+            },
+            "WOD2B": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 171
+              }
+            },
+            "WOD3": {
+              "points": 71.43,
+              "result": {
+                "status": "ok",
+                "value": 423
+              }
+            }
+          },
+          "total": 314.29
+        },
+        {
+          "id": 5,
+          "full_name": "Постникова Юлия",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 71.43,
+              "result": {
+                "status": "ok",
+                "value": 70.0
+              }
+            },
+            "WOD2A": {
+              "points": 57.14,
+              "result": {
+                "status": "ok",
+                "value": 48
+              }
+            },
+            "WOD2B": {
+              "points": 71.43,
+              "result": {
+                "status": "ok",
+                "value": 167
+              }
+            },
+            "WOD3": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 362
+              }
+            }
+          },
+          "total": 300.0
+        },
+        {
+          "id": 7,
+          "full_name": "Авакова Кристина",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 100.0,
+              "result": {
+                "status": "ok",
+                "value": 90.0
+              }
+            },
+            "WOD2A": {
+              "points": 71.43,
+              "result": {
+                "status": "ok",
+                "value": 49
+              }
+            },
+            "WOD2B": {
+              "points": 42.86,
+              "result": {
+                "status": "ok",
+                "value": 153
+              }
+            },
+            "WOD3": {
+              "points": 42.86,
+              "result": {
+                "status": "ok",
+                "value": 436
+              }
+            }
+          },
+          "total": 257.15
+        },
+        {
+          "id": 9,
+          "full_name": "Лукьяненко Виктория",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 85.71,
+              "result": {
+                "status": "ok",
+                "value": 85.0
+              }
+            },
+            "WOD2A": {
+              "points": 42.86,
+              "result": {
+                "status": "ok",
+                "value": 47
+              }
+            },
+            "WOD2B": {
+              "points": 57.14,
+              "result": {
+                "status": "ok",
+                "value": 163
+              }
+            },
+            "WOD3": {
+              "points": 57.14,
+              "result": {
+                "status": "ok",
+                "value": 433
+              }
+            }
+          },
+          "total": 242.85
+        },
+        {
+          "id": 10,
+          "full_name": "Тедеева Моника",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 42.86,
+              "result": {
+                "status": "ok",
+                "value": 65.0
+              }
+            },
+            "WOD2A": {
+              "points": 14.29,
+              "result": {
+                "status": "ok",
+                "value": 40
+              }
+            },
+            "WOD2B": {
+              "points": 28.57,
+              "result": {
+                "status": "ok",
+                "value": 126
+              }
+            },
+            "WOD3": {
+              "points": 14.29,
+              "result": {
+                "status": "capped",
+                "value": 148
+              }
+            }
+          },
+          "total": 100.01
+        },
+        {
+          "id": 11,
+          "full_name": "Мелкумова Яна",
+          "age": 25,
+          "club": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": 14.29,
+              "result": {
+                "status": "ok",
+                "value": 55.0
+              }
+            },
+            "WOD2A": {
+              "points": 28.57,
+              "result": {
+                "status": "ok",
+                "value": 43
+              }
+            },
+            "WOD2B": {
+              "points": 14.29,
+              "result": {
+                "status": "ok",
+                "value": 121
+              }
+            },
+            "WOD3": {
+              "points": 28.57,
+              "result": {
+                "status": "ok",
+                "value": 553
+              }
+            }
+          },
+          "total": 85.72
+        }
+      ]
+    },
+    "BEGSCAL_M": {
+      "title": "Beginners/Scaled — Men",
+      "rows": []
+    },
+    "INT_F": {
+      "title": "Intermediate — Women",
+      "rows": []
+    },
+    "INT_M": {
+      "title": "Intermediate — Men",
+      "rows": []
+    }
+  },
+  "scores": [
+    {
+      "id": "WOD1",
+      "title": "Комплекс 1",
+      "type": "weight",
+      "time_cap_enabled": false
+    },
+    {
+      "id": "WOD2A",
+      "title": "Комплекс 2 — Зачёт 1",
+      "type": "reps",
+      "time_cap_enabled": false
+    },
+    {
+      "id": "WOD2B",
+      "title": "Комплекс 2 — Зачёт 2",
+      "type": "reps",
+      "time_cap_enabled": false
+    },
+    {
+      "id": "WOD3",
+      "title": "Комплекс 3",
+      "type": "time",
+      "time_cap_enabled": true
+    }
+  ],
+  "heats": {}
+}
