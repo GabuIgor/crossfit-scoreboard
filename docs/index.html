@@ -3,110 +3,109 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scoreboard (TV)</title>
+  <title>Scoreboard TV</title>
   <style>
-    :root {
-      --border: #d9d9d9;
-      --muted: #666;
-      --points-bg: #fff4cc;
-      --points-border: #e4c766;
-    }
-    * { box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; margin: 8px; background: #fff; }
-    .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
-    .layout { display: grid; grid-template-columns: 1fr 1fr 0.85fr; gap: 8px; align-items: start; }
-    .tables { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .box { border: 1px solid var(--border); border-radius: 10px; padding: 6px; overflow: hidden; }
-    h2 { margin: 0 0 6px 0; font-size: 14px; }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 10px; }
+    body { font-family: Arial, sans-serif; margin: 10px; background: #fff; color: #111; }
+    .meta { color: #666; font-size: 12px; margin-bottom: 8px; }
+    .layout { display: grid; grid-template-columns: 2.3fr 1fr; gap: 10px; align-items: start; }
+    .tables { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: 8px; overflow: hidden; }
+    h2, h3 { margin: 0 0 6px 0; }
+    h2 { font-size: 15px; }
+    h3 { font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
     th, td { border-bottom: 1px solid #eee; padding: 3px 4px; text-align: left; vertical-align: top; }
-    th { font-size: 9px; }
+    th.points, td.points { background: #eef5ff; }
+    .athlete-meta { color: #666; font-size: 10px; line-height: 1.2; }
     .flag { width: 16px; height: 11px; object-fit: cover; border: 1px solid #ddd; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
-    .athleteCell { line-height: 1.15; }
-    .athleteMain { font-weight: 700; }
-    .athleteMeta { color: var(--muted); font-size: 9px; margin-top: 2px; }
-    .scoreWrap { display: flex; flex-direction: column; gap: 1px; }
-    .resultLine { color: var(--muted); font-size: 9px; }
-    .pointsCell, th.pointsCell { background: var(--points-bg); border-left: 1px solid var(--points-border); border-right: 1px solid var(--points-border); }
-    .totalCell { font-weight: 700; }
-    .heatsPre { font-size: 11px; white-space: pre-wrap; margin: 0; }
+    .res { display:block; color:#666; font-size:10px; }
+    .heat-card { border: 1px solid #eee; border-radius: 8px; padding: 6px; margin-bottom: 8px; }
+    .lane { display:grid; grid-template-columns: 22px 1fr; gap: 6px; padding: 3px 0; border-bottom: 1px dashed #eee; font-size: 12px; }
+    .lane:last-child { border-bottom: none; }
+    .tabs { display:flex; gap:6px; margin-bottom: 8px; flex-wrap: wrap; }
+    .tabbtn { border:1px solid #ccc; background:#f7f7f7; border-radius:999px; padding:4px 8px; cursor:pointer; font-size:12px; }
+    .tabbtn.active { background:#111; color:#fff; border-color:#111; }
   </style>
 </head>
 <body>
   <div class="meta" id="meta">Loading...</div>
   <div class="layout">
-    <div class="tables">
-      <div class="box" id="BEGSCAL_F"></div>
-      <div class="box" id="INT_F"></div>
-      <div class="box" id="BEGSCAL_M"></div>
-      <div class="box" id="INT_M"></div>
-    </div>
-    <div class="box" id="heatsBox">
+    <div class="tables" id="tables"></div>
+    <div class="box">
       <h2>Заходы</h2>
-      <div class="meta">Каркас. После уточнения логики сюда можно сразу вывести старт-листы.</div>
-      <pre class="heatsPre" id="heatsPre"></pre>
+      <div class="tabs" id="tabs"></div>
+      <div id="heats"></div>
     </div>
   </div>
-
 <script>
-const DIV_ORDER = ["BEGSCAL_F","INT_F","BEGSCAL_M","INT_M"];
-function fmtPoints(p) {
-  if (p === null || p === undefined) return "—";
-  if (typeof p === "number") return p.toFixed(2).replace(/\.00$/, "");
-  return String(p);
-}
-function safeText(s){ return (s===null||s===undefined) ? "" : String(s); }
-function scoreHtml(score) {
-  if (!score) return `<div class="scoreWrap"><div>—</div><div class="resultLine">—</div></div>`;
-  return `<div class="scoreWrap"><div>${fmtPoints(score.points)}</div><div class="resultLine">${safeText(score.display_result || "—")}</div></div>`;
-}
-function renderDivision(divId, divData) {
-  const el = document.getElementById(divId);
-  if (!el) return;
-  const rows = divData.rows || [];
-  let html = `<h2>${safeText(divData.title)}</h2>`;
-  html += `<table><thead><tr>
-    <th style="width:6%">#</th>
-    <th style="width:36%">Атлет</th>
-    <th style="width:14%">Клуб / Город</th>
-    <th class="pointsCell" style="width:9%">W1</th>
-    <th class="pointsCell" style="width:9%">W2A</th>
-    <th class="pointsCell" style="width:9%">W2B</th>
-    <th class="pointsCell" style="width:9%">W3</th>
-    <th class="pointsCell" style="width:8%">Σ</th>
-  </tr></thead><tbody>`;
-
-  rows.slice(0, 16).forEach((r, idx) => {
-    const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : "";
-    html += `<tr>
-      <td>${idx + 1}</td>
-      <td class="athleteCell"><div class="athleteMain">${flag}${safeText(r.full_name)}</div><div class="athleteMeta">${safeText(r.age)} лет</div></td>
-      <td class="athleteCell"><div>${safeText(r.club)}</div><div class="athleteMeta">${safeText(r.city)}</div></td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD1)}</td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD2A)}</td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD2B)}</td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD3)}</td>
-      <td class="pointsCell totalCell">${fmtPoints(r.total)}</td>
-    </tr>`;
+const DIV_ORDER = ["BEGSCAL_F","BEGSCAL_M","INT_F","INT_M"];
+const DIV_SHORT = {"BEGSCAL_F":"BEG/SCAL W","BEGSCAL_M":"BEG/SCAL M","INT_F":"INT W","INT_M":"INT M"};
+let currentWorkout = 'WOD1';
+let cache = null;
+function fmt(v){ if(v===null||v===undefined) return '—'; return (typeof v==='number') ? String(Number(v.toFixed ? v.toFixed(2) : v)).replace(/\.00$/,'') : String(v); }
+function safe(s){ return s===null||s===undefined ? '' : String(s); }
+function renderTables(data){
+  const root = document.getElementById('tables');
+  root.innerHTML = '';
+  DIV_ORDER.forEach(divId => {
+    const div = data.divisions?.[divId];
+    if(!div) return;
+    const box = document.createElement('div');
+    box.className = 'box';
+    let html = `<h2>${safe(div.title)}</h2><table><thead><tr><th>#</th><th>Атлет</th><th class="points">W1</th><th class="points">W2A</th><th class="points">W2B</th><th class="points">W3</th><th class="points">ИТОГО</th></tr></thead><tbody>`;
+    (div.rows||[]).forEach(r => {
+      const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : '';
+      const meta = [r.age ? `${r.age}` : '', r.club || '', r.city || ''].filter(Boolean).join(' · ');
+      html += `<tr><td>${fmt(r.place)}</td><td>${flag}${safe(r.full_name)}<div class="athlete-meta">${safe(meta)}</div></td>` +
+        `<td class="points">${fmt(r.scores?.WOD1?.points)}<span class="res">${safe(r.scores?.WOD1?.result_text)}</span></td>` +
+        `<td class="points">${fmt(r.scores?.WOD2A?.points)}<span class="res">${safe(r.scores?.WOD2A?.result_text)}</span></td>` +
+        `<td class="points">${fmt(r.scores?.WOD2B?.points)}<span class="res">${safe(r.scores?.WOD2B?.result_text)}</span></td>` +
+        `<td class="points">${fmt(r.scores?.WOD3?.points)}<span class="res">${safe(r.scores?.WOD3?.result_text)}</span></td>` +
+        `<td class="points">${fmt(r.total)}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+    root.appendChild(box);
   });
-
-  html += `</tbody></table>`;
-  el.innerHTML = html;
 }
-
-async function load() {
+function renderTabs(data){
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  ['WOD1','WOD2','WOD3'].forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'tabbtn' + (id===currentWorkout ? ' active' : '');
+    btn.textContent = data.heats?.[id]?.title || id;
+    btn.onclick = () => { currentWorkout = id; renderTabs(data); renderHeats(data); };
+    tabs.appendChild(btn);
+  });
+}
+function renderHeats(data){
+  const root = document.getElementById('heats');
+  const workout = data.heats?.[currentWorkout];
+  if(!workout){ root.innerHTML = '<div class="meta">Нет заходов</div>'; return; }
+  let html = '';
+  DIV_ORDER.forEach(divId => {
+    const heats = workout.divisions?.[divId] || [];
+    if(!heats.length) return;
+    html += `<h3>${safe(DIV_SHORT[divId] || divId)}</h3>`;
+    heats.forEach(h => {
+      html += `<div class="heat-card"><strong>Заход ${h.heat}</strong>`;
+      (h.assignments || []).forEach(a => {
+        const flag = a.flag ? `<img class="flag" src="${a.flag}" />` : '';
+        html += `<div class="lane"><div>${a.lane}</div><div>${flag}${safe(a.full_name)}</div></div>`;
+      });
+      html += `</div>`;
+    });
+  });
+  root.innerHTML = html || '<div class="meta">Заходы ещё не сформированы</div>';
+}
+async function load(){
   const res = await fetch(`results.json?ts=${Date.now()}`);
-  const data = await res.json();
-  document.getElementById("meta").textContent = `Обновлено: ${data.generated_at}`;
-  const divisions = data.divisions || {};
-  DIV_ORDER.forEach(id => {
-    if (divisions[id]) renderDivision(id, divisions[id]);
-  });
-  document.getElementById("heatsPre").textContent = JSON.stringify(data.heats || {}, null, 2);
+  cache = await res.json();
+  document.getElementById('meta').textContent = `Обновлено: ${cache.generated_at}`;
+  renderTables(cache); renderTabs(cache); renderHeats(cache);
 }
-
-load();
-setInterval(load, 5000);
+load(); setInterval(load, 5000);
 </script>
 </body>
 </html>

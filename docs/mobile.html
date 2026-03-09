@@ -3,96 +3,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scoreboard (Mobile)</title>
+  <title>Scoreboard Mobile</title>
   <style>
-    :root {
-      --border: #d9d9d9;
-      --muted: #666;
-      --points-bg: #fff4cc;
-    }
-    * { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; margin: 12px; }
-    .box { border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
-    .muted { color: var(--muted); font-size: 12px; }
-    h2 { margin: 0 0 8px 0; font-size: 18px; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-    th, td { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; vertical-align: top; }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+    .muted { color: #777; font-size: 12px; }
     .flag { width: 18px; height: 12px; object-fit: cover; border: 1px solid #ddd; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
-    .athleteCell { line-height: 1.2; }
-    .athleteMain { font-weight: 700; }
-    .athleteMeta { color: var(--muted); font-size: 11px; margin-top: 2px; }
-    .scoreWrap { display: flex; flex-direction: column; gap: 2px; }
-    .resultLine { color: var(--muted); font-size: 11px; }
-    .pointsCell, th.pointsCell { background: var(--points-bg); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; vertical-align: top; }
+    th.points, td.points { background: #eef5ff; }
+    .meta2 { color:#666; font-size: 11px; line-height: 1.25; }
+    .res { display:block; color:#666; font-size:10px; }
+    .lane { display:grid; grid-template-columns: 24px 1fr; gap:8px; padding:4px 0; border-bottom:1px dashed #eee; }
+    .lane:last-child { border-bottom:none; }
   </style>
 </head>
 <body>
   <div class="muted" id="meta">Loading...</div>
-  <label>Таблица:
-    <select id="sel"></select>
-  </label>
-  <div class="box" id="content"></div>
-
+  <label>Таблица: <select id="divSel"></select></label>
+  <label style="margin-left:8px;">Заходы: <select id="wodSel"></select></label>
+  <div class="box" id="tableBox"></div>
+  <div class="box" id="heatsBox"></div>
 <script>
 const DIVS = ["BEGSCAL_F","BEGSCAL_M","INT_F","INT_M"];
-const DIV_NAMES = {
-  "BEGSCAL_F":"BEG/SCAL — Women",
-  "BEGSCAL_M":"BEG/SCAL — Men",
-  "INT_F":"Intermediate — Women",
-  "INT_M":"Intermediate — Men",
-};
-const sel = document.getElementById("sel");
-DIVS.forEach(id => {
-  const opt = document.createElement("option");
-  opt.value = id;
-  opt.textContent = DIV_NAMES[id] || id;
-  sel.appendChild(opt);
-});
-function fmt(p){ if (p===null||p===undefined) return "—"; return (typeof p==="number") ? p.toFixed(2).replace(/\.00$/,"") : String(p); }
-function safeText(s){ return (s===null||s===undefined) ? "" : String(s); }
-function scoreHtml(score) {
-  if (!score) return `<div class="scoreWrap"><div>—</div><div class="resultLine">—</div></div>`;
-  return `<div class="scoreWrap"><div>${fmt(score.points)}</div><div class="resultLine">${safeText(score.display_result || "—")}</div></div>`;
-}
-function render(divId, divData) {
-  const el = document.getElementById("content");
-  const rows = (divData.rows || []);
-  let html = `<h2>${divData.title || divId}</h2>`;
-  html += `<table><thead><tr>
-    <th style="width:8%">#</th>
-    <th style="width:44%">Атлет</th>
-    <th class="pointsCell" style="width:12%">W1</th>
-    <th class="pointsCell" style="width:12%">W2A</th>
-    <th class="pointsCell" style="width:12%">W2B</th>
-    <th class="pointsCell" style="width:12%">W3</th>
-  </tr></thead><tbody>`;
-
-  rows.forEach((r, idx) => {
-    const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : "";
-    html += `<tr>
-      <td>${idx+1}</td>
-      <td class="athleteCell"><div class="athleteMain">${flag}${safeText(r.full_name)}</div><div class="athleteMeta">${safeText(r.age)} лет · ${safeText(r.club)} · ${safeText(r.city)}</div><div class="athleteMeta">Σ ${fmt(r.total)}</div></td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD1)}</td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD2A)}</td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD2B)}</td>
-      <td class="pointsCell">${scoreHtml(r.scores?.WOD3)}</td>
-    </tr>`;
+let cache = null;
+const divSel = document.getElementById('divSel');
+const wodSel = document.getElementById('wodSel');
+function fmt(v){ if(v===null||v===undefined) return '—'; return (typeof v==='number') ? String(Number(v.toFixed ? v.toFixed(2) : v)).replace(/\.00$/,'') : String(v); }
+function safe(s){ return s===null||s===undefined ? '' : String(s); }
+DIVS.forEach(id => { const opt=document.createElement('option'); opt.value=id; opt.textContent=id; divSel.appendChild(opt); });
+['WOD1','WOD2','WOD3'].forEach(id => { const opt=document.createElement('option'); opt.value=id; opt.textContent=id; wodSel.appendChild(opt); });
+function renderTable(){
+  const id = divSel.value; const div = cache.divisions?.[id];
+  if(!div){ document.getElementById('tableBox').innerHTML='Нет данных'; return; }
+  let html = `<h3>${safe(div.title)}</h3><table><thead><tr><th>#</th><th>Атлет</th><th class="points">W1</th><th class="points">W2A</th><th class="points">W2B</th><th class="points">W3</th><th class="points">Σ</th></tr></thead><tbody>`;
+  (div.rows||[]).forEach(r => {
+    const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : '';
+    const meta = [r.age ? `${r.age}` : '', r.club || '', r.city || ''].filter(Boolean).join(' · ');
+    html += `<tr><td>${fmt(r.place)}</td><td>${flag}${safe(r.full_name)}<div class="meta2">${safe(meta)}</div></td>` +
+      `<td class="points">${fmt(r.scores?.WOD1?.points)}<span class="res">${safe(r.scores?.WOD1?.result_text)}</span></td>` +
+      `<td class="points">${fmt(r.scores?.WOD2A?.points)}<span class="res">${safe(r.scores?.WOD2A?.result_text)}</span></td>` +
+      `<td class="points">${fmt(r.scores?.WOD2B?.points)}<span class="res">${safe(r.scores?.WOD2B?.result_text)}</span></td>` +
+      `<td class="points">${fmt(r.scores?.WOD3?.points)}<span class="res">${safe(r.scores?.WOD3?.result_text)}</span></td>` +
+      `<td class="points">${fmt(r.total)}</td></tr>`;
   });
-
-  html += `</tbody></table>`;
-  el.innerHTML = html;
+  html += '</tbody></table>'; document.getElementById('tableBox').innerHTML = html;
 }
-let cached = null;
-async function load() {
-  const res = await fetch(`results.json?ts=${Date.now()}`);
-  cached = await res.json();
-  document.getElementById("meta").textContent = `Обновлено: ${cached.generated_at}`;
-  render(sel.value || DIVS[0], cached.divisions[sel.value || DIVS[0]]);
+function renderHeats(){
+  const divId = divSel.value; const wodId = wodSel.value; const heats = cache.heats?.[wodId]?.divisions?.[divId] || [];
+  let html = `<h3>${safe(cache.heats?.[wodId]?.title || wodId)} — заходы</h3>`;
+  heats.forEach(h => {
+    html += `<div><strong>Заход ${h.heat}</strong>`;
+    (h.assignments||[]).forEach(a => { const flag = a.flag ? `<img class="flag" src="${a.flag}" />` : ''; html += `<div class="lane"><div>${a.lane}</div><div>${flag}${safe(a.full_name)}</div></div>`; });
+    html += `</div><hr/>`;
+  });
+  document.getElementById('heatsBox').innerHTML = html || 'Нет заходов';
 }
-sel.addEventListener("change", () => { if (cached) render(sel.value, cached.divisions[sel.value]); });
-sel.value = DIVS[0];
-load();
-setInterval(load, 5000);
+async function load(){
+  const res = await fetch(`results.json?ts=${Date.now()}`); cache = await res.json();
+  document.getElementById('meta').textContent = `Обновлено: ${cache.generated_at}`;
+  renderTable(); renderHeats();
+}
+divSel.onchange = () => { if(cache){ renderTable(); renderHeats(); } };
+wodSel.onchange = () => { if(cache){ renderHeats(); } };
+load(); setInterval(load, 5000);
 </script>
 </body>
 </html>
