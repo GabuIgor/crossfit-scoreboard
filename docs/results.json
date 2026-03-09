@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T12:45:06.753133+00:00",
+  "generated_at": "2026-03-09T13:25:34.298505+00:00",
   "divisions": {
     "BEGSCAL_F": {
       "title": "BEG/SCAL — Women",
@@ -1148,6 +1148,74 @@
               }
             ]
           }
+        ],
+        "BEGSCAL_F": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 7,
+                "full_name": "Авакова Кристина",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 4,
+                "full_name": "Воронкина Влада",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 6,
+                "full_name": "Жегулева Ксения",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 9,
+                "full_name": "Лукьяненко Виктория",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 11,
+                "full_name": "Мелкумова Яна",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 5,
+                "full_name": "Постникова Юлия",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 10,
+                "full_name": "Тедеева Моника",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
         ]
       }
     },
@@ -1303,12 +1371,149 @@
               }
             ]
           }
+        ],
+        "BEGSCAL_F": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 11,
+                "full_name": "Мелкумова Яна",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 10,
+                "full_name": "Тедеева Моника",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 6,
+                "full_name": "Жегулева Ксения",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 5,
+                "full_name": "Постникова Юлия",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 4,
+                "full_name": "Воронкина Влада",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 9,
+                "full_name": "Лукьяненко Виктория",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 7,
+                "full_name": "Авакова Кристина",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
         ]
       }
     },
     "WOD3": {
       "title": "Комплекс 3",
-      "divisions": {}
+      "divisions": {
+        "BEGSCAL_F": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 11,
+                "full_name": "Мелкумова Яна",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 10,
+                "full_name": "Тедеева Моника",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 9,
+                "full_name": "Лукьяненко Виктория",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 5,
+                "full_name": "Постникова Юлия",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 7,
+                "full_name": "Авакова Кристина",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 6,
+                "full_name": "Жегулева Ксения",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 4,
+                "full_name": "Воронкина Влада",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
+        ]
+      }
     }
   }
 }
