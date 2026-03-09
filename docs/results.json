@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-02-27T11:53:40.324587+00:00",
+  "generated_at": "2026-03-09T12:10:54.032262+00:00",
   "divisions": {
     "BEGSCAL_F": {
-      "title": "Beginners/Scaled — Women",
+      "title": "BEG/SCAL — Women",
       "rows": [
         {
           "id": 4,
@@ -19,28 +19,32 @@
               "result": {
                 "status": "ok",
                 "value": 70.0
-              }
+              },
+              "display_result": "70"
             },
             "WOD2A": {
               "points": 100.0,
               "result": {
                 "status": "ok",
                 "value": 58
-              }
+              },
+              "display_result": "58"
             },
             "WOD2B": {
               "points": 100.0,
               "result": {
                 "status": "ok",
                 "value": 171
-              }
+              },
+              "display_result": "171"
             },
             "WOD3": {
               "points": 85.71,
               "result": {
                 "status": "ok",
                 "value": 385
-              }
+              },
+              "display_result": "6:25"
             }
           },
           "total": 357.14
@@ -60,28 +64,32 @@
               "result": {
                 "status": "ok",
                 "value": 65.0
-              }
+              },
+              "display_result": "65"
             },
             "WOD2A": {
               "points": 100.0,
               "result": {
                 "status": "ok",
                 "value": 58
-              }
+              },
+              "display_result": "58"
             },
             "WOD2B": {
               "points": 100.0,
               "result": {
                 "status": "ok",
                 "value": 171
-              }
+              },
+              "display_result": "171"
             },
             "WOD3": {
               "points": 71.43,
               "result": {
                 "status": "ok",
                 "value": 423
-              }
+              },
+              "display_result": "7:03"
             }
           },
           "total": 314.29
@@ -101,28 +109,32 @@
               "result": {
                 "status": "ok",
                 "value": 70.0
-              }
+              },
+              "display_result": "70"
             },
             "WOD2A": {
               "points": 57.14,
               "result": {
                 "status": "ok",
                 "value": 48
-              }
+              },
+              "display_result": "48"
             },
             "WOD2B": {
               "points": 71.43,
               "result": {
                 "status": "ok",
                 "value": 167
-              }
+              },
+              "display_result": "167"
             },
             "WOD3": {
               "points": 100.0,
               "result": {
                 "status": "ok",
                 "value": 362
-              }
+              },
+              "display_result": "6:02"
             }
           },
           "total": 300.0
@@ -142,28 +154,32 @@
               "result": {
                 "status": "ok",
                 "value": 90.0
-              }
+              },
+              "display_result": "90"
             },
             "WOD2A": {
               "points": 71.43,
               "result": {
                 "status": "ok",
                 "value": 49
-              }
+              },
+              "display_result": "49"
             },
             "WOD2B": {
               "points": 42.86,
               "result": {
                 "status": "ok",
                 "value": 153
-              }
+              },
+              "display_result": "153"
             },
             "WOD3": {
               "points": 42.86,
               "result": {
                 "status": "ok",
                 "value": 436
-              }
+              },
+              "display_result": "7:16"
             }
           },
           "total": 257.15
@@ -183,28 +199,32 @@
               "result": {
                 "status": "ok",
                 "value": 85.0
-              }
+              },
+              "display_result": "85"
             },
             "WOD2A": {
               "points": 42.86,
               "result": {
                 "status": "ok",
                 "value": 47
-              }
+              },
+              "display_result": "47"
             },
             "WOD2B": {
               "points": 57.14,
               "result": {
                 "status": "ok",
                 "value": 163
-              }
+              },
+              "display_result": "163"
             },
             "WOD3": {
               "points": 57.14,
               "result": {
                 "status": "ok",
                 "value": 433
-              }
+              },
+              "display_result": "7:13"
             }
           },
           "total": 242.85
@@ -213,39 +233,43 @@
           "id": 10,
           "full_name": "Тедеева Моника",
           "age": 25,
-          "club": "",
-          "city": "",
+          "club": "QLUKVA",
+          "city": "РСО-А-Владикавказ",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
-          "flag": null,
+          "flag": "flags/athlete_10.png",
           "scores": {
             "WOD1": {
               "points": 42.86,
               "result": {
                 "status": "ok",
                 "value": 65.0
-              }
+              },
+              "display_result": "65"
             },
             "WOD2A": {
               "points": 14.29,
               "result": {
                 "status": "ok",
                 "value": 40
-              }
+              },
+              "display_result": "40"
             },
             "WOD2B": {
               "points": 28.57,
               "result": {
                 "status": "ok",
                 "value": 126
-              }
+              },
+              "display_result": "126"
             },
             "WOD3": {
               "points": 14.29,
               "result": {
                 "status": "capped",
                 "value": 148
-              }
+              },
+              "display_result": "CAP 148 reps"
             }
           },
           "total": 100.01
@@ -265,28 +289,32 @@
               "result": {
                 "status": "ok",
                 "value": 55.0
-              }
+              },
+              "display_result": "55"
             },
             "WOD2A": {
               "points": 28.57,
               "result": {
                 "status": "ok",
                 "value": 43
-              }
+              },
+              "display_result": "43"
             },
             "WOD2B": {
               "points": 14.29,
               "result": {
                 "status": "ok",
                 "value": 121
-              }
+              },
+              "display_result": "121"
             },
             "WOD3": {
               "points": 28.57,
               "result": {
                 "status": "ok",
                 "value": 553
-              }
+              },
+              "display_result": "9:13"
             }
           },
           "total": 85.72
@@ -294,7 +322,7 @@
       ]
     },
     "BEGSCAL_M": {
-      "title": "Beginners/Scaled — Men",
+      "title": "BEG/SCAL — Men",
       "rows": []
     },
     "INT_F": {
