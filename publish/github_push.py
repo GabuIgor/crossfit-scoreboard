@@ -42,7 +42,7 @@ def main():
     build_all()
 
     print("=== GIT ADD ===")
-    run([git, "add", "docs/results.json", "docs/flags", "docs/index.html", "docs/mobile.html"])
+    run([git, "add", "-A", "docs"])
 
     print("=== GIT STATUS ===")
     status = run([git, "status", "--porcelain"], check=False)
