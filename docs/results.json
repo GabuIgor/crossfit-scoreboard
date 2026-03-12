@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T13:51:03.367883+00:00",
+  "generated_at": "2026-03-12T16:01:39.702404+00:00",
   "divisions": {
     "BEGSCAL_F": {
       "title": "Beginners/Scaled — Women",
@@ -1008,82 +1008,8 @@
             "assignments": [
               {
                 "lane": 1,
-                "athlete_id": 13,
-                "full_name": "Индиго Гиго",
-                "club": "",
-                "city": "",
-                "flag": null
-              },
-              {
-                "lane": 2,
-                "athlete_id": 18,
-                "full_name": "ввввясвясяч",
-                "club": "",
-                "city": "",
-                "flag": null
-              },
-              {
-                "lane": 3,
-                "athlete_id": 17,
-                "full_name": "йцуйцйййй",
-                "club": "",
-                "city": "",
-                "flag": null
-              },
-              {
-                "lane": 4,
-                "athlete_id": 20,
-                "full_name": "ясячсячсяч",
-                "club": "",
-                "city": "",
-                "flag": null
-              }
-            ]
-          },
-          {
-            "heat": 2,
-            "assignments": [
-              {
-                "lane": 1,
-                "athlete_id": 26,
-                "full_name": "сячсфвы",
-                "club": "",
-                "city": "",
-                "flag": null
-              },
-              {
-                "lane": 2,
                 "athlete_id": 16,
                 "full_name": "фыввфв",
-                "club": "",
-                "city": "",
-                "flag": null
-              },
-              {
-                "lane": 3,
-                "athlete_id": 25,
-                "full_name": "фывйвая",
-                "club": "",
-                "city": "",
-                "flag": null
-              },
-              {
-                "lane": 4,
-                "athlete_id": 15,
-                "full_name": "ццйвцв",
-                "club": "",
-                "city": "",
-                "flag": null
-              }
-            ]
-          },
-          {
-            "heat": 3,
-            "assignments": [
-              {
-                "lane": 1,
-                "athlete_id": 19,
-                "full_name": "ывфвячс",
                 "club": "",
                 "city": "",
                 "flag": null
@@ -1098,16 +1024,16 @@
               },
               {
                 "lane": 3,
-                "athlete_id": 23,
-                "full_name": "ясчячсячсячс",
+                "athlete_id": 20,
+                "full_name": "ясячсячсяч",
                 "club": "",
                 "city": "",
                 "flag": null
               },
               {
                 "lane": 4,
-                "athlete_id": 24,
-                "full_name": "ясячсячсчя",
+                "athlete_id": 27,
+                "full_name": "ячсвыявчс",
                 "club": "",
                 "city": "",
                 "flag": null
@@ -1115,20 +1041,57 @@
             ]
           },
           {
-            "heat": 4,
+            "heat": 2,
             "assignments": [
               {
                 "lane": 1,
-                "athlete_id": 12,
-                "full_name": "Санек Сашок",
-                "club": "Urban",
-                "city": "Волгоград",
+                "athlete_id": 19,
+                "full_name": "ывфвячс",
+                "club": "",
+                "city": "",
                 "flag": null
               },
               {
                 "lane": 2,
-                "athlete_id": 27,
-                "full_name": "ячсвыявчс",
+                "athlete_id": 17,
+                "full_name": "йцуйцйййй",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 26,
+                "full_name": "сячсфвы",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 23,
+                "full_name": "ясчячсячсячс",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 3,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 18,
+                "full_name": "ввввясвясяч",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 25,
+                "full_name": "фывйвая",
                 "club": "",
                 "city": "",
                 "flag": null
@@ -1143,8 +1106,45 @@
               },
               {
                 "lane": 4,
+                "athlete_id": 12,
+                "full_name": "Санек Сашок",
+                "club": "Urban",
+                "city": "Волгоград",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 4,
+            "assignments": [
+              {
+                "lane": 1,
                 "athlete_id": 21,
                 "full_name": "ячсчясяя",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 24,
+                "full_name": "ясячсячсчя",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 15,
+                "full_name": "ццйвцв",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 13,
+                "full_name": "Индиго Гиго",
                 "club": "",
                 "city": "",
                 "flag": null
@@ -1152,7 +1152,79 @@
             ]
           }
         ],
-        "BEGSCAL_F": []
+        "BEGSCAL_F": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 4,
+                "full_name": "Воронкина Влада",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 9,
+                "full_name": "Лукьяненко Виктория",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 5,
+                "full_name": "Постникова Юлия",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 10,
+                "full_name": "Тедеева Моника",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 7,
+                "full_name": "Авакова Кристина",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 6,
+                "full_name": "Жегулева Ксения",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 3,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": null,
+                "full_name": "",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
+        ]
       }
     },
     "WOD2": {
@@ -1307,12 +1379,309 @@
               }
             ]
           }
+        ],
+        "BEGSCAL_F": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 11,
+                "full_name": "Мелкумова Яна",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 6,
+                "full_name": "Жегулева Ксения",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 10,
+                "full_name": "Тедеева Моника",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 4,
+                "full_name": "Воронкина Влада",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 5,
+                "full_name": "Постникова Юлия",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 9,
+                "full_name": "Лукьяненко Виктория",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 3,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 7,
+                "full_name": "Авакова Кристина",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
         ]
       }
     },
     "WOD3": {
       "title": "Комплекс 3",
-      "divisions": {}
+      "divisions": {
+        "INT_M": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 16,
+                "full_name": "фыввфв",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 17,
+                "full_name": "йцуйцйййй",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 19,
+                "full_name": "ывфвячс",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 15,
+                "full_name": "ццйвцв",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 18,
+                "full_name": "ввввясвясяч",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 22,
+                "full_name": "ячсммаымв",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 27,
+                "full_name": "ячсвыявчс",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 13,
+                "full_name": "Индиго Гиго",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 3,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 12,
+                "full_name": "Санек Сашок",
+                "club": "Urban",
+                "city": "Волгоград",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 20,
+                "full_name": "ясячсячсяч",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 24,
+                "full_name": "ясячсячсчя",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 28,
+                "full_name": "ыфвфычс",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 4,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 21,
+                "full_name": "ячсчясяя",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 26,
+                "full_name": "сячсфвы",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 23,
+                "full_name": "ясчячсячсячс",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 25,
+                "full_name": "фывйвая",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
+        ],
+        "BEGSCAL_F": [
+          {
+            "heat": 1,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 11,
+                "full_name": "Мелкумова Яна",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 10,
+                "full_name": "Тедеева Моника",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 3,
+                "athlete_id": 9,
+                "full_name": "Лукьяненко Виктория",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 4,
+                "athlete_id": 5,
+                "full_name": "Постникова Юлия",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 2,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 7,
+                "full_name": "Авакова Кристина",
+                "club": "",
+                "city": "",
+                "flag": null
+              },
+              {
+                "lane": 2,
+                "athlete_id": 6,
+                "full_name": "Жегулева Ксения",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          },
+          {
+            "heat": 3,
+            "assignments": [
+              {
+                "lane": 1,
+                "athlete_id": 4,
+                "full_name": "Воронкина Влада",
+                "club": "",
+                "city": "",
+                "flag": null
+              }
+            ]
+          }
+        ]
+      }
     },
     "WOD4": {
       "title": "WOD4",
