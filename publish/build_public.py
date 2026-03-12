@@ -2,7 +2,7 @@ import json
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 
 from config import DOCS_DIR, DOCS_RESULTS_FILE, DOCS_FLAGS_DIR, DIVISIONS
 from heats_logic import serialize_heats_for_public
@@ -14,6 +14,35 @@ from utils import display_result_value
 def ensure_docs_dirs() -> None:
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     DOCS_FLAGS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _public_result_text(score_def: Dict[str, Any], result: Optional[Dict[str, Any]]) -> str:
+    if not result:
+        return ""
+
+    status = result.get("status")
+    value = result.get("value")
+
+    if status == "wd":
+        return "WD"
+
+    if status == "capped":
+        pretty = display_result_value(score_def, value)
+        return f"CAP {pretty}" if pretty else "CAP"
+
+    return display_result_value(score_def, value)
+
+
+def _assign_places_by_total(rows: List[Dict[str, Any]]) -> None:
+    place = 0
+    prev_total = None
+
+    for index, row in enumerate(rows, start=1):
+        total = float(row.get("total") or 0.0)
+        if prev_total is None or total != prev_total:
+            place = index
+        row["place"] = place
+        prev_total = total
 
 
 def build_public_payload() -> Dict[str, Any]:
@@ -48,10 +77,10 @@ def build_public_payload() -> Dict[str, Any]:
             key=lambda p: (-total_points_for_athlete(db, int(p["id"])), p.get("full_name", ""))
         )
 
-        for idx, p in enumerate(sorted_participants, start=1):
+        for p in sorted_participants:
             aid = int(p["id"])
             row = {
-                "place": idx,
+                "place": None,
                 "id": aid,
                 "full_name": p.get("full_name", ""),
                 "age": p.get("age", ""),
@@ -65,12 +94,15 @@ def build_public_payload() -> Dict[str, Any]:
             }
             for s in scores:
                 sid = s["id"]
+                raw_result = result_maps[sid].get(aid)
                 row["scores"][sid] = {
                     "points": points_maps[sid].get(aid),
-                    "result": result_maps[sid].get(aid),
-                    "result_text": display_result_value(s, result_maps[sid].get(aid)),
+                    "result": raw_result,
+                    "result_text": _public_result_text(s, raw_result),
                 }
             rows.append(row)
+
+        _assign_places_by_total(rows)
 
         payload["divisions"][div_id] = {
             "title": d["title"],

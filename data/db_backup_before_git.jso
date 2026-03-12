@@ -1,0 +1,1016 @@
+{
+  "settings": {
+    "division_limits": {
+      "BEGSCAL_M": 16,
+      "BEGSCAL_F": 7,
+      "INT_M": 16,
+      "INT_F": 8
+    },
+    "scores": [
+      {
+        "id": "WOD1",
+        "title": "Комплекс 1",
+        "type": "weight",
+        "time_cap_enabled": false
+      },
+      {
+        "id": "WOD2A",
+        "title": "Комплекс 2 — Зачёт 1",
+        "type": "reps",
+        "time_cap_enabled": false
+      },
+      {
+        "id": "WOD2B",
+        "title": "Комплекс 2 — Зачёт 2",
+        "type": "reps",
+        "time_cap_enabled": false
+      },
+      {
+        "id": "WOD3",
+        "title": "Комплекс 3",
+        "type": "time",
+        "time_cap_enabled": true
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": 1,
+      "full_name": "Чимоненко Сережа",
+      "sex": "M",
+      "age": 34,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_M",
+      "city": "Владикавказ",
+      "club": "Байрон",
+      "flag_path": "data/flags/athlete_1.png",
+      "deleted": true
+    },
+    {
+      "id": 2,
+      "full_name": "Мязулян Мазуля",
+      "sex": "F",
+      "age": 19,
+      "category": "INT",
+      "division_id": "INT_F",
+      "city": "Чебоксары",
+      "club": "Чунька",
+      "flag_path": null,
+      "deleted": true
+    },
+    {
+      "id": 3,
+      "full_name": "Метиса Салоха",
+      "sex": "F",
+      "age": 19,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "Курск",
+      "club": "Ава",
+      "flag_path": null,
+      "deleted": true
+    },
+    {
+      "id": 4,
+      "full_name": "Воронкина Влада",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 5,
+      "full_name": "Постникова Юлия",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 6,
+      "full_name": "Жегулева Ксения",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 7,
+      "full_name": "Авакова Кристина",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 8,
+      "full_name": "Авакова Кристина",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": true
+    },
+    {
+      "id": 9,
+      "full_name": "Лукьяненко Виктория",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 10,
+      "full_name": "Тедеева Моника",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "РСО-А, Владикавказ",
+      "club": "QLUKVA",
+      "flag_path": "data/flags/athlete_10.png",
+      "deleted": false,
+      "region": ""
+    },
+    {
+      "id": 11,
+      "full_name": "Мелкумова Яна",
+      "sex": "F",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_F",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 12,
+      "full_name": "Санек Сашок",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "Волгоград",
+      "club": "Urban",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 13,
+      "full_name": "Индиго Гиго",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 14,
+      "full_name": "Салун солн",
+      "sex": "M",
+      "age": 25,
+      "category": "BEGSCAL",
+      "division_id": "BEGSCAL_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 15,
+      "full_name": "ццйвцв",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 16,
+      "full_name": "фыввфв",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 17,
+      "full_name": "йцуйцйййй",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 18,
+      "full_name": "ввввясвясяч",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 19,
+      "full_name": "ывфвячс",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 20,
+      "full_name": "ясячсячсяч",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 21,
+      "full_name": "ячсчясяя",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 22,
+      "full_name": "ячсммаымв",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 23,
+      "full_name": "ясчячсячсячс",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 24,
+      "full_name": "ясячсячсчя",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 25,
+      "full_name": "фывйвая",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 26,
+      "full_name": "сячсфвы",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 27,
+      "full_name": "ячсвыявчс",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    },
+    {
+      "id": 28,
+      "full_name": "ыфвфычс",
+      "sex": "M",
+      "age": 25,
+      "category": "INT",
+      "division_id": "INT_M",
+      "city": "",
+      "club": "",
+      "flag_path": null,
+      "deleted": false
+    }
+  ],
+  "results": {
+    "3": {
+      "WOD1": {
+        "status": "ok",
+        "value": 96
+      }
+    },
+    "4": {
+      "WOD1": {
+        "status": "ok",
+        "value": 70.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 58
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 171
+      },
+      "WOD3": {
+        "status": "ok",
+        "value": 385
+      }
+    },
+    "5": {
+      "WOD1": {
+        "status": "ok",
+        "value": 70.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 48
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 167
+      },
+      "WOD3": {
+        "status": "ok",
+        "value": 362
+      }
+    },
+    "6": {
+      "WOD1": {
+        "status": "ok",
+        "value": 65.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 58
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 171
+      },
+      "WOD3": {
+        "status": "ok",
+        "value": 423
+      }
+    },
+    "7": {
+      "WOD1": {
+        "status": "ok",
+        "value": 90.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 49
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 153
+      },
+      "WOD3": {
+        "status": "ok",
+        "value": 436
+      }
+    },
+    "9": {
+      "WOD1": {
+        "status": "ok",
+        "value": 85.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 47
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 163
+      },
+      "WOD3": {
+        "status": "ok",
+        "value": 433
+      }
+    },
+    "10": {
+      "WOD1": {
+        "status": "ok",
+        "value": 65.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 40
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 126
+      },
+      "WOD3": {
+        "status": "capped",
+        "value": 148
+      }
+    },
+    "11": {
+      "WOD1": {
+        "status": "ok",
+        "value": 55.0
+      },
+      "WOD2A": {
+        "status": "ok",
+        "value": 43
+      },
+      "WOD2B": {
+        "status": "ok",
+        "value": 121
+      },
+      "WOD3": {
+        "status": "ok",
+        "value": 553
+      }
+    },
+    "13": {
+      "WOD1": {
+        "status": "ok",
+        "value": 100.0
+      }
+    },
+    "12": {
+      "WOD1": {
+        "status": "ok",
+        "value": 120.0
+      }
+    },
+    "18": {
+      "WOD1": {
+        "status": "ok",
+        "value": 50.0
+      }
+    },
+    "17": {
+      "WOD1": {
+        "status": "ok",
+        "value": 14.0
+      }
+    },
+    "26": {
+      "WOD1": {
+        "status": "ok",
+        "value": 142.0
+      }
+    },
+    "16": {
+      "WOD1": {
+        "status": "ok",
+        "value": 0.0
+      }
+    },
+    "25": {
+      "WOD1": {
+        "status": "ok",
+        "value": 222.0
+      }
+    },
+    "15": {
+      "WOD1": {
+        "status": "ok",
+        "value": 45.0
+      }
+    },
+    "19": {
+      "WOD1": {
+        "status": "ok",
+        "value": 34.0
+      }
+    },
+    "23": {
+      "WOD1": {
+        "status": "ok",
+        "value": 145.0
+      }
+    },
+    "24": {
+      "WOD1": {
+        "status": "ok",
+        "value": 123.0
+      }
+    },
+    "27": {
+      "WOD1": {
+        "status": "ok",
+        "value": 95.0
+      }
+    },
+    "22": {
+      "WOD1": {
+        "status": "ok",
+        "value": 83.0
+      }
+    },
+    "21": {
+      "WOD1": {
+        "status": "ok",
+        "value": 131.0
+      }
+    },
+    "28": {
+      "WOD1": {
+        "status": "ok",
+        "value": 131.0
+      }
+    },
+    "20": {
+      "WOD1": {
+        "status": "ok",
+        "value": 121.0
+      }
+    },
+    "14": {
+      "WOD1": {
+        "status": "ok",
+        "value": 21.0
+      }
+    }
+  },
+  "heats": {
+    "WOD1": {
+      "INT_M": [
+        {
+          "heat": 1,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 16
+            },
+            {
+              "lane": 2,
+              "athlete_id": 28
+            },
+            {
+              "lane": 3,
+              "athlete_id": 20
+            },
+            {
+              "lane": 4,
+              "athlete_id": 27
+            }
+          ]
+        },
+        {
+          "heat": 2,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 19
+            },
+            {
+              "lane": 2,
+              "athlete_id": 17
+            },
+            {
+              "lane": 3,
+              "athlete_id": 26
+            },
+            {
+              "lane": 4,
+              "athlete_id": 23
+            }
+          ]
+        },
+        {
+          "heat": 3,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 18
+            },
+            {
+              "lane": 2,
+              "athlete_id": 25
+            },
+            {
+              "lane": 3,
+              "athlete_id": 22
+            },
+            {
+              "lane": 4,
+              "athlete_id": 12
+            }
+          ]
+        },
+        {
+          "heat": 4,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 21
+            },
+            {
+              "lane": 2,
+              "athlete_id": 24
+            },
+            {
+              "lane": 3,
+              "athlete_id": 15
+            },
+            {
+              "lane": 4,
+              "athlete_id": 13
+            }
+          ]
+        }
+      ],
+      "BEGSCAL_F": [
+        {
+          "heat": 1,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 4
+            },
+            {
+              "lane": 2,
+              "athlete_id": 9
+            },
+            {
+              "lane": 3,
+              "athlete_id": 5
+            },
+            {
+              "lane": 4,
+              "athlete_id": 10
+            }
+          ]
+        },
+        {
+          "heat": 2,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 7
+            },
+            {
+              "lane": 2,
+              "athlete_id": 6
+            }
+          ]
+        },
+        {
+          "heat": 3,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": null
+            }
+          ]
+        }
+      ]
+    },
+    "WOD2": {
+      "INT_M": [
+        {
+          "heat": 1,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 16
+            },
+            {
+              "lane": 2,
+              "athlete_id": 17
+            },
+            {
+              "lane": 3,
+              "athlete_id": 19
+            },
+            {
+              "lane": 4,
+              "athlete_id": 15
+            }
+          ]
+        },
+        {
+          "heat": 2,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 18
+            },
+            {
+              "lane": 2,
+              "athlete_id": 22
+            },
+            {
+              "lane": 3,
+              "athlete_id": 27
+            },
+            {
+              "lane": 4,
+              "athlete_id": 13
+            }
+          ]
+        },
+        {
+          "heat": 3,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 12
+            },
+            {
+              "lane": 2,
+              "athlete_id": 20
+            },
+            {
+              "lane": 3,
+              "athlete_id": 24
+            },
+            {
+              "lane": 4,
+              "athlete_id": 28
+            }
+          ]
+        },
+        {
+          "heat": 4,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 21
+            },
+            {
+              "lane": 2,
+              "athlete_id": 26
+            },
+            {
+              "lane": 3,
+              "athlete_id": 23
+            },
+            {
+              "lane": 4,
+              "athlete_id": 25
+            }
+          ]
+        }
+      ],
+      "BEGSCAL_F": [
+        {
+          "heat": 1,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 11
+            },
+            {
+              "lane": 2,
+              "athlete_id": 6
+            },
+            {
+              "lane": 3,
+              "athlete_id": 10
+            },
+            {
+              "lane": 4,
+              "athlete_id": 4
+            }
+          ]
+        },
+        {
+          "heat": 2,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 5
+            },
+            {
+              "lane": 2,
+              "athlete_id": 9
+            }
+          ]
+        },
+        {
+          "heat": 3,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 7
+            }
+          ]
+        }
+      ]
+    },
+    "WOD3": {
+      "INT_M": [
+        {
+          "heat": 1,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 16
+            },
+            {
+              "lane": 2,
+              "athlete_id": 17
+            },
+            {
+              "lane": 3,
+              "athlete_id": 19
+            },
+            {
+              "lane": 4,
+              "athlete_id": 15
+            }
+          ]
+        },
+        {
+          "heat": 2,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 18
+            },
+            {
+              "lane": 2,
+              "athlete_id": 22
+            },
+            {
+              "lane": 3,
+              "athlete_id": 27
+            },
+            {
+              "lane": 4,
+              "athlete_id": 13
+            }
+          ]
+        },
+        {
+          "heat": 3,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 12
+            },
+            {
+              "lane": 2,
+              "athlete_id": 20
+            },
+            {
+              "lane": 3,
+              "athlete_id": 24
+            },
+            {
+              "lane": 4,
+              "athlete_id": 28
+            }
+          ]
+        },
+        {
+          "heat": 4,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 21
+            },
+            {
+              "lane": 2,
+              "athlete_id": 26
+            },
+            {
+              "lane": 3,
+              "athlete_id": 23
+            },
+            {
+              "lane": 4,
+              "athlete_id": 25
+            }
+          ]
+        }
+      ],
+      "BEGSCAL_F": [
+        {
+          "heat": 1,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 11
+            },
+            {
+              "lane": 2,
+              "athlete_id": 10
+            },
+            {
+              "lane": 3,
+              "athlete_id": 9
+            },
+            {
+              "lane": 4,
+              "athlete_id": 5
+            }
+          ]
+        },
+        {
+          "heat": 2,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 7
+            },
+            {
+              "lane": 2,
+              "athlete_id": 6
+            }
+          ]
+        },
+        {
+          "heat": 3,
+          "assignments": [
+            {
+              "lane": 1,
+              "athlete_id": 4
+            }
+          ]
+        }
+      ]
+    },
+    "WOD4": {}
+  },
+  "meta": {
+    "version": 1
+  }
+}

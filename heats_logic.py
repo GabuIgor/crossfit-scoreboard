@@ -3,68 +3,111 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 
-def serialize_heats_for_public(db: Dict[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
-    """
-    Возвращает заходы в безопасном для public JSON формате.
+def _participant_map(db: Dict[str, Any]) -> Dict[int, Dict[str, Any]]:
+    result: Dict[int, Dict[str, Any]] = {}
+    for p in db.get("participants", []):
+        if p.get("deleted", False):
+            continue
+        try:
+            result[int(p.get("id"))] = p
+        except (TypeError, ValueError):
+            continue
+    return result
 
-    Поддерживает несколько возможных структур в db:
-    - db["heats"] как словарь {score_id: [...]}
-    - db["heats"] как список
-    - отсутствие db["heats"]
+
+def _score_title_map(db: Dict[str, Any]) -> Dict[str, str]:
+    result: Dict[str, str] = {}
+    for s in db.get("settings", {}).get("scores", []):
+        sid = str(s.get("id", "")).strip()
+        if sid:
+            result[sid] = s.get("title") or sid
+    result.setdefault("WOD2", "Комплекс 2")
+    return result
+
+
+def serialize_heats_for_public(db: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    Нормализует heats в public-формат, который ожидают docs/index.html и docs/mobile.html:
+
+    {
+      "WOD1": {
+        "title": "Комплекс 1",
+        "divisions": {
+          "INT_M": [
+            {
+              "heat": 1,
+              "assignments": [
+                {"lane": 1, "athlete_id": 10, "full_name": "...", ...}
+              ]
+            }
+          ]
+        }
+      }
+    }
     """
 
     heats = db.get("heats", {})
+    if not isinstance(heats, dict):
+        return {}
 
-    if isinstance(heats, dict):
-        result: Dict[str, List[Dict[str, Any]]] = {}
+    participants = _participant_map(db)
+    score_titles = _score_title_map(db)
+    public: Dict[str, Dict[str, Any]] = {}
 
-        for workout_id, items in heats.items():
-            if not isinstance(items, list):
-                result[str(workout_id)] = []
-                continue
+    for workout_id, workout_data in heats.items():
+        wid = str(workout_id)
+        workout_public: Dict[str, Any] = {
+            "title": score_titles.get(wid, wid),
+            "divisions": {},
+        }
 
-            normalized: List[Dict[str, Any]] = []
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
+        if not isinstance(workout_data, dict):
+            public[wid] = workout_public
+            continue
 
-                normalized.append(
-                    {
-                        "heat": item.get("heat"),
-                        "lane": item.get("lane"),
-                        "athlete_id": item.get("athlete_id"),
-                        "division_id": item.get("division_id"),
-                        "full_name": item.get("full_name"),
-                        "club": item.get("club"),
-                        "city": item.get("city"),
-                        "flag": item.get("flag"),
-                    }
-                )
+        for division_id, division_heats in workout_data.items():
+            div_id = str(division_id)
+            normalized_heats: List[Dict[str, Any]] = []
 
-            result[str(workout_id)] = normalized
+            if isinstance(division_heats, list):
+                for heat in division_heats:
+                    if not isinstance(heat, dict):
+                        continue
 
-        return result
+                    assignments_public: List[Dict[str, Any]] = []
+                    assignments = heat.get("assignments", [])
+                    if isinstance(assignments, list):
+                        for assignment in assignments:
+                            if not isinstance(assignment, dict):
+                                continue
 
-    if isinstance(heats, list):
-        normalized_list: List[Dict[str, Any]] = []
-        for item in heats:
-            if not isinstance(item, dict):
-                continue
+                            athlete_id = assignment.get("athlete_id")
+                            try:
+                                athlete_key = int(athlete_id)
+                            except (TypeError, ValueError):
+                                athlete_key = None
 
-            normalized_list.append(
-                {
-                    "heat": item.get("heat"),
-                    "lane": item.get("lane"),
-                    "athlete_id": item.get("athlete_id"),
-                    "division_id": item.get("division_id"),
-                    "full_name": item.get("full_name"),
-                    "club": item.get("club"),
-                    "city": item.get("city"),
-                    "flag": item.get("flag"),
-                    "score_id": item.get("score_id"),
-                }
-            )
+                            participant = participants.get(athlete_key) if athlete_key is not None else {}
+                            assignments_public.append(
+                                {
+                                    "lane": assignment.get("lane"),
+                                    "athlete_id": athlete_key,
+                                    "full_name": participant.get("full_name", ""),
+                                    "club": participant.get("club", ""),
+                                    "city": participant.get("city", ""),
+                                    "flag": f"flags/athlete_{athlete_key}.png" if participant.get("flag_path") and athlete_key is not None else None,
+                                }
+                            )
 
-        return {"items": normalized_list}
+                    normalized_heats.append(
+                        {
+                            "heat": heat.get("heat"),
+                            "assignments": assignments_public,
+                        }
+                    )
 
-    return {}
+            workout_public["divisions"][div_id] = normalized_heats
+
+        public[wid] = workout_public
+
+    return public

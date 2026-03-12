@@ -6,3 +6,6 @@ __pycache__/
 data/db.json
 data/flags/
 public/flags/
+public/
+*.zip
+docs/flags/
