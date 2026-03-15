@@ -16,237 +16,57 @@
       --shadow: 0 8px 24px rgba(16, 19, 26, 0.06);
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow: hidden;
-    }
-    .page {
-      height: 100vh;
-      padding: 10px;
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      gap: 8px;
-    }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-    .title {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-    .meta {
-      color: var(--muted);
-      font-size: 10px;
-      white-space: nowrap;
-    }
-    .scene-indicator {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: #d6dbe5;
-      transition: all .25s ease;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+    .page { height: 100vh; padding: 10px; display: grid; grid-template-rows: auto auto 1fr; gap: 8px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .title { font-size: 22px; font-weight: 700; letter-spacing: 0.02em; }
+    .meta { color: var(--muted); font-size: 10px; white-space: nowrap; }
+    .scene-indicator { display: flex; gap: 8px; align-items: center; }
+    .dot { width: 10px; height: 10px; border-radius: 999px; background: #d6dbe5; transition: all .25s ease; }
     .dot.active { background: #111827; transform: scale(1.12); }
-
-    .scene {
-      display: none;
-      height: 100%;
-      animation: fadein .35s ease;
-    }
+    .scene { display: none; height: 100%; animation: fadein .35s ease; }
     .scene.active { display: block; }
-    @keyframes fadein {
-      from { opacity: 0.18; }
-      to { opacity: 1; }
-    }
-
-    .scene-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 6px;
-    }
-    .scene-header h2 {
-      margin: 0;
-      font-size: 18px;
-    }
-    .scene-sub {
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .two-col {
-      height: calc(100% - 28px);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-    .card-head {
-      padding: 8px 10px 7px;
-      border-bottom: 1px solid var(--line);
-      background: #fff;
-    }
-    .card-head h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-    .card-head .caption {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 11px;
-    }
-    th, td {
-      border-bottom: 1px solid var(--line);
-      padding: 4px 6px;
-      vertical-align: top;
-    }
-    th {
-      background: #fff;
-      text-align: left;
-      font-size: 10px;
-      color: var(--muted);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-    .table-wrap {
-      overflow: hidden;
-      min-height: 0;
-      flex: 1;
-    }
-    .score-table tbody tr:last-child td,
-    .heat-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    .col-place { width: 42px; text-align: center; }
+    @keyframes fadein { from { opacity: 0.18; } to { opacity: 1; } }
+    .scene-header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+    .scene-header h2 { margin: 0; font-size: 18px; }
+    .scene-sub { color: var(--muted); font-size: 10px; }
+    .two-col { height: calc(100% - 28px); display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+    .card-head { padding: 8px 10px 7px; border-bottom: 1px solid var(--line); background: #fff; }
+    .card-head h3 { margin: 0; font-size: 16px; }
+    .card-head .caption { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 4px 6px; vertical-align: top; }
+    th { background: #fff; text-align: left; font-size: 10px; color: var(--muted); position: sticky; top: 0; z-index: 1; }
+    .table-wrap { overflow: hidden; min-height: 0; flex: 1; }
+    .score-table tbody tr:last-child td, .heat-table tbody tr:last-child td, .team-table tbody tr:last-child td { border-bottom: none; }
+    .col-place { width: 54px; text-align: center; }
     .col-athlete { width: auto; }
     .col-score, .col-total { width: 64px; text-align: center; }
-    th.points, td.points {
-      background: var(--accent);
-    }
-    td.total-points, th.total-points {
-      background: var(--accent-strong);
-      font-weight: 700;
-    }
-    .athlete-line {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.15;
-    }
-    .athlete-meta {
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.25;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .flag {
-      width: 18px;
-      height: 12px;
-      object-fit: cover;
-      border: 1px solid #d5d9e2;
-      border-radius: 3px;
-      flex: 0 0 auto;
-    }
-    .score-main {
-      font-weight: 700;
-      font-size: 10px;
-      line-height: 1.1;
-    }
-    .score-sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.1;
-      min-height: 11px;
-    }
-
-    .heats-layout {
-      height: calc(100% - 28px);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      align-items: start;
-    }
-    .heat-column {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .heat-column-title {
-      font-size: 15px;
-      font-weight: 700;
-      padding: 6px 8px;
-      border-radius: 10px;
-      background: #fff;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-    .heat-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    .heat-card-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      align-items: center;
-      padding: 6px 8px;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-    }
+    .col-team { width: auto; }
+    .col-team-small { width: 68px; text-align: center; }
+    th.points, td.points { background: var(--accent); }
+    td.total-points, th.total-points { background: var(--accent-strong); font-weight: 700; }
+    .athlete-line { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; line-height: 1.15; }
+    .athlete-meta { margin-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .flag { width: 18px; height: 12px; object-fit: cover; border: 1px solid #d5d9e2; border-radius: 3px; flex: 0 0 auto; }
+    .score-main { font-weight: 700; font-size: 10px; line-height: 1.1; }
+    .score-sub { margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.1; min-height: 11px; }
+    .note { padding: 6px 10px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--line); background: #fff; }
+    .heats-layout { height: calc(100% - 28px); display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: start; }
+    .heat-column { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .heat-column-title { font-size: 15px; font-weight: 700; padding: 6px 8px; border-radius: 10px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .heat-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+    .heat-card-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 8px; background: #fff; border-bottom: 1px solid var(--line); }
     .heat-card-head strong { font-size: 16px; }
     .heat-card-head span { color: var(--muted); font-size: 12px; }
     .heat-table { font-size: 12px; }
     .lane-col { width: 42px; text-align: center; font-weight: 700; }
-    .empty {
-      color: var(--muted);
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      border: 1px dashed var(--line);
-      border-radius: 12px;
-      background: #fff;
-    }
+    .empty { color: var(--muted); font-size: 16px; display: flex; align-items: center; justify-content: center; height: 100%; border: 1px dashed var(--line); border-radius: 12px; background: #fff; }
+    .breakdown-list { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+    .breakdown-item { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 6px 8px; }
+    .breakdown-item strong { font-size: 13px; }
+    .breakdown-item .meta2 { margin-top: 3px; font-size: 10px; color: var(--muted); line-height: 1.2; }
   </style>
 </head>
 <body>
@@ -257,11 +77,12 @@
     </div>
     <div class="topbar">
       <div class="scene-indicator" id="sceneIndicator"></div>
-      <div class="meta" id="sceneMeta">Экран 1 из 3</div>
+      <div class="meta" id="sceneMeta">Экран 1 из 4</div>
     </div>
 
     <section class="scene active" id="scene-begscal"></section>
     <section class="scene" id="scene-int"></section>
+    <section class="scene" id="scene-teams"></section>
     <section class="scene" id="scene-heats"></section>
   </div>
 
@@ -269,9 +90,10 @@
 const SCENE_DURATION_MS = 10000;
 const DATA_REFRESH_MS = 5000;
 const SCENES = [
-  { id: 'scene-begscal', label: 'BEG/SCAL', divs: ['BEGSCAL_F', 'BEGSCAL_M'] },
-  { id: 'scene-int', label: 'Intermediate', divs: ['INT_F', 'INT_M'] },
-  { id: 'scene-heats', label: 'Заходы', divs: ['BEGSCAL_F', 'BEGSCAL_M', 'INT_F', 'INT_M'] },
+  { id: 'scene-begscal', label: 'BEG/SCAL' },
+  { id: 'scene-int', label: 'Intermediate' },
+  { id: 'scene-teams', label: 'Команды' },
+  { id: 'scene-heats', label: 'Заходы' },
 ];
 const DIV_SHORT = {
   BEGSCAL_F: 'BEG/SCAL — Women',
@@ -287,23 +109,22 @@ function fmt(v) {
   if (v === null || v === undefined || v === '') return '—';
   return (typeof v === 'number') ? String(Number(v.toFixed ? v.toFixed(2) : v)).replace(/\.00$/, '') : String(v);
 }
-function metaLine(parts) {
-  return parts.filter(Boolean).join(' · ');
-}
+function metaLine(parts) { return parts.filter(Boolean).join(' · '); }
 function athleteCell(r) {
   const flag = r.flag ? `<img class="flag" src="${r.flag}" alt="flag" />` : '';
-  const meta = metaLine([r.age ? `${r.age}` : '', r.club || '', r.city || '']);
+  const meta = metaLine([r.age ? `${r.age}` : '', r.club || '', r.city || '', r.team_name && r.team_name !== '--' ? r.team_name : '']);
   return `<div class="athlete-line"><span>${safe(r.full_name)}</span>${flag}</div><div class="athlete-meta">${safe(meta)}</div>`;
 }
 function scoreCell(scoreObj) {
   return `<div class="score-main">${fmt(scoreObj?.points)}</div><div class="score-sub">${safe(scoreObj?.result_text || '')}</div>`;
 }
-function renderDivisionTable(divId, div) {
+function renderDivisionTable(div) {
+  const note = cache?.tie_break_mode === 'priority_score' ? `ПР — место определено по приоритетному комплексу (${safe(cache?.priority_score_id)})` : 'Одинаковые суммы остаются на одинаковом месте';
   return `
     <div class="card">
       <div class="card-head">
         <h3>${safe(div.title)}</h3>
-        <div class="caption">Флаг · возраст · клуб · город</div>
+        <div class="caption">Флаг · возраст · клуб · город · команда</div>
       </div>
       <div class="table-wrap">
         <table class="score-table">
@@ -321,7 +142,7 @@ function renderDivisionTable(divId, div) {
           <tbody>
             ${(div.rows || []).map(r => `
               <tr>
-                <td class="col-place">${fmt(r.place)}</td>
+                <td class="col-place">${safe(r.place_label || fmt(r.place))}</td>
                 <td class="col-athlete">${athleteCell(r)}</td>
                 <td class="col-score points">${scoreCell(r.scores?.WOD1)}</td>
                 <td class="col-score points">${scoreCell(r.scores?.WOD2A)}</td>
@@ -333,13 +154,12 @@ function renderDivisionTable(divId, div) {
           </tbody>
         </table>
       </div>
+      <div class="note">${note}</div>
     </div>`;
 }
 function renderSceneTables(sceneId, sceneTitle, divIds) {
   const root = document.getElementById(sceneId);
-  const cards = divIds
-    .map(divId => cache?.divisions?.[divId] ? renderDivisionTable(divId, cache.divisions[divId]) : '')
-    .join('');
+  const cards = divIds.map(divId => cache?.divisions?.[divId] ? renderDivisionTable(cache.divisions[divId]) : '').join('');
   root.innerHTML = `
     <div class="scene-header">
       <h2>${sceneTitle}</h2>
@@ -347,17 +167,74 @@ function renderSceneTables(sceneId, sceneTitle, divIds) {
     </div>
     <div class="two-col">${cards || '<div class="empty">Нет данных</div>'}</div>`;
 }
+function renderTeamsScene() {
+  const root = document.getElementById('scene-teams');
+  const rows = cache?.teams?.rows || [];
+  const left = `
+    <div class="card">
+      <div class="card-head">
+        <h3>Командный рейтинг</h3>
+        <div class="caption">Общий зачёт по всем категориям</div>
+      </div>
+      <div class="table-wrap">
+        <table class="team-table">
+          <thead>
+            <tr>
+              <th class="col-place">#</th>
+              <th class="col-team">Команда</th>
+              <th class="col-team-small points">Очки</th>
+              <th class="col-team-small points">Участ.</th>
+              <th class="col-team-small points">1х</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td class="col-place">${fmt(r.place)}</td>
+                <td class="col-team"><div class="athlete-line"><span>${safe(r.team_name)}</span></div><div class="athlete-meta">${fmt(r.contributors)} зачётных результата</div></td>
+                <td class="col-team-small points"><div class="score-main">${fmt(r.points)}</div></td>
+                <td class="col-team-small points"><div class="score-main">${fmt(r.participants_count)}</div></td>
+                <td class="col-team-small points"><div class="score-main">${fmt(r.first_places)}</div></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="note">При равенстве очков выше команда с меньшим составом, затем по числу 1 мест и результатам приоритетного комплекса.</div>
+    </div>`;
+
+  const right = `
+    <div class="card">
+      <div class="card-head">
+        <h3>Кто принёс очки</h3>
+        <div class="caption">Расшифровка командного зачёта</div>
+      </div>
+      <div class="table-wrap breakdown-list">
+        ${rows.map(team => {
+          const top = (team.breakdown || []).slice(0, 4);
+          const body = top.length
+            ? top.map(item => `<div class="breakdown-item"><strong>${safe(team.team_name)}</strong><div class="meta2">${safe(item.full_name)} · ${safe(item.division_title)} · место ${safe(item.place_label)} · +${fmt(item.awarded_points)} очк.</div></div>`).join('')
+            : `<div class="breakdown-item"><strong>${safe(team.team_name)}</strong><div class="meta2">Пока без зачётных баллов</div></div>`;
+          return body;
+        }).join('')}
+      </div>
+      <div class="note">ПР — место определено через приоритетный комплекс при равенстве суммы очков.</div>
+    </div>`;
+
+  root.innerHTML = `
+    <div class="scene-header">
+      <h2>Командный зачёт</h2>
+      <div class="scene-sub">Текущий рейтинг и вклад атлетов</div>
+    </div>
+    <div class="two-col">${left}${right}</div>`;
+}
 function heatAthleteCell(a) {
   const flag = a.flag ? `<img class="flag" src="${a.flag}" alt="flag" />` : '';
   const meta = metaLine([a.club || '', a.city || '']);
   return `<div class="athlete-line"><span>${safe(a.full_name)}</span>${flag}</div><div class="athlete-meta">${safe(meta)}</div>`;
 }
 function buildWorkoutNameMap() {
-  return {
-    WOD1: cache?.heats?.WOD1?.title || 'Комплекс 1',
-    WOD2: cache?.heats?.WOD2?.title || 'Комплекс 2',
-    WOD3: cache?.heats?.WOD3?.title || 'Комплекс 3'
-  };
+  return { WOD1: cache?.heats?.WOD1?.title || 'Комплекс 1', WOD2: cache?.heats?.WOD2?.title || 'Комплекс 2', WOD3: cache?.heats?.WOD3?.title || 'Комплекс 3' };
 }
 function renderHeatsScene() {
   const root = document.getElementById('scene-heats');
@@ -371,53 +248,31 @@ function renderHeatsScene() {
             <strong>${workoutNames[workoutId]} · Заход ${fmt(h.heat)}</strong>
             <span>${safe(DIV_SHORT[divId])}</span>
           </div>
-          <table class="heat-table">
-            <tbody>
-              ${(h.assignments || []).map(a => `
-                <tr>
-                  <td class="lane-col">${fmt(a.lane)}</td>
-                  <td>${heatAthleteCell(a)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+          <table class="heat-table"><tbody>
+            ${(h.assignments || []).map(a => `<tr><td class="lane-col">${fmt(a.lane)}</td><td>${heatAthleteCell(a)}</td></tr>`).join('')}
+          </tbody></table>
         </div>`);
     }).join('');
-
-    return `
-      <div class="heat-column">
-        <div class="heat-column-title">${safe(DIV_SHORT[divId])}</div>
-        ${cards || '<div class="empty">Заходы ещё не сформированы</div>'}
-      </div>`;
+    return `<div class="heat-column"><div class="heat-column-title">${safe(DIV_SHORT[divId])}</div>${cards || '<div class="empty">Заходы ещё не сформированы</div>'}</div>`;
   }).join('');
-
-  root.innerHTML = `
-    <div class="scene-header">
-      <h2>Заходы</h2>
-      <div class="scene-sub">Все категории и все полы</div>
-    </div>
-    <div class="heats-layout">${columns}</div>`;
+  root.innerHTML = `<div class="scene-header"><h2>Заходы</h2><div class="scene-sub">Все категории и все полы</div></div><div class="heats-layout">${columns}</div>`;
 }
 function renderAll() {
   if (!cache) return;
   document.getElementById('meta').textContent = `Обновлено: ${cache.generated_at}`;
   renderSceneTables('scene-begscal', 'BEG/SCAL', ['BEGSCAL_F', 'BEGSCAL_M']);
   renderSceneTables('scene-int', 'Intermediate', ['INT_F', 'INT_M']);
+  renderTeamsScene();
   renderHeatsScene();
   renderSceneState();
 }
 function renderSceneState() {
-  document.querySelectorAll('.scene').forEach((el, idx) => {
-    el.classList.toggle('active', idx === sceneIndex);
-  });
+  document.querySelectorAll('.scene').forEach((el, idx) => { el.classList.toggle('active', idx === sceneIndex); });
   const indicator = document.getElementById('sceneIndicator');
   indicator.innerHTML = SCENES.map((scene, idx) => `<div class="dot ${idx === sceneIndex ? 'active' : ''}" title="${scene.label}"></div>`).join('');
   document.getElementById('sceneMeta').textContent = `${SCENES[sceneIndex].label} · экран ${sceneIndex + 1} из ${SCENES.length}`;
 }
-function nextScene() {
-  sceneIndex = (sceneIndex + 1) % SCENES.length;
-  renderSceneState();
-}
+function nextScene() { sceneIndex = (sceneIndex + 1) % SCENES.length; renderSceneState(); }
 async function load() {
   const res = await fetch(`results.json?ts=${Date.now()}`);
   cache = await res.json();

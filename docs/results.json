@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-03-15T12:20:04.937949+00:00",
+  "generated_at": "2026-03-15T13:16:18.056049+00:00",
   "divisions": {
     "BEGSCAL_F": {
       "title": "Beginners/Scaled — Women",
       "rows": [
         {
           "place": 1,
+          "place_label": "1",
           "id": 4,
           "full_name": "Воронкина Влада",
           "age": 25,
@@ -13,6 +14,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -48,10 +50,13 @@
               "result_text": "6:25"
             }
           },
-          "total": 357.14
+          "total": 357.14,
+          "priority_place": 1,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 2,
+          "place_label": "2",
           "id": 6,
           "full_name": "Жегулева Ксения",
           "age": 25,
@@ -59,6 +64,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -94,10 +100,13 @@
               "result_text": "7:03"
             }
           },
-          "total": 314.29
+          "total": 314.29,
+          "priority_place": 1,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 3,
+          "place_label": "3",
           "id": 5,
           "full_name": "Постникова Юлия",
           "age": 25,
@@ -105,6 +114,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -140,10 +150,13 @@
               "result_text": "6:02"
             }
           },
-          "total": 300.0
+          "total": 300.0,
+          "priority_place": 3,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 4,
+          "place_label": "4",
           "id": 7,
           "full_name": "Авакова Кристина",
           "age": 25,
@@ -151,6 +164,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -186,10 +200,13 @@
               "result_text": "7:16"
             }
           },
-          "total": 257.15
+          "total": 257.15,
+          "priority_place": 5,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 5,
+          "place_label": "5",
           "id": 9,
           "full_name": "Лукьяненко Виктория",
           "age": 25,
@@ -197,6 +214,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -232,10 +250,13 @@
               "result_text": "7:13"
             }
           },
-          "total": 242.85
+          "total": 242.85,
+          "priority_place": 4,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 6,
+          "place_label": "6",
           "id": 10,
           "full_name": "Тедеева Моника",
           "age": 25,
@@ -243,6 +264,7 @@
           "city": "РСО-А, Владикавказ",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": "flags/athlete_10.png",
           "scores": {
             "WOD1": {
@@ -278,10 +300,13 @@
               "result_text": "CAP 2:28"
             }
           },
-          "total": 100.01
+          "total": 100.01,
+          "priority_place": 6,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 7,
+          "place_label": "7",
           "id": 11,
           "full_name": "Мелкумова Яна",
           "age": 25,
@@ -289,6 +314,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_F",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -324,7 +350,9 @@
               "result_text": "9:13"
             }
           },
-          "total": 85.72
+          "total": 85.72,
+          "priority_place": 7,
+          "priority_tiebreak_applied": false
         }
       ]
     },
@@ -333,6 +361,7 @@
       "rows": [
         {
           "place": 1,
+          "place_label": "1",
           "id": 14,
           "full_name": "Салун солн",
           "age": 25,
@@ -340,6 +369,7 @@
           "city": "",
           "category": "BEGSCAL",
           "division_id": "BEGSCAL_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -366,7 +396,9 @@
               "result_text": ""
             }
           },
-          "total": 100.0
+          "total": 100.0,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         }
       ]
     },
@@ -379,6 +411,7 @@
       "rows": [
         {
           "place": 1,
+          "place_label": "1",
           "id": 25,
           "full_name": "фывйвая",
           "age": 25,
@@ -386,6 +419,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -412,10 +446,13 @@
               "result_text": ""
             }
           },
-          "total": 100.0
+          "total": 100.0,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 2,
+          "place_label": "2",
           "id": 23,
           "full_name": "ясчячсячсячс",
           "age": 25,
@@ -423,6 +460,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -449,10 +487,13 @@
               "result_text": ""
             }
           },
-          "total": 93.75
+          "total": 93.75,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 3,
+          "place_label": "3",
           "id": 26,
           "full_name": "сячсфвы",
           "age": 25,
@@ -460,6 +501,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -486,10 +528,13 @@
               "result_text": ""
             }
           },
-          "total": 87.5
+          "total": 87.5,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 4,
+          "place_label": "4",
           "id": 28,
           "full_name": "ыфвфычс",
           "age": 25,
@@ -497,6 +542,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -523,10 +569,13 @@
               "result_text": ""
             }
           },
-          "total": 81.25
+          "total": 81.25,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 4,
+          "place_label": "4",
           "id": 21,
           "full_name": "ячсчясяя",
           "age": 25,
@@ -534,6 +583,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -560,10 +610,13 @@
               "result_text": ""
             }
           },
-          "total": 81.25
+          "total": 81.25,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 6,
+          "place_label": "6",
           "id": 24,
           "full_name": "ясячсячсчя",
           "age": 25,
@@ -571,6 +624,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -597,10 +651,13 @@
               "result_text": ""
             }
           },
-          "total": 68.75
+          "total": 68.75,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 7,
+          "place_label": "7",
           "id": 20,
           "full_name": "ясячсячсяч",
           "age": 25,
@@ -608,6 +665,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -634,10 +692,13 @@
               "result_text": ""
             }
           },
-          "total": 62.5
+          "total": 62.5,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 8,
+          "place_label": "8",
           "id": 12,
           "full_name": "Санек Сашок",
           "age": 25,
@@ -645,6 +706,7 @@
           "city": "Волгоград",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -671,10 +733,13 @@
               "result_text": ""
             }
           },
-          "total": 56.25
+          "total": 56.25,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 9,
+          "place_label": "9",
           "id": 13,
           "full_name": "Индиго Гиго",
           "age": 25,
@@ -682,6 +747,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -708,10 +774,13 @@
               "result_text": ""
             }
           },
-          "total": 50.0
+          "total": 50.0,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 10,
+          "place_label": "10",
           "id": 27,
           "full_name": "ячсвыявчс",
           "age": 25,
@@ -719,6 +788,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -745,10 +815,13 @@
               "result_text": ""
             }
           },
-          "total": 43.75
+          "total": 43.75,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 11,
+          "place_label": "11",
           "id": 22,
           "full_name": "ячсммаымв",
           "age": 25,
@@ -756,6 +829,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -782,10 +856,13 @@
               "result_text": ""
             }
           },
-          "total": 37.5
+          "total": 37.5,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 12,
+          "place_label": "12",
           "id": 18,
           "full_name": "ввввясвясяч",
           "age": 25,
@@ -793,6 +870,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -819,10 +897,13 @@
               "result_text": ""
             }
           },
-          "total": 31.25
+          "total": 31.25,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 13,
+          "place_label": "13",
           "id": 15,
           "full_name": "ццйвцв",
           "age": 25,
@@ -830,6 +911,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -856,10 +938,13 @@
               "result_text": ""
             }
           },
-          "total": 25.0
+          "total": 25.0,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 14,
+          "place_label": "14",
           "id": 19,
           "full_name": "ывфвячс",
           "age": 25,
@@ -867,6 +952,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -893,10 +979,13 @@
               "result_text": ""
             }
           },
-          "total": 18.75
+          "total": 18.75,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 15,
+          "place_label": "15",
           "id": 17,
           "full_name": "йцуйцйййй",
           "age": 25,
@@ -904,6 +993,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -930,10 +1020,13 @@
               "result_text": ""
             }
           },
-          "total": 12.5
+          "total": 12.5,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         },
         {
           "place": 16,
+          "place_label": "16",
           "id": 16,
           "full_name": "фыввфв",
           "age": 25,
@@ -941,6 +1034,7 @@
           "city": "",
           "category": "INT",
           "division_id": "INT_M",
+          "team_name": "--",
           "flag": null,
           "scores": {
             "WOD1": {
@@ -967,7 +1061,9 @@
               "result_text": ""
             }
           },
-          "total": 6.25
+          "total": 6.25,
+          "priority_place": null,
+          "priority_tiebreak_applied": false
         }
       ]
     }
@@ -998,6 +1094,9 @@
       "time_cap_enabled": true
     }
   ],
+  "tie_break_mode": "priority_score",
+  "priority_score_id": "WOD2B",
+  "priority_score_title": "Комплекс 2 — Зачёт 2",
   "heats": {
     "WOD1": {
       "title": "Комплекс 1",
@@ -1687,5 +1786,21 @@
       "title": "WOD4",
       "divisions": {}
     }
+  },
+  "teams": {
+    "rows": [
+      {
+        "place": 1,
+        "team_id": "team_1",
+        "team_name": "Qlukva",
+        "points": 0,
+        "participants_count": 0,
+        "first_places": 0,
+        "second_places": 0,
+        "third_places": 0,
+        "contributors": 0,
+        "breakdown": []
+      }
+    ]
   }
 }
