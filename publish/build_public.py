@@ -45,8 +45,45 @@ def _assign_places_by_total(rows: List[Dict[str, Any]]) -> None:
         prev_total = total
 
 
-def build_public_payload() -> Dict[str, Any]:
-    db = load_db()
+def _collect_existing_flags(db: Dict[str, Any]) -> Dict[int, Path]:
+    result: Dict[int, Path] = {}
+
+    for p in db.get("participants", []):
+        if p.get("deleted", False):
+            continue
+
+        raw_flag_path = p.get("flag_path")
+        if not raw_flag_path:
+            continue
+
+        src = Path(raw_flag_path)
+        if not src.exists() or not src.is_file():
+            continue
+
+        try:
+            athlete_id = int(p["id"])
+        except Exception:
+            continue
+
+        result[athlete_id] = src
+
+    return result
+
+
+def copy_flags_to_docs(flag_sources: Dict[int, Path]) -> None:
+    ensure_docs_dirs()
+
+    if DOCS_FLAGS_DIR.exists():
+        for f in DOCS_FLAGS_DIR.glob("*"):
+            if f.is_file():
+                f.unlink()
+
+    for athlete_id, src in flag_sources.items():
+        dst = DOCS_FLAGS_DIR / f"athlete_{athlete_id}.png"
+        shutil.copyfile(src, dst)
+
+
+def build_public_payload(db: Dict[str, Any], flag_sources: Dict[int, Path]) -> Dict[str, Any]:
     settings = db["settings"]
     scores = settings["scores"]
 
@@ -66,6 +103,7 @@ def build_public_payload() -> Dict[str, Any]:
 
         points_maps = {}
         result_maps = {}
+
         for s in scores:
             ranking = build_ranking(db, div_id, s["id"])
             points_maps[s["id"]] = {r["athlete_id"]: r.get("points") for r in ranking}
@@ -79,6 +117,8 @@ def build_public_payload() -> Dict[str, Any]:
 
         for p in sorted_participants:
             aid = int(p["id"])
+            flag_rel = f"flags/athlete_{aid}.png" if aid in flag_sources else None
+
             row = {
                 "place": None,
                 "id": aid,
@@ -88,10 +128,11 @@ def build_public_payload() -> Dict[str, Any]:
                 "city": p.get("city", ""),
                 "category": p.get("category", ""),
                 "division_id": div_id,
-                "flag": f"flags/athlete_{aid}.png" if p.get("flag_path") else None,
+                "flag": flag_rel,
                 "scores": {},
                 "total": total_points_for_athlete(db, aid),
             }
+
             for s in scores:
                 sid = s["id"]
                 raw_result = result_maps[sid].get(aid)
@@ -100,6 +141,7 @@ def build_public_payload() -> Dict[str, Any]:
                     "result": raw_result,
                     "result_text": _public_result_text(s, raw_result),
                 }
+
             rows.append(row)
 
         _assign_places_by_total(rows)
@@ -112,26 +154,6 @@ def build_public_payload() -> Dict[str, Any]:
     return payload
 
 
-def copy_flags_to_docs() -> None:
-    ensure_docs_dirs()
-
-    if DOCS_FLAGS_DIR.exists():
-        for f in DOCS_FLAGS_DIR.glob("*"):
-            if f.is_file():
-                f.unlink()
-
-    db = load_db()
-    for p in db.get("participants", []):
-        if p.get("deleted", False) or not p.get("flag_path"):
-            continue
-
-        src = Path(p["flag_path"])
-        if not src.exists():
-            continue
-
-        shutil.copyfile(src, DOCS_FLAGS_DIR / f"athlete_{p['id']}.png")
-
-
 def write_public_results(payload: Dict[str, Any]) -> None:
     ensure_docs_dirs()
     with DOCS_RESULTS_FILE.open("w", encoding="utf-8") as f:
@@ -139,8 +161,10 @@ def write_public_results(payload: Dict[str, Any]) -> None:
 
 
 def build_all() -> None:
-    payload = build_public_payload()
-    copy_flags_to_docs()
+    db = load_db()
+    flag_sources = _collect_existing_flags(db)
+    copy_flags_to_docs(flag_sources)
+    payload = build_public_payload(db, flag_sources)
     write_public_results(payload)
 
 
