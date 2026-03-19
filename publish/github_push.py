@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import subprocess
 import sys
 from datetime import datetime
@@ -35,7 +34,8 @@ def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproce
 
 
 def git(*args: str, check: bool = True) -> subprocess.CompletedProcess:
-    return run(["git", *args], cwd=REPO_ROOT, check=check)
+    git_exe = r"C:\Program Files\Git\cmd\git.EXE"
+    return run([git_exe, *args], cwd=REPO_ROOT, check=check)
 
 
 def python_cmd(*args: str, check: bool = True) -> subprocess.CompletedProcess:
@@ -80,8 +80,7 @@ def ensure_no_in_progress_git_operation(repo_root: Path) -> None:
 
 def get_status_lines() -> list[str]:
     result = git("status", "--porcelain", check=True)
-    lines = [line for line in result.stdout.splitlines() if line.strip()]
-    return lines
+    return [line for line in result.stdout.splitlines() if line.strip()]
 
 
 def split_status_lines(lines: list[str]) -> tuple[list[str], list[str]]:
@@ -127,8 +126,42 @@ def ensure_remote_exists() -> None:
         )
 
 
+def sync_with_remote_before_build() -> None:
+    print("\n=== REMOTE CHECK ===")
+    ensure_remote_exists()
+    git("remote", "get-url", "origin")
+
+    print("\n=== GIT FETCH ===")
+    git("fetch", "origin")
+
+    local_sha = git("rev-parse", "HEAD").stdout.strip()
+    remote_sha = git("rev-parse", "origin/main").stdout.strip()
+    base_sha = git("merge-base", "HEAD", "origin/main").stdout.strip()
+
+    if local_sha == remote_sha:
+        print("Локальная ветка уже синхронизирована с origin/main")
+        return
+
+    if local_sha == base_sha:
+        print("\n=== FAST-FORWARD PULL ===")
+        git("pull", "--ff-only", "origin", "main")
+        return
+
+    if remote_sha == base_sha:
+        raise RuntimeError(
+            "Локальная ветка содержит свои коммиты и опережает origin/main.\n"
+            "Сначала отдельно запушь или синхронизируй рабочие изменения вручную,\n"
+            "а потом запускай publish."
+        )
+
+    raise RuntimeError(
+        "Локальная ветка и origin/main разошлись.\n"
+        "Сначала синхронизируй основной проект вручную, затем повтори publish."
+    )
+
+
 def build_public() -> None:
-    print("=== BUILD ===")
+    print("\n=== BUILD ===")
     python_cmd("-m", "publish.build_public")
 
 
@@ -158,14 +191,7 @@ def commit_docs_if_needed() -> bool:
     return True
 
 
-def sync_with_remote() -> None:
-    print("\n=== REMOTE CHECK ===")
-    ensure_remote_exists()
-    git("remote", "get-url", "origin")
-
-    print("\n=== GIT PULL ===")
-    git("pull", "--rebase", "--autostash", "origin", "main")
-
+def push_docs() -> None:
     print("\n=== GIT PUSH ===")
     git("push", "origin", "main")
 
@@ -175,16 +201,15 @@ def main() -> None:
         ensure_repo_exists()
         ensure_docs_exists()
         ensure_no_in_progress_git_operation(REPO_ROOT)
-
-        # До сборки убеждаемся, что вне docs нет грязных файлов
         ensure_no_non_docs_changes()
 
+        sync_with_remote_before_build()
         build_public()
         stage_docs()
         committed = commit_docs_if_needed()
 
         if committed:
-            sync_with_remote()
+            push_docs()
             print("\nПубликация завершена")
         else:
             print("\nПубликовать нечего")
