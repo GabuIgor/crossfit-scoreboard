@@ -1,17 +1,15 @@
 {
-  "generated_at": "2026-03-19T15:37:24.752771+00:00",
+  "generated_at": "2026-03-19T15:59:18.015774+00:00",
   "divisions": {
     "BEGSCAL_F": {
       "title": "Beginners/Scaled — Women",
       "rows": [
         {
           "place": 1,
-          "place_label": "1",
           "id": 4,
           "full_name": "Воронкина Влада",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -55,12 +53,10 @@
         },
         {
           "place": 2,
-          "place_label": "2",
           "id": 6,
           "full_name": "Жегулева Ксения",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -104,12 +100,10 @@
         },
         {
           "place": 3,
-          "place_label": "3",
           "id": 5,
           "full_name": "Постникова Юлия",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -153,12 +147,10 @@
         },
         {
           "place": 4,
-          "place_label": "4",
           "id": 7,
           "full_name": "Авакова Кристина",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -202,12 +194,10 @@
         },
         {
           "place": 5,
-          "place_label": "5",
           "id": 9,
           "full_name": "Лукьяненко Виктория",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -251,12 +241,10 @@
         },
         {
           "place": 6,
-          "place_label": "6",
           "id": 10,
           "full_name": "Тедеева Моника",
           "age": 25,
           "club": "QLUKVA",
-          "team_name": "QLUKVA",
           "region": "РСО-А, Владикавказ",
           "city": "РСО-А, Владикавказ",
           "category": "BEGSCAL",
@@ -300,12 +288,10 @@
         },
         {
           "place": 7,
-          "place_label": "7",
           "id": 11,
           "full_name": "Мелкумова Яна",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -354,12 +340,10 @@
       "rows": [
         {
           "place": 1,
-          "place_label": "1",
           "id": 14,
           "full_name": "Салун солн",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "BEGSCAL",
@@ -403,12 +387,10 @@
       "rows": [
         {
           "place": 1,
-          "place_label": "1",
           "id": 25,
           "full_name": "фывйвая",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -443,12 +425,10 @@
         },
         {
           "place": 2,
-          "place_label": "2",
           "id": 23,
           "full_name": "ясчячсячсячс",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -483,12 +463,10 @@
         },
         {
           "place": 3,
-          "place_label": "3",
           "id": 26,
           "full_name": "сячсфвы",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -523,12 +501,10 @@
         },
         {
           "place": 4,
-          "place_label": "4",
           "id": 28,
           "full_name": "ыфвфычс",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -563,12 +539,10 @@
         },
         {
           "place": 4,
-          "place_label": "4",
           "id": 21,
           "full_name": "ячсчясяя",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -603,12 +577,10 @@
         },
         {
           "place": 6,
-          "place_label": "6",
           "id": 24,
           "full_name": "ясячсячсчя",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -643,12 +615,10 @@
         },
         {
           "place": 7,
-          "place_label": "7",
           "id": 20,
           "full_name": "ясячсячсяч",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -683,12 +653,10 @@
         },
         {
           "place": 8,
-          "place_label": "8",
           "id": 12,
           "full_name": "Санек Сашок",
           "age": 25,
           "club": "Urban",
-          "team_name": "Urban",
           "region": "Волгоград",
           "city": "Волгоград",
           "category": "INT",
@@ -723,12 +691,10 @@
         },
         {
           "place": 9,
-          "place_label": "9",
           "id": 13,
           "full_name": "Индиго Гиго",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -763,12 +729,10 @@
         },
         {
           "place": 10,
-          "place_label": "10",
           "id": 27,
           "full_name": "ячсвыявчс",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -803,12 +767,10 @@
         },
         {
           "place": 11,
-          "place_label": "11",
           "id": 22,
           "full_name": "ячсммаымв",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -843,12 +805,10 @@
         },
         {
           "place": 12,
-          "place_label": "12",
           "id": 18,
           "full_name": "ввввясвясяч",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -883,12 +843,10 @@
         },
         {
           "place": 13,
-          "place_label": "13",
           "id": 15,
           "full_name": "ццйвцв",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -923,12 +881,10 @@
         },
         {
           "place": 14,
-          "place_label": "14",
           "id": 19,
           "full_name": "ывфвячс",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -963,12 +919,10 @@
         },
         {
           "place": 15,
-          "place_label": "15",
           "id": 17,
           "full_name": "йцуйцйййй",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -1003,12 +957,10 @@
         },
         {
           "place": 16,
-          "place_label": "16",
           "id": 16,
           "full_name": "фыввфв",
           "age": 25,
           "club": "",
-          "team_name": "",
           "region": "",
           "city": "",
           "category": "INT",
@@ -1831,110 +1783,22 @@
   },
   "display": {
     "main": {
-      "section_title_size": 18,
-      "card_title_size": 16,
-      "table_text_size": 11,
-      "meta_text_size": 10,
-      "row_height": 4,
-      "block_gap": 8,
-      "container_scale": 1.0
+      "page_title_font_size": 22,
+      "section_title_font_size": 18,
+      "card_title_font_size": 16,
+      "table_font_size": 11,
+      "athlete_font_size": 13,
+      "meta_font_size": 11,
+      "heat_title_font_size": 16,
+      "heat_text_font_size": 12
     },
     "mobile": {
-      "section_title_size": 22,
-      "card_title_size": 18,
-      "table_text_size": 12,
-      "meta_text_size": 11,
-      "row_height": 6,
-      "block_gap": 12,
-      "container_scale": 1.0
+      "table_font_size": 12,
+      "secondary_font_size": 11,
+      "heat_title_font_size": 16,
+      "heat_text_font_size": 14,
+      "heat_lane_font_size": 13,
+      "heat_card_width": 180
     }
-  },
-  "clubs": {
-    "rows": [
-      {
-        "club_name": "QLUKVA",
-        "team_name": "QLUKVA",
-        "points": 100.01,
-        "participants_count": 1,
-        "contributors": 1,
-        "first_places": 0,
-        "breakdown": [
-          {
-            "athlete_id": 10,
-            "full_name": "Тедеева Моника",
-            "division_id": "BEGSCAL_F",
-            "division_title": "Beginners/Scaled — Women",
-            "place": 6,
-            "place_label": "6",
-            "awarded_points": 100.01
-          }
-        ],
-        "place": 1
-      },
-      {
-        "club_name": "Urban",
-        "team_name": "Urban",
-        "points": 56.25,
-        "participants_count": 1,
-        "contributors": 1,
-        "first_places": 0,
-        "breakdown": [
-          {
-            "athlete_id": 12,
-            "full_name": "Санек Сашок",
-            "division_id": "INT_M",
-            "division_title": "Intermediate — Men",
-            "place": 8,
-            "place_label": "8",
-            "awarded_points": 56.25
-          }
-        ],
-        "place": 2
-      }
-    ]
-  },
-  "teams": {
-    "rows": [
-      {
-        "club_name": "QLUKVA",
-        "team_name": "QLUKVA",
-        "points": 100.01,
-        "participants_count": 1,
-        "contributors": 1,
-        "first_places": 0,
-        "breakdown": [
-          {
-            "athlete_id": 10,
-            "full_name": "Тедеева Моника",
-            "division_id": "BEGSCAL_F",
-            "division_title": "Beginners/Scaled — Women",
-            "place": 6,
-            "place_label": "6",
-            "awarded_points": 100.01
-          }
-        ],
-        "place": 1
-      },
-      {
-        "club_name": "Urban",
-        "team_name": "Urban",
-        "points": 56.25,
-        "participants_count": 1,
-        "contributors": 1,
-        "first_places": 0,
-        "breakdown": [
-          {
-            "athlete_id": 12,
-            "full_name": "Санек Сашок",
-            "division_id": "INT_M",
-            "division_title": "Intermediate — Men",
-            "place": 8,
-            "place_label": "8",
-            "awarded_points": 56.25
-          }
-        ],
-        "place": 2
-      }
-    ]
   }
 }
