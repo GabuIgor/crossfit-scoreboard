@@ -61,17 +61,19 @@
     .score-main { font-weight: 700; font-size: var(--table-text-size); line-height: 1.1; }
     .score-sub { margin-top: 3px; color: var(--muted); font-size: var(--meta-text-size); line-height: 1.1; min-height: 11px; }
     .note { padding: 6px 10px; font-size: var(--meta-text-size); color: var(--muted); border-top: 1px solid var(--line); background: #fff; }
-    .heats-layout { height: calc(100% - 28px); display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--block-gap); align-items: start; }
-    .heat-column { min-width: 0; display: flex; flex-direction: column; gap: max(4px, calc(var(--block-gap) * 0.75)); }
-    .heat-column-title { font-size: calc(var(--card-title-size) - 1px); font-weight: 700; padding: 6px 8px; border-radius: 10px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
-    .heat-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
-    .heat-card-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 8px; background: #fff; border-bottom: 1px solid var(--line); }
-    .heat-card-head strong { font-size: var(--card-title-size); line-height: 1.1; }
-    .heat-card-head span { color: var(--muted); font-size: var(--meta-text-size); }
-    .heat-table { font-size: var(--table-text-size); }
-    .heat-table .athlete-line { font-size: calc(var(--table-text-size) + 1px); }
-    .heat-table .athlete-meta { font-size: var(--meta-text-size); }
-    .lane-col { width: 42px; text-align: center; font-weight: 700; }
+    .heats-layout { height: calc(100% - 28px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: max(4px, calc(var(--block-gap) * 0.9)); align-items: start; }
+    .heat-column { min-width: 0; display: flex; flex-direction: column; gap: max(4px, calc(var(--block-gap) * 0.65)); min-height: 0; }
+    .heat-column-title { font-size: calc(var(--card-title-size) - 1px); font-weight: 700; padding: 5px 8px; border-radius: 10px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .heat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: max(4px, calc(var(--block-gap) * 0.65)); align-content: start; }
+    .heat-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); min-width: 0; }
+    .heat-card-head { display: flex; justify-content: space-between; gap: 6px; align-items: center; padding: 5px 7px; background: #fff; border-bottom: 1px solid var(--line); }
+    .heat-card-head strong { font-size: calc(var(--card-title-size) - 2px); line-height: 1.05; }
+    .heat-card-head span { color: var(--muted); font-size: calc(var(--meta-text-size) - 1px); display: none; }
+    .heat-table { font-size: calc(var(--table-text-size) - 1px); }
+    .heat-table td { padding: max(2px, calc(var(--row-height) - 1px)) 4px; }
+    .heat-table .athlete-line { font-size: var(--table-text-size); }
+    .heat-table .athlete-meta { font-size: calc(var(--meta-text-size) - 1px); }
+    .lane-col { width: 28px; text-align: center; font-weight: 700; }
     .empty { color: var(--muted); font-size: 16px; display: flex; align-items: center; justify-content: center; height: 100%; border: 1px dashed var(--line); border-radius: 12px; background: #fff; }
     .breakdown-list { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
     .breakdown-item { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 6px 8px; }
@@ -246,6 +248,11 @@ function heatAthleteCell(a) {
 function buildWorkoutNameMap() {
   return { WOD1: cache?.heats?.WOD1?.title || 'Комплекс 1', WOD2: cache?.heats?.WOD2?.title || 'Комплекс 2', WOD3: cache?.heats?.WOD3?.title || 'Комплекс 3' };
 }
+function shortWorkoutLabel(workoutId, workoutNames) {
+  const name = safe(workoutNames[workoutId] || workoutId);
+  const match = name.match(/(\d+)/);
+  return match ? `К${match[1]}` : name;
+}
 function renderHeatsScene() {
   const root = document.getElementById('scene-heats');
   const workoutNames = buildWorkoutNameMap();
@@ -255,7 +262,7 @@ function renderHeatsScene() {
       return heats.map(h => `
         <div class="heat-card">
           <div class="heat-card-head">
-            <strong>${workoutNames[workoutId]} · Заход ${fmt(h.heat)}</strong>
+            <strong>${shortWorkoutLabel(workoutId, workoutNames)} · З${fmt(h.heat)}</strong>
             <span>${safe(DIV_SHORT[divId])}</span>
           </div>
           <table class="heat-table"><tbody>
@@ -263,9 +270,10 @@ function renderHeatsScene() {
           </tbody></table>
         </div>`);
     }).join('');
-    return `<div class="heat-column"><div class="heat-column-title">${safe(DIV_SHORT[divId])}</div>${cards || '<div class="empty">Заходы ещё не сформированы</div>'}</div>`;
+    const content = cards ? `<div class="heat-grid">${cards}</div>` : '<div class="empty">Заходы ещё не сформированы</div>';
+    return `<div class="heat-column"><div class="heat-column-title">${safe(DIV_SHORT[divId])}</div>${content}</div>`;
   }).join('');
-  root.innerHTML = `<div class="scene-header"><h2>Заходы</h2><div class="scene-sub">Все категории и все полы</div></div><div class="heats-layout">${columns}</div>`;
+  root.innerHTML = `<div class="scene-header"><h2>Заходы</h2><div class="scene-sub">Компактная сетка по категориям</div></div><div class="heats-layout">${columns}</div>`;
 }
 
 function applyDisplaySettings() {
