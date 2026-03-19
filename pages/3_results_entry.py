@@ -117,7 +117,7 @@ edited_df = st.data_editor(
     column_config={
         "athlete_id": st.column_config.NumberColumn("ID", format="%d"),
         "athlete": st.column_config.TextColumn("Атлет"),
-        "club": st.column_config.TextColumn("Клуб"),
+        "club": st.column_config.TextColumn("Клуб / команда"),
         "region": st.column_config.TextColumn("Регион"),
         "status": st.column_config.SelectboxColumn("Статус", options=status_options, required=True),
         "value": st.column_config.NumberColumn("Значение", step=0.5 if stype == "weight" else 1),

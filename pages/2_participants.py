@@ -54,7 +54,7 @@ with st.form("add_participant"):
         region = st.text_input("Регион")
         city = st.text_input("Город")
     with c3:
-        club = st.text_input("Клуб")
+        club = st.text_input("Клуб / команда")
         flag_file = st.file_uploader(
             f"Флаг (PNG/JPG, до {MAX_FLAG_UPLOAD_BYTES // 1024 // 1024} MB)",
             type=["png", "jpg", "jpeg"],
@@ -112,7 +112,7 @@ else:
         st.session_state.pending_delete_id = None
 
     header = st.columns([0.6, 2.5, 0.7, 0.8, 1.4, 1.4, 1.6, 1.0, 0.8])
-    labels = ["ID", "ФИО", "Пол", "Возраст", "DIV", "Регион", "Клуб", "Флаг", "Del"]
+    labels = ["ID", "ФИО", "Пол", "Возраст", "DIV", "Регион", "Клуб / команда", "Флаг", "Del"]
     for col, label in zip(header, labels):
         col.markdown(f"**{label}**")
 

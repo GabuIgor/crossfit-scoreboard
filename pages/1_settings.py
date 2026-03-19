@@ -1,5 +1,5 @@
 import streamlit as st
-from storage import load_db, save_db
+from storage import load_db, save_db, default_display_settings, clear_results, clear_all_data
 from config import DIVISIONS
 from utils import compact_page_style
 
@@ -8,10 +8,12 @@ compact_page_style()
 st.title("⚙️ Settings")
 
 db = load_db()
+settings = db["settings"]
+settings.setdefault("display", default_display_settings())
 
 st.subheader("Лимиты участников по дивизионам")
 
-limits = db["settings"]["division_limits"]
+limits = settings["division_limits"]
 changed = False
 
 cols = st.columns(4)
@@ -27,7 +29,7 @@ for i, d in enumerate(DIVISIONS):
 st.divider()
 st.subheader("Настройка зачётов")
 
-score_rows = db["settings"]["scores"]
+score_rows = settings["scores"]
 for s in score_rows:
     st.markdown(f"### {s['id']} — {s['title']}")
     c1, c2 = st.columns(2)
@@ -50,6 +52,71 @@ for s in score_rows:
         if new_cap != bool(s.get("time_cap_enabled", False)):
             s["time_cap_enabled"] = bool(new_cap)
             changed = True
+
+st.divider()
+st.subheader("Ручная настройка отображения экранов")
+st.caption("Эти настройки попадают в public-экраны после Publish и помогают уместить больше информации на ТВ и mobile.")
+
+display = settings["display"]
+display_labels = {
+    "section_title_size": "Размер заголовков разделов",
+    "card_title_size": "Размер заголовков блоков",
+    "table_text_size": "Размер текста таблиц",
+    "meta_text_size": "Размер вторичного текста",
+    "row_height": "Вертикальный отступ строк",
+    "block_gap": "Отступы между блоками",
+    "container_scale": "Масштаб контейнеров",
+}
+display_ranges = {
+    "section_title_size": (14, 36, 1),
+    "card_title_size": (12, 30, 1),
+    "table_text_size": (9, 22, 1),
+    "meta_text_size": (8, 18, 1),
+    "row_height": (2, 14, 1),
+    "block_gap": (4, 24, 1),
+    "container_scale": (0.8, 1.2, 0.01),
+}
+
+for screen_key, title in (("main", "Основные экраны"), ("mobile", "Мобильный экран")):
+    st.markdown(f"### {title}")
+    cols = st.columns(2)
+    screen_settings = display.setdefault(screen_key, default_display_settings()[screen_key])
+    for idx, (key, label) in enumerate(display_labels.items()):
+        col = cols[idx % 2]
+        min_v, max_v, step = display_ranges[key]
+        current = screen_settings.get(key, default_display_settings()[screen_key][key])
+        with col:
+            if isinstance(step, float):
+                new_value = st.slider(label, min_value=float(min_v), max_value=float(max_v), value=float(current), step=float(step), key=f"display_{screen_key}_{key}")
+            else:
+                new_value = st.slider(label, min_value=int(min_v), max_value=int(max_v), value=int(current), step=int(step), key=f"display_{screen_key}_{key}")
+        if new_value != current:
+            screen_settings[key] = new_value
+            changed = True
+
+    if st.button(f"Сбросить настройки: {title}", key=f"reset_display_{screen_key}"):
+        display[screen_key] = default_display_settings()[screen_key].copy()
+        save_db(db)
+        st.success(f"Настройки '{title}' сброшены.")
+        st.rerun()
+
+st.divider()
+st.subheader("Сервисные действия")
+left, right = st.columns(2)
+with left:
+    st.warning("Очистить только результаты: атлеты, клубы и заходы останутся.")
+    if st.button("🧹 Очистить результаты", key="clear_results_btn"):
+        clear_results(db)
+        save_db(db)
+        st.success("Результаты очищены. Атлеты, клубы и заходы сохранены.")
+        st.rerun()
+with right:
+    st.error("Полное удаление данных: атлеты, результаты и заходы будут очищены.")
+    if st.button("🗑️ Удалить всё", key="clear_all_btn"):
+        clear_all_data(db)
+        save_db(db)
+        st.success("Все данные очищены.")
+        st.rerun()
 
 st.divider()
 if st.button("💾 Save Settings", type="primary"):

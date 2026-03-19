@@ -5,6 +5,29 @@ from typing import Dict, Any
 from config import DATA_DIR, DB_FILE, DATA_FLAGS_DIR, DIVISIONS, DEFAULT_SCORES
 
 
+def default_display_settings() -> Dict[str, Any]:
+    return {
+        "main": {
+            "section_title_size": 18,
+            "card_title_size": 16,
+            "table_text_size": 11,
+            "meta_text_size": 10,
+            "row_height": 4,
+            "block_gap": 8,
+            "container_scale": 1.0,
+        },
+        "mobile": {
+            "section_title_size": 22,
+            "card_title_size": 18,
+            "table_text_size": 12,
+            "meta_text_size": 11,
+            "row_height": 6,
+            "block_gap": 12,
+            "container_scale": 1.0,
+        },
+    }
+
+
 def ensure_dirs() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     DATA_FLAGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -20,12 +43,13 @@ def default_db() -> Dict[str, Any]:
                 "INT_F": 8,
             },
             "scores": DEFAULT_SCORES,
+            "display": default_display_settings(),
         },
         "participants": [],
         "results": {},
         "heats": {},
         "meta": {
-            "version": 3,
+            "version": 4,
         },
     }
 
@@ -34,7 +58,7 @@ def _normalize_participant(raw: Any) -> Dict[str, Any] | None:
     if not isinstance(raw, dict):
         return None
     try:
-        participant_id = int(raw.get("id"))
+            participant_id = int(raw.get("id"))
     except (TypeError, ValueError):
         return None
 
@@ -71,7 +95,7 @@ def _normalize_participant(raw: Any) -> Dict[str, Any] | None:
         "division_id": division_id,
         "region": str(raw.get("region") or "").strip(),
         "city": str(raw.get("city") or "").strip(),
-        "club": str(raw.get("club") or "").strip(),
+        "club": str(raw.get("club") or raw.get("team_name") or "").strip(),
         "flag_path": raw.get("flag_path") or None,
         "deleted": bool(raw.get("deleted", False)),
     }
@@ -85,6 +109,7 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
     settings = db.get("settings") if isinstance(db.get("settings"), dict) else {}
     division_limits = settings.get("division_limits") if isinstance(settings.get("division_limits"), dict) else {}
     scores = settings.get("scores") if isinstance(settings.get("scores"), list) and settings.get("scores") else DEFAULT_SCORES
+    display = settings.get("display") if isinstance(settings.get("display"), dict) else {}
 
     participants_raw = db.get("participants") if isinstance(db.get("participants"), list) else []
     participants = []
@@ -93,10 +118,16 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
         if normalized is not None:
             participants.append(normalized)
 
+    merged_display = default_display_settings()
+    for screen_key, screen_defaults in merged_display.items():
+        raw_screen = display.get(screen_key) if isinstance(display.get(screen_key), dict) else {}
+        merged_display[screen_key] = {**screen_defaults, **raw_screen}
+
     normalized = {
         "settings": {
             "division_limits": {**base["settings"]["division_limits"], **division_limits},
             "scores": scores,
+            "display": merged_display,
         },
         "participants": participants,
         "results": db.get("results") if isinstance(db.get("results"), dict) else {},
@@ -104,7 +135,7 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
         "meta": db.get("meta") if isinstance(db.get("meta"), dict) else {},
     }
 
-    normalized["meta"].setdefault("version", 3)
+    normalized["meta"].setdefault("version", 4)
     return normalized
 
 
@@ -157,3 +188,13 @@ def delete_participant(db: Dict[str, Any], participant_id: int) -> None:
         if int(p["id"]) == int(participant_id):
             p["deleted"] = True
             break
+
+
+def clear_results(db: Dict[str, Any]) -> None:
+    db["results"] = {}
+
+
+def clear_all_data(db: Dict[str, Any]) -> None:
+    db["participants"] = []
+    db["results"] = {}
+    db["heats"] = {}

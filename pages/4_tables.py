@@ -52,7 +52,7 @@ for div in DIVISIONS:
             "Возраст": p.get("age", ""),
             "DIV": p.get("category", ""),
             "Регион": p.get("region", "") or p.get("city", ""),
-            "Клуб": p.get("club", ""),
+            "Клуб / команда": p.get("club", ""),
             "Флаг": "✅" if p.get("flag_path") else "—",
         }
         for s in scores:

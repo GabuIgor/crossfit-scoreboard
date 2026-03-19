@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Scoreboard Mobile</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 12px; }
-    .box { border: 1px solid #ddd; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
-    .muted { color: #777; font-size: 12px; }
+    :root { --section-title-size: 22px; --card-title-size: 18px; --table-text-size: 12px; --meta-text-size: 11px; --row-height: 6px; --block-gap: 12px; --container-scale: 1; }
+    body { font-family: Arial, sans-serif; margin: var(--block-gap, 12px); }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: calc(10px * var(--container-scale)); margin-bottom: var(--block-gap); }
+    .muted { color: #777; font-size: var(--meta-text-size); }
     .flag { width: 18px; height: 12px; object-fit: cover; border: 1px solid #ddd; border-radius: 3px; vertical-align: middle; margin-left: 4px; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th, td { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; vertical-align: top; }
+    table { width: 100%; border-collapse: collapse; font-size: var(--table-text-size); }
+    th, td { border-bottom: 1px solid #eee; padding: var(--row-height) 4px; text-align: left; vertical-align: top; }
     th.points, td.points { background: #eef5ff; }
-    .meta2 { color:#666; font-size: 11px; line-height: 1.25; }
-    .res { display:block; color:#666; font-size:10px; }
-    .heats-row { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
-    .heat-col { min-width: 180px; flex:0 0 180px; border:1px solid #eee; border-radius:8px; padding:8px; }
-    .heat-title { margin-bottom:6px; font-weight:700; }
+    .meta2 { color:#666; font-size: var(--meta-text-size); line-height: 1.25; }
+    .res { display:block; color:#666; font-size: calc(var(--meta-text-size) - 1px); }
+    .heats-row { display:flex; gap: var(--block-gap); overflow-x:auto; padding-bottom:4px; }
+    .heat-col { min-width: 180px; flex:0 0 180px; border:1px solid #eee; border-radius:8px; padding: calc(8px * var(--container-scale)); }
+    .heat-title { margin-bottom:6px; font-weight:700; font-size: var(--card-title-size); }
     .lane { display:grid; grid-template-columns: 24px 1fr; gap:8px; padding:4px 0; border-bottom:1px dashed #eee; }
     .lane:last-child { border-bottom:none; }
   </style>
@@ -54,14 +55,14 @@ function renderTable(){
   html += '</tbody></table>'; document.getElementById('tableBox').innerHTML = html;
 }
 function renderTeams(){
-  const rows = cache.teams?.rows || [];
-  let html = `<h3>Командный зачёт</h3><table><thead><tr><th>#</th><th>Команда</th><th class="points">Очки</th><th class="points">Участ.</th><th class="points">1х</th></tr></thead><tbody>`;
+  const rows = cache.clubs?.rows || cache.teams?.rows || [];
+  let html = `<h3>Клубный зачёт</h3><table><thead><tr><th>#</th><th>Клуб</th><th class="points">Очки</th><th class="points">Участ.</th><th class="points">1х</th></tr></thead><tbody>`;
   rows.forEach(r => {
     html += `<tr><td>${fmt(r.place)}</td><td>${safe(r.team_name)}<div class="meta2">${fmt(r.contributors)} зачётных результата</div></td><td class="points">${fmt(r.points)}</td><td class="points">${fmt(r.participants_count)}</td><td class="points">${fmt(r.first_places)}</td></tr>`;
   });
   html += `</tbody></table>`;
   if(rows[0]?.breakdown?.length){
-    html += `<div class="muted" style="margin-top:8px;">Топ-команда: ${safe(rows[0].team_name)}</div>`;
+    html += `<div class="muted" style="margin-top:8px;">Топ-клуб: ${safe(rows[0].team_name)}</div>`;
     rows[0].breakdown.slice(0,5).forEach(item => {
       html += `<div class="meta2" style="margin-top:4px;">${safe(item.full_name)} · ${safe(item.division_title)} · место ${safe(item.place_label)} · +${fmt(item.awarded_points)}</div>`;
     });
@@ -81,9 +82,23 @@ function renderHeats(){
   html += `</div>`;
   document.getElementById('heatsBox').innerHTML = html;
 }
+
+function applyDisplaySettings(){
+  const display = cache?.display?.mobile || {};
+  const root = document.documentElement;
+  root.style.setProperty('--section-title-size', `${display.section_title_size || 22}px`);
+  root.style.setProperty('--card-title-size', `${display.card_title_size || 18}px`);
+  root.style.setProperty('--table-text-size', `${display.table_text_size || 12}px`);
+  root.style.setProperty('--meta-text-size', `${display.meta_text_size || 11}px`);
+  root.style.setProperty('--row-height', `${display.row_height || 6}px`);
+  root.style.setProperty('--block-gap', `${display.block_gap || 12}px`);
+  root.style.setProperty('--container-scale', `${display.container_scale || 1}`);
+}
+
 async function load(){
   const res = await fetch(`results.json?ts=${Date.now()}`); cache = await res.json();
   document.getElementById('meta').textContent = `Обновлено: ${cache.generated_at}`;
+  applyDisplaySettings();
   renderTable(); renderTeams(); renderHeats();
 }
 divSel.onchange = () => { if(cache){ renderTable(); renderHeats(); } };
