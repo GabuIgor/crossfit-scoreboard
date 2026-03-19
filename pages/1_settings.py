@@ -1,8 +1,10 @@
 import streamlit as st
 from storage import load_db, save_db
 from config import DIVISIONS
+from utils import compact_page_style
 
 st.set_page_config(page_title="Settings", layout="wide")
+compact_page_style()
 st.title("⚙️ Settings")
 
 db = load_db()
@@ -23,9 +25,8 @@ for i, d in enumerate(DIVISIONS):
             changed = True
 
 st.divider()
-st.subheader("Настройка зачётов (универсально)")
+st.subheader("Настройка зачётов")
 
-# Здесь можно менять тип зачёта, но пока оставим аккуратно.
 score_rows = db["settings"]["scores"]
 for s in score_rows:
     st.markdown(f"### {s['id']} — {s['title']}")
@@ -41,15 +42,18 @@ for s in score_rows:
             s["type"] = new_type
             changed = True
     with c2:
-        new_cap = st.checkbox("Разрешить Time cap (только для time)", value=bool(s.get("time_cap_enabled", False)), key=f"cap_{s['id']}")
+        new_cap = st.checkbox(
+            "Разрешить Time cap (только для time)",
+            value=bool(s.get("time_cap_enabled", False)),
+            key=f"cap_{s['id']}",
+        )
         if new_cap != bool(s.get("time_cap_enabled", False)):
             s["time_cap_enabled"] = bool(new_cap)
             changed = True
 
 st.divider()
-if st.button("💾 Save Settings"):
+if st.button("💾 Save Settings", type="primary"):
     save_db(db)
     st.success("Сохранено.")
-else:
-    if changed:
-        st.warning("Есть изменения. Нажми Save Settings.")
+elif changed:
+    st.warning("Есть изменения. Нажми Save Settings.")

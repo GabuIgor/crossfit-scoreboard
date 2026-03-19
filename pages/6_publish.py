@@ -1,8 +1,10 @@
 import subprocess
 import sys
 import streamlit as st
+from utils import compact_page_style
 
 st.set_page_config(page_title="Publish", layout="wide")
+compact_page_style()
 st.title("🚀 Publish (GitHub Pages)")
 
 st.write(

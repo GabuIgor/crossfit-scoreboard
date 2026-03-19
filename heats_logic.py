@@ -1,7 +1,32 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+import base64
+import mimetypes
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
+
+
+
+def _flag_data_uri(flag_path: Optional[str]) -> Optional[str]:
+    if not flag_path:
+        return None
+
+    src = Path(flag_path)
+    if not src.is_absolute():
+        src = Path.cwd() / src
+    if not src.exists() or not src.is_file():
+        return None
+
+    mime_type, _ = mimetypes.guess_type(src.name)
+    mime_type = mime_type or "image/png"
+
+    try:
+        encoded = base64.b64encode(src.read_bytes()).decode("ascii")
+    except OSError:
+        return None
+
+    return f"data:{mime_type};base64,{encoded}"
 
 def _participant_map(db: Dict[str, Any]) -> Dict[int, Dict[str, Any]]:
     result: Dict[int, Dict[str, Any]] = {}
@@ -26,26 +51,6 @@ def _score_title_map(db: Dict[str, Any]) -> Dict[str, str]:
 
 
 def serialize_heats_for_public(db: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    """
-    Нормализует heats в public-формат, который ожидают docs/index.html и docs/mobile.html:
-
-    {
-      "WOD1": {
-        "title": "Комплекс 1",
-        "divisions": {
-          "INT_M": [
-            {
-              "heat": 1,
-              "assignments": [
-                {"lane": 1, "athlete_id": 10, "full_name": "...", ...}
-              ]
-            }
-          ]
-        }
-      }
-    }
-    """
-
     heats = db.get("heats", {})
     if not isinstance(heats, dict):
         return {}
@@ -94,8 +99,9 @@ def serialize_heats_for_public(db: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
                                     "athlete_id": athlete_key,
                                     "full_name": participant.get("full_name", ""),
                                     "club": participant.get("club", ""),
+                                    "region": participant.get("region", "") or participant.get("city", ""),
                                     "city": participant.get("city", ""),
-                                    "flag": f"flags/athlete_{athlete_key}.png" if participant.get("flag_path") and athlete_key is not None else None,
+                                    "flag": _flag_data_uri(participant.get("flag_path")),
                                 }
                             )
 

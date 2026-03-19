@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 from typing import Dict, Any
 
 from config import DATA_DIR, DB_FILE, DATA_FLAGS_DIR, DIVISIONS, DEFAULT_SCORES
@@ -12,16 +11,6 @@ def ensure_dirs() -> None:
 
 
 def default_db() -> Dict[str, Any]:
-    """
-    Единственный источник правды — data/db.json.
-    Структура:
-      db = {
-        "settings": {...},
-        "participants": [ ... ],
-        "results": { "<athlete_id>": { "<score_id>": {...} } },
-        "heats": { ... }
-      }
-    """
     return {
         "settings": {
             "division_limits": {
@@ -36,8 +25,55 @@ def default_db() -> Dict[str, Any]:
         "results": {},
         "heats": {},
         "meta": {
-            "version": 2,
+            "version": 3,
         },
+    }
+
+
+def _normalize_participant(raw: Any) -> Dict[str, Any] | None:
+    if not isinstance(raw, dict):
+        return None
+    try:
+        participant_id = int(raw.get("id"))
+    except (TypeError, ValueError):
+        return None
+
+    sex = str(raw.get("sex") or "").strip().upper()
+    if sex not in {"M", "F"}:
+        sex = "M"
+
+    category = str(raw.get("category") or "").strip().upper()
+    if category not in {"BEGSCAL", "INT"}:
+        category = "BEGSCAL"
+
+    division_id = str(raw.get("division_id") or "").strip()
+    if division_id not in {d["id"] for d in DIVISIONS}:
+        if category == "BEGSCAL" and sex == "M":
+            division_id = "BEGSCAL_M"
+        elif category == "BEGSCAL" and sex == "F":
+            division_id = "BEGSCAL_F"
+        elif category == "INT" and sex == "M":
+            division_id = "INT_M"
+        else:
+            division_id = "INT_F"
+
+    try:
+        age = int(raw.get("age", 0) or 0)
+    except (TypeError, ValueError):
+        age = 0
+
+    return {
+        "id": participant_id,
+        "full_name": str(raw.get("full_name") or "").strip(),
+        "sex": sex,
+        "age": age,
+        "category": category,
+        "division_id": division_id,
+        "region": str(raw.get("region") or "").strip(),
+        "city": str(raw.get("city") or "").strip(),
+        "club": str(raw.get("club") or "").strip(),
+        "flag_path": raw.get("flag_path") or None,
+        "deleted": bool(raw.get("deleted", False)),
     }
 
 
@@ -50,18 +86,25 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
     division_limits = settings.get("division_limits") if isinstance(settings.get("division_limits"), dict) else {}
     scores = settings.get("scores") if isinstance(settings.get("scores"), list) and settings.get("scores") else DEFAULT_SCORES
 
+    participants_raw = db.get("participants") if isinstance(db.get("participants"), list) else []
+    participants = []
+    for item in participants_raw:
+        normalized = _normalize_participant(item)
+        if normalized is not None:
+            participants.append(normalized)
+
     normalized = {
         "settings": {
             "division_limits": {**base["settings"]["division_limits"], **division_limits},
             "scores": scores,
         },
-        "participants": db.get("participants") if isinstance(db.get("participants"), list) else [],
+        "participants": participants,
         "results": db.get("results") if isinstance(db.get("results"), dict) else {},
         "heats": db.get("heats") if isinstance(db.get("heats"), dict) else {},
         "meta": db.get("meta") if isinstance(db.get("meta"), dict) else {},
     }
 
-    normalized["meta"].setdefault("version", 2)
+    normalized["meta"].setdefault("version", 3)
     return normalized
 
 
@@ -110,10 +153,6 @@ def count_participants_in_division(db: Dict[str, Any], division_id: str) -> int:
 
 
 def delete_participant(db: Dict[str, Any], participant_id: int) -> None:
-    """
-    Удаление делаем мягким: помечаем deleted=True.
-    Это безопаснее: не потеряем историю.
-    """
     for p in db.get("participants", []):
         if int(p["id"]) == int(participant_id):
             p["deleted"] = True

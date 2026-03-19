@@ -11,6 +11,8 @@ from scoring import build_ranking
 from storage import load_db, save_db
 
 st.set_page_config(page_title="Heats", page_icon="🏁", layout="wide")
+from utils import compact_page_style
+compact_page_style()
 
 HEAT_WODS = ["WOD1", "WOD2", "WOD3"]
 MAX_LANES = 4

@@ -1,40 +1,18 @@
+import pandas as pd
 import streamlit as st
+
 from storage import load_db, save_db
 from config import DIVISIONS
-
-
-def parse_mmss_to_seconds(raw: str) -> int:
-    raw = str(raw or '').strip()
-    if not raw:
-        return 0
-    if ':' not in raw:
-        try:
-            return max(0, int(float(raw)))
-        except (TypeError, ValueError):
-            return 0
-    try:
-        minutes, seconds = raw.split(':', 1)
-        minutes_i = int(minutes)
-        seconds_i = int(seconds)
-        if minutes_i < 0 or seconds_i < 0:
-            return 0
-        return minutes_i * 60 + seconds_i
-    except (TypeError, ValueError):
-        return 0
-
-
-def format_seconds_to_mmss(total_seconds: int) -> str:
-    total_seconds = max(0, int(total_seconds or 0))
-    return f"{total_seconds // 60}:{total_seconds % 60:02d}"
+from utils import compact_page_style
 
 st.set_page_config(page_title="Results Entry", layout="wide")
+compact_page_style()
 st.title("🧾 Results Entry")
 
 db = load_db()
 settings = db["settings"]
 scores = settings["scores"]
 
-# --- выбираем дивизион и зачёт ---
 div_titles = {d["title"]: d["id"] for d in DIVISIONS}
 score_titles = {f"{s['id']} — {s['title']}": s["id"] for s in scores}
 
@@ -46,72 +24,53 @@ with colB:
     score_label = st.selectbox("Зачёт / Комплекс", list(score_titles.keys()))
     score_id = score_titles[score_label]
 
-# определяем тип текущего зачёта
 sdef = next(s for s in scores if s["id"] == score_id)
 stype = sdef["type"]
 cap_enabled = bool(sdef.get("time_cap_enabled", False))
 
 st.info(f"Тип зачёта: **{stype}**. Time cap: **{cap_enabled}**")
 
-# --- список атлетов этого дивизиона ---
 participants = [
     p for p in db.get("participants", [])
     if p.get("division_id") == division_id and not p.get("deleted", False)
 ]
+participants.sort(key=lambda p: (p.get("full_name") or "").lower())
 
 if not participants:
     st.warning("В этом дивизионе нет участников.")
     st.stop()
 
-# список выбора атлета показываем с ID, чтобы не путаться
 options = []
 id_by_label = {}
 for p in participants:
-    label = f"{p['full_name']} ({p.get('club','')}, {p.get('city','')}) [ID:{p['id']}]"
+    region = p.get("region", "") or p.get("city", "")
+    label = f"{p['full_name']} ({p.get('club','')}, {region}) [ID:{p['id']}]"
     options.append(label)
     id_by_label[label] = int(p["id"])
 
-# --- форма ввода результата ---
-st.subheader("Ввод результата (после кнопки поля НЕ сбрасываем)")
-
-# Важно: не используем st.form_submit_button с очисткой, просто пишем в db и сохраняем
+st.subheader("Ввод результата через форму")
 ath_label = st.selectbox("Атлет", options)
 ath_id = id_by_label[ath_label]
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 with col1:
     withdrawn = st.checkbox("Снялся (0 очков)", value=False)
 with col2:
     capped = st.checkbox("Не уложился (только для time)", value=False, disabled=not (stype == "time" and cap_enabled))
-with col3:
-    st.write("")
 
-# Поле ввода результата:
-# - если withdrawn -> поле блокируем
-# - если time и capped -> вводим reps (int)
-# - если time и not capped -> вводим секунды (int)
-# - reps -> int
-# - weight -> float
 disabled_input = withdrawn
-
 value = None
 if stype == "time":
     if capped and cap_enabled:
-        value = st.number_input("Повторы при time cap (чем больше, тем лучше, но хуже любого времени)", min_value=0, step=1, value=0, disabled=disabled_input)
+        value = st.number_input("Повторы при time cap", min_value=0, step=1, value=0, disabled=disabled_input)
     else:
-        time_input = st.text_input(
-            "Время (мм:сс, чем меньше тем лучше)",
-            value=format_seconds_to_mmss(0),
-            disabled=disabled_input,
-            help="Например: 1:32",
-        )
-        value = parse_mmss_to_seconds(time_input)
+        value = st.number_input("Время (секунды)", min_value=0, step=1, value=0, disabled=disabled_input)
 elif stype == "reps":
-    value = st.number_input("Повторы (чем больше тем лучше)", min_value=0, step=1, value=0, disabled=disabled_input)
+    value = st.number_input("Повторы", min_value=0, step=1, value=0, disabled=disabled_input)
 elif stype == "weight":
-    value = st.number_input("Вес (кг, чем больше тем лучше)", min_value=0.0, step=0.5, value=0.0, disabled=disabled_input)
+    value = st.number_input("Вес (кг)", min_value=0.0, step=0.5, value=0.0, disabled=disabled_input)
 
-if st.button("✅ Ввести результат"):
+if st.button("✅ Ввести результат", type="primary"):
     db.setdefault("results", {})
     db["results"].setdefault(str(ath_id), {})
 
@@ -121,11 +80,77 @@ if st.button("✅ Ввести результат"):
         if stype == "time" and capped and cap_enabled:
             db["results"][str(ath_id)][score_id] = {"status": "capped", "value": int(value)}
         else:
-            # normal ok
             if stype in ("time", "reps"):
                 db["results"][str(ath_id)][score_id] = {"status": "ok", "value": int(value)}
             else:
                 db["results"][str(ath_id)][score_id] = {"status": "ok", "value": float(value)}
 
     save_db(db)
-    st.success("Результат сохранён. Таблицы обновятся на странице Tables.")
+    st.success("Результат сохранён.")
+
+st.divider()
+st.subheader("Ввод результата через таблицу")
+st.caption("В Streamlit редактирование идёт через клик по ячейке. Это почти тот же сценарий, что и двойной щелчок в таблице.")
+
+status_options = ["ok", "wd"]
+if stype == "time" and cap_enabled:
+    status_options = ["ok", "capped", "wd"]
+
+rows = []
+for p in participants:
+    res = db.get("results", {}).get(str(p["id"]), {}).get(score_id)
+    rows.append({
+        "athlete_id": int(p["id"]),
+        "athlete": p.get("full_name", ""),
+        "club": p.get("club", ""),
+        "region": p.get("region", "") or p.get("city", ""),
+        "status": (res or {}).get("status", "ok"),
+        "value": (res or {}).get("value", None),
+    })
+
+editor_df = pd.DataFrame(rows)
+edited_df = st.data_editor(
+    editor_df,
+    use_container_width=True,
+    hide_index=True,
+    disabled=["athlete_id", "athlete", "club", "region"],
+    column_config={
+        "athlete_id": st.column_config.NumberColumn("ID", format="%d"),
+        "athlete": st.column_config.TextColumn("Атлет"),
+        "club": st.column_config.TextColumn("Клуб"),
+        "region": st.column_config.TextColumn("Регион"),
+        "status": st.column_config.SelectboxColumn("Статус", options=status_options, required=True),
+        "value": st.column_config.NumberColumn("Значение", step=0.5 if stype == "weight" else 1),
+    },
+    key=f"results_editor_{division_id}_{score_id}",
+)
+
+if st.button("💾 Сохранить таблицу результатов"):
+    db.setdefault("results", {})
+    for _, row in edited_df.iterrows():
+        athlete_id = int(row["athlete_id"])
+        status = str(row["status"] or "ok")
+        raw_value = row["value"]
+
+        if status not in status_options:
+            status = "ok"
+
+        db["results"].setdefault(str(athlete_id), {})
+
+        if status == "wd":
+            db["results"][str(athlete_id)][score_id] = {"status": "wd", "value": 0}
+            continue
+
+        if pd.isna(raw_value) or raw_value in ("", None):
+            db["results"][str(athlete_id)].pop(score_id, None)
+            continue
+
+        if stype == "weight":
+            value_to_save = float(raw_value)
+        else:
+            value_to_save = int(float(raw_value))
+
+        db["results"][str(athlete_id)][score_id] = {"status": status, "value": value_to_save}
+
+    save_db(db)
+    st.success("Таблица результатов сохранена.")
