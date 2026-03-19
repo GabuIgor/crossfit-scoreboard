@@ -1,6 +1,5 @@
 import streamlit as st
-
-from storage import load_db, save_db, default_display_settings, clear_results, clear_all_data
+from storage import load_db, save_db, default_display_settings, clear_results, clear_all_data, default_team_scoring
 from config import DIVISIONS
 from utils import compact_page_style
 
@@ -10,11 +9,15 @@ st.title("⚙️ Settings")
 
 db = load_db()
 settings = db["settings"]
-display = settings.setdefault("display", default_display_settings())
-changed = False
+settings.setdefault("display", default_display_settings())
+settings.setdefault("clubs", [])
+settings.setdefault("team_scoring", default_team_scoring())
 
 st.subheader("Лимиты участников по дивизионам")
+
 limits = settings["division_limits"]
+changed = False
+
 cols = st.columns(4)
 for i, d in enumerate(DIVISIONS):
     with cols[i]:
@@ -26,7 +29,82 @@ for i, d in enumerate(DIVISIONS):
             changed = True
 
 st.divider()
+st.subheader("Клубы и командный зачёт")
+
+club_list = settings.setdefault("clubs", [])
+club_text = st.text_area(
+    "Список клубов",
+    value="\n".join(club_list),
+    height=160,
+    help="По одному клубу в строке. Эти клубы будут доступны в выпадающем списке при добавлении и редактировании атлета.",
+)
+parsed_clubs = []
+seen = set()
+for line in club_text.splitlines():
+    name = line.strip()
+    if not name:
+        continue
+    key = name.casefold()
+    if key in seen:
+        continue
+    seen.add(key)
+    parsed_clubs.append(name)
+parsed_clubs.sort(key=lambda x: x.casefold())
+if parsed_clubs != club_list:
+    settings["clubs"] = parsed_clubs
+    changed = True
+
+team_scoring = settings.setdefault("team_scoring", default_team_scoring())
+priority_score_id = str(team_scoring.get("priority_score_id") or "WOD3")
+score_ids = [s["id"] for s in settings.get("scores", [])]
+if priority_score_id not in score_ids and score_ids:
+    priority_score_id = score_ids[-1]
+    team_scoring["priority_score_id"] = priority_score_id
+    changed = True
+
+c1, c2 = st.columns([1, 1])
+with c1:
+    new_enabled = st.checkbox("Включить командный зачёт", value=bool(team_scoring.get("enabled", True)))
+    if new_enabled != bool(team_scoring.get("enabled", True)):
+        team_scoring["enabled"] = new_enabled
+        changed = True
+with c2:
+    new_priority = st.selectbox("Приоритетный комплекс", score_ids, index=score_ids.index(priority_score_id) if priority_score_id in score_ids else 0)
+    if new_priority != priority_score_id:
+        team_scoring["priority_score_id"] = new_priority
+        changed = True
+
+places_cfg = team_scoring.setdefault("places", [1, 2, 3])
+place_cols = st.columns(3)
+for idx, place in enumerate((1, 2, 3)):
+    with place_cols[idx]:
+        checked = place in places_cfg
+        new_checked = st.checkbox(f"Начислять за {place} место", value=checked, key=f"team_place_{place}")
+        if new_checked and place not in places_cfg:
+            places_cfg.append(place)
+            places_cfg.sort()
+            changed = True
+        if not new_checked and place in places_cfg:
+            places_cfg.remove(place)
+            changed = True
+
+st.caption("Ниже задаются очки клубного зачёта за призовые места в каждой индивидуальной категории.")
+for div in DIVISIONS:
+    div_id = div["id"]
+    cur_map = team_scoring.setdefault("division_points", {}).setdefault(div_id, {"1": 0, "2": 0, "3": 0})
+    st.markdown(f"**{div['title']}**")
+    cols = st.columns(3)
+    for idx, place in enumerate((1, 2, 3)):
+        cur_val = int(cur_map.get(str(place), 0))
+        with cols[idx]:
+            new_val = st.number_input(f"{place} место", min_value=0, step=1, value=cur_val, key=f"team_pts_{div_id}_{place}")
+        if int(new_val) != cur_val:
+            cur_map[str(place)] = int(new_val)
+            changed = True
+
+st.divider()
 st.subheader("Настройка зачётов")
+
 score_rows = settings["scores"]
 for s in score_rows:
     st.markdown(f"### {s['id']} — {s['title']}")
@@ -51,70 +129,69 @@ for s in score_rows:
             s["time_cap_enabled"] = bool(new_cap)
             changed = True
 
+st.divider()
+st.subheader("Ручная настройка отображения экранов")
+st.caption("Эти настройки попадают в public-экраны после Publish и помогают уместить больше информации на ТВ и mobile.")
 
-def slider_block(title: str, key: str, specs: list[tuple[str, str, int, int, float, int | float]]):
-    global changed
-    st.divider()
-    st.subheader(title)
-    target = display.setdefault(key, default_display_settings()[key])
-    c1, c2 = st.columns(2)
-    halves = [specs[: (len(specs) + 1) // 2], specs[(len(specs) + 1) // 2 :]]
-    for col, items in zip((c1, c2), halves):
+display = settings["display"]
+display_labels = {
+    "section_title_size": "Размер заголовков разделов",
+    "card_title_size": "Размер заголовков блоков",
+    "table_text_size": "Размер текста таблиц",
+    "meta_text_size": "Размер вторичного текста",
+    "row_height": "Вертикальный отступ строк",
+    "block_gap": "Отступы между блоками",
+    "container_scale": "Масштаб контейнеров",
+}
+display_ranges = {
+    "section_title_size": (14, 36, 1),
+    "card_title_size": (12, 30, 1),
+    "table_text_size": (9, 22, 1),
+    "meta_text_size": (8, 18, 1),
+    "row_height": (2, 14, 1),
+    "block_gap": (4, 24, 1),
+    "container_scale": (0.8, 1.2, 0.01),
+}
+
+for screen_key, title in (("main", "Основные экраны"), ("mobile", "Мобильный экран")):
+    st.markdown(f"### {title}")
+    cols = st.columns(2)
+    screen_settings = display.setdefault(screen_key, default_display_settings()[screen_key])
+    for idx, (key, label) in enumerate(display_labels.items()):
+        col = cols[idx % 2]
+        min_v, max_v, step = display_ranges[key]
+        current = screen_settings.get(key, default_display_settings()[screen_key][key])
         with col:
-            for label, field, min_v, max_v, default_v, step in items:
-                cur = target.get(field, default_v)
-                new_val = st.slider(label, min_value=min_v, max_value=max_v, value=cur, step=step, key=f"{key}_{field}")
-                if new_val != cur:
-                    target[field] = new_val
-                    changed = True
+            if isinstance(step, float):
+                new_value = st.slider(label, min_value=float(min_v), max_value=float(max_v), value=float(current), step=float(step), key=f"display_{screen_key}_{key}")
+            else:
+                new_value = st.slider(label, min_value=int(min_v), max_value=int(max_v), value=int(current), step=int(step), key=f"display_{screen_key}_{key}")
+        if new_value != current:
+            screen_settings[key] = new_value
+            changed = True
 
-
-slider_block(
-    "Настройки TV / основных экранов",
-    "main",
-    [
-        ("Размер заголовков разделов", "section_title_size", 20, 42, 30, 1),
-        ("Размер заголовков карточек", "card_title_size", 16, 34, 24, 1),
-        ("Размер текста таблиц", "table_text_size", 12, 24, 18, 1),
-        ("Размер вторичного текста", "meta_text_size", 10, 18, 14, 1),
-        ("Высота строк", "row_height", 24, 52, 36, 1),
-        ("Отступы между блоками", "block_gap", 4, 24, 12, 1),
-        ("Масштаб контейнеров", "container_scale", 0.8, 1.15, 1.0, 0.01),
-    ],
-)
-
-slider_block(
-    "Настройки мобильного экрана",
-    "mobile",
-    [
-        ("Размер заголовков разделов", "section_title_size", 14, 28, 18, 1),
-        ("Размер заголовков карточек", "card_title_size", 12, 24, 16, 1),
-        ("Размер текста таблиц", "table_text_size", 10, 18, 12, 1),
-        ("Размер вторичного текста", "meta_text_size", 9, 16, 11, 1),
-        ("Высота строк", "row_height", 20, 42, 28, 1),
-        ("Отступы между блоками", "block_gap", 4, 20, 8, 1),
-        ("Масштаб контейнеров", "container_scale", 0.8, 1.15, 1.0, 0.01),
-        ("Размер заголовка захода", "heat_title_font_size", 12, 24, 16, 1),
-        ("Размер имени атлета в заходе", "heat_name_font_size", 10, 20, 13, 1),
-        ("Размер номера дорожки", "heat_lane_font_size", 10, 18, 13, 1),
-        ("Ширина карточки захода", "heat_card_width", 140, 280, 180, 10),
-    ],
-)
+    if st.button(f"Сбросить настройки: {title}", key=f"reset_display_{screen_key}"):
+        display[screen_key] = default_display_settings()[screen_key].copy()
+        save_db(db)
+        st.success(f"Настройки '{title}' сброшены.")
+        st.rerun()
 
 st.divider()
 st.subheader("Сервисные действия")
-service1, service2 = st.columns(2)
-with service1:
-    if st.button("🧹 Очистить результаты", use_container_width=True):
+left, right = st.columns(2)
+with left:
+    st.warning("Очистить только результаты: атлеты, клубы и заходы останутся.")
+    if st.button("🧹 Очистить результаты", key="clear_results_btn"):
         clear_results(db)
         save_db(db)
         st.success("Результаты очищены. Атлеты, клубы и заходы сохранены.")
         st.rerun()
-with service2:
-    if st.button("🗑️ Удалить всё", use_container_width=True):
-        cleared = clear_all_data(db)
-        save_db(cleared)
-        st.success("Все участники, результаты и заходы удалены. Настройки сохранены.")
+with right:
+    st.error("Полное удаление данных: атлеты, результаты и заходы будут очищены.")
+    if st.button("🗑️ Удалить всё", key="clear_all_btn"):
+        clear_all_data(db)
+        save_db(db)
+        st.success("Все данные очищены.")
         st.rerun()
 
 st.divider()

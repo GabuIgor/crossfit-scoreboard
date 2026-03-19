@@ -11,6 +11,8 @@ compact_page_style()
 st.title("👥 Participants")
 
 db = load_db()
+settings = db["settings"]
+clubs = settings.get("clubs", [])
 
 
 def resolve_division_id(sex_val: str, cat_val: str) -> str:
@@ -42,6 +44,14 @@ def save_flag_image(flag_file, pid: int) -> str:
     return str(out_path.as_posix())
 
 
+def normalize_club_choice(choice: str) -> str:
+    return "" if choice == "—" else choice
+
+
+def club_select_options():
+    return ["—"] + clubs
+
+
 st.subheader("Добавить участника")
 with st.form("add_participant"):
     c1, c2, c3 = st.columns(3)
@@ -52,9 +62,8 @@ with st.form("add_participant"):
     with c2:
         category = st.selectbox("Категория", ["BEGSCAL", "INT"])
         region = st.text_input("Регион")
-        city = st.text_input("Город")
     with c3:
-        club = st.text_input("Клуб / команда")
+        club_choice = st.selectbox("Клуб", club_select_options())
         flag_file = st.file_uploader(
             f"Флаг (PNG/JPG, до {MAX_FLAG_UPLOAD_BYTES // 1024 // 1024} MB)",
             type=["png", "jpg", "jpeg"],
@@ -91,8 +100,8 @@ if submitted:
                 "category": category,
                 "division_id": division_id,
                 "region": (region or "").strip(),
-                "city": (city or "").strip(),
-                "club": (club or "").strip(),
+                "city": "",
+                "club": normalize_club_choice(club_choice),
                 "flag_path": flag_path,
                 "deleted": False,
             })
@@ -102,56 +111,130 @@ if submitted:
             st.rerun()
 
 st.divider()
-st.subheader("Список участников")
-participants = [p for p in db.get("participants", []) if not p.get("deleted", False)]
 
+participants = [p for p in db.get("participants", []) if not p.get("deleted", False)]
+participants.sort(key=lambda p: (str(p.get("division_id") or ""), str(p.get("full_name") or "").lower()))
+
+st.session_state.setdefault("pending_delete_id", None)
+st.session_state.setdefault("edit_participant_id", None)
+
+edit_id = st.session_state.edit_participant_id
+if edit_id is not None:
+    target = next((x for x in participants if int(x["id"]) == int(edit_id)), None)
+    if target:
+        st.subheader(f"Редактировать участника #{edit_id}")
+        st.info(f"Сейчас редактируется: {target.get('full_name', '')}")
+        with st.form(f"edit_participant_{edit_id}"):
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                edit_name = st.text_input("Фамилия Имя", value=target.get("full_name", ""))
+                edit_sex = st.selectbox("Пол", ["M", "F"], index=["M", "F"].index(target.get("sex", "M")))
+                edit_age = st.number_input("Возраст", min_value=1, max_value=120, step=1, value=int(target.get("age", 25) or 25))
+            with c2:
+                edit_category = st.selectbox("Категория", ["BEGSCAL", "INT"], index=["BEGSCAL", "INT"].index(target.get("category", "BEGSCAL")))
+                edit_region = st.text_input("Регион", value=target.get("region", "") or target.get("city", ""))
+            with c3:
+                club_options = club_select_options()
+                current_club = target.get("club", "") or "—"
+                if current_club not in club_options:
+                    club_options = club_options + [current_club]
+                edit_club = st.selectbox("Клуб", club_options, index=club_options.index(current_club))
+                edit_flag_file = st.file_uploader(
+                    f"Новый флаг (необязательно)",
+                    type=["png", "jpg", "jpeg"],
+                    key=f"edit_flag_{edit_id}",
+                )
+
+            s1, s2 = st.columns(2)
+            save_pressed = s1.form_submit_button("💾 Сохранить")
+            cancel_pressed = s2.form_submit_button("Отмена")
+
+        if cancel_pressed:
+            st.session_state.edit_participant_id = None
+            st.rerun()
+
+        if save_pressed:
+            new_division_id = resolve_division_id(edit_sex, edit_category)
+            old_division_id = str(target.get("division_id") or "")
+            if new_division_id != old_division_id:
+                limit = int(db["settings"]["division_limits"].get(new_division_id, 0))
+                current = count_participants_in_division(db, new_division_id)
+                if limit > 0 and current >= limit:
+                    st.error(f"Лимит для {new_division_id} = {limit}. Сейчас уже {current}. Перенос запрещён.")
+                    st.stop()
+
+            target["full_name"] = (edit_name or "").strip()
+            target["sex"] = edit_sex
+            target["age"] = int(edit_age)
+            target["category"] = edit_category
+            target["division_id"] = new_division_id
+            target["region"] = (edit_region or "").strip()
+            target["city"] = ""
+            target["club"] = normalize_club_choice(edit_club)
+            if edit_flag_file is not None:
+                try:
+                    target["flag_path"] = save_flag_image(edit_flag_file, int(target["id"]))
+                except ValueError as exc:
+                    st.error(str(exc))
+                    st.stop()
+
+            save_db(db)
+            st.session_state.edit_participant_id = None
+            st.success("Участник обновлён.")
+            st.rerun()
+
+        st.divider()
+
+st.subheader("Список участников")
 if not participants:
     st.info("Пока участников нет.")
 else:
-    if "pending_delete_id" not in st.session_state:
-        st.session_state.pending_delete_id = None
-
-    header = st.columns([0.6, 2.5, 0.7, 0.8, 1.4, 1.4, 1.6, 1.0, 0.8])
-    labels = ["ID", "ФИО", "Пол", "Возраст", "DIV", "Регион", "Клуб / команда", "Флаг", "Del"]
+    header = st.columns([0.6, 0.7, 2.6, 0.7, 0.8, 1.4, 1.4, 1.2, 0.8, 0.8])
+    labels = ["ID", "Edit", "ФИО", "Пол", "Возраст", "DIV", "Регион", "Клуб", "Флаг", "Del"]
     for col, label in zip(header, labels):
         col.markdown(f"**{label}**")
 
     for p in participants:
-        cols = st.columns([0.6, 2.5, 0.7, 0.8, 1.4, 1.4, 1.6, 1.0, 0.8])
+        cols = st.columns([0.6, 0.7, 2.6, 0.7, 0.8, 1.4, 1.4, 1.2, 0.8, 0.8])
         cols[0].write(p["id"])
-        cols[1].write(p.get("full_name", ""))
-        cols[2].write(p.get("sex", ""))
-        cols[3].write(p.get("age", ""))
-        cols[4].write(p.get("division_id", ""))
-        cols[5].write(p.get("region", "") or p.get("city", ""))
-        cols[6].write(p.get("club", ""))
+        if cols[1].button("✏️", key=f"edit_{p['id']}"):
+            st.session_state.edit_participant_id = int(p["id"])
+            st.rerun()
+        cols[2].write(p.get("full_name", ""))
+        cols[3].write(p.get("sex", ""))
+        cols[4].write(p.get("age", ""))
+        cols[5].write(p.get("division_id", ""))
+        cols[6].write(p.get("region", "") or p.get("city", ""))
+        cols[7].write(p.get("club", "") or "—")
 
         fp = p.get("flag_path")
         if fp:
             try:
-                cols[7].image(fp, width=34)
+                cols[8].image(fp, width=34)
             except Exception:
-                cols[7].write("⚠️")
+                cols[8].write("⚠️")
         else:
-            cols[7].write("—")
+            cols[8].write("—")
 
-        if cols[8].button("❌", key=f"del_{p['id']}"):
+        if cols[9].button("❌", key=f"del_{p['id']}"):
             st.session_state.pending_delete_id = int(p["id"])
 
-    if st.session_state.pending_delete_id is not None:
-        pid = st.session_state.pending_delete_id
-        target = next((x for x in participants if int(x["id"]) == int(pid)), None)
-        if target:
-            st.warning(f"Удалить участника: **{target['full_name']}** (ID {pid})?")
-            c1, c2 = st.columns(2)
-            if c1.button("✅ Да, удалить"):
-                delete_participant(db, pid)
-                save_db(db)
-                st.session_state.pending_delete_id = None
-                st.success("Удалено.")
-                st.rerun()
-            if c2.button("❌ Нет, отмена"):
-                st.session_state.pending_delete_id = None
-                st.info("Отменено.")
-        else:
+if st.session_state.pending_delete_id is not None:
+    pid = st.session_state.pending_delete_id
+    target = next((x for x in participants if int(x["id"]) == int(pid)), None)
+    if target:
+        st.warning(f"Удалить участника: **{target['full_name']}** (ID {pid})?")
+        c1, c2 = st.columns(2)
+        if c1.button("✅ Да, удалить"):
+            delete_participant(db, pid)
+            save_db(db)
             st.session_state.pending_delete_id = None
+            if st.session_state.edit_participant_id == pid:
+                st.session_state.edit_participant_id = None
+            st.success("Удалено.")
+            st.rerun()
+        if c2.button("❌ Нет, отмена"):
+            st.session_state.pending_delete_id = None
+            st.info("Отменено.")
+    else:
+        st.session_state.pending_delete_id = None

@@ -1,8 +1,8 @@
 import streamlit as st
 from storage import load_db
 from config import DIVISIONS
-from scoring import build_ranking, total_points_for_athlete
-from utils import compact_page_style
+from scoring import build_ranking, total_points_for_athlete, build_division_overall, build_club_ranking
+from utils import compact_page_style, display_result_value
 
 st.set_page_config(page_title="Tables", layout="wide")
 compact_page_style()
@@ -11,6 +11,7 @@ st.title("📊 Tables (админ-панель)")
 db = load_db()
 settings = db["settings"]
 scores = settings["scores"]
+team_scoring = settings.get("team_scoring", {})
 
 
 def display_value_for_public(sdef, res):
@@ -20,12 +21,10 @@ def display_value_for_public(sdef, res):
     val = res.get("value")
     if status == "wd":
         return "WD"
-    if sdef["type"] == "time":
-        if status == "ok":
-            return f"{int(val)}s"
-        if status == "capped":
-            return f"CAP {int(val)} reps"
-    return str(val)
+    if status == "capped":
+        pretty = display_result_value(sdef, val)
+        return f"CAP {pretty}" if pretty else "CAP"
+    return display_result_value(sdef, val)
 
 
 for div in DIVISIONS:
@@ -44,15 +43,20 @@ for div in DIVISIONS:
         points_maps[s["id"]] = {r["athlete_id"]: r.get("points") for r in ranking}
         result_maps[s["id"]] = {r["athlete_id"]: r.get("result") for r in ranking}
 
+    overall_rows = build_division_overall(db, div_id)
+    overall_map = {int(r["athlete_id"]): r for r in overall_rows}
+
     table_rows = []
     for p in participants:
         aid = int(p["id"])
+        overall = overall_map.get(aid, {})
         row = {
+            "Место": overall.get("place_label", "—"),
             "ФИО": p.get("full_name", ""),
             "Возраст": p.get("age", ""),
             "DIV": p.get("category", ""),
             "Регион": p.get("region", "") or p.get("city", ""),
-            "Клуб / команда": p.get("club", ""),
+            "Клуб": p.get("club", ""),
             "Флаг": "✅" if p.get("flag_path") else "—",
         }
         for s in scores:
@@ -61,11 +65,34 @@ for div in DIVISIONS:
             res = result_maps[sid].get(aid)
             row[f"{sid}"] = "—" if pts is None else pts
             row[f"{sid}_res"] = display_value_for_public(s, res)
+        row["Приоритет"] = overall.get("priority_points", "—") if overall.get("priority_points") is not None else "—"
         row["ИТОГО"] = total_points_for_athlete(db, aid)
         table_rows.append(row)
 
-    table_rows.sort(key=lambda r: (-(r["ИТОГО"]), r["ФИО"]))
+    table_rows.sort(key=lambda r: (-float(r["ИТОГО"]), -float(r["Приоритет"]) if isinstance(r["Приоритет"], (int, float)) else 1, r["ФИО"]))
     st.dataframe(table_rows, use_container_width=True, hide_index=True)
     st.divider()
 
-st.caption("Если результата нет — стоит '—' и он не участвует в сумме. WD = 0 очков.")
+st.subheader("Клубный зачёт")
+club_payload = build_club_ranking(db)
+club_rows = []
+for row in club_payload.get("rows", []):
+    club_rows.append({
+        "Место": row.get("place"),
+        "Клуб": row.get("team_name"),
+        "Очки": row.get("points"),
+        "Участников": row.get("participants_count"),
+        "Зачётных мест": row.get("contributors"),
+        "1 мест": row.get("first_places"),
+        "2 мест": row.get("second_places"),
+        "3 мест": row.get("third_places"),
+        "Приоритетный комплекс": row.get("priority_sum"),
+    })
+if club_rows:
+    st.dataframe(club_rows, use_container_width=True, hide_index=True)
+else:
+    st.info("Клубов пока нет.")
+
+st.caption(
+    f"Командный зачёт считает призовые места по категориям. Приоритетный комплекс для тай-брейка: {team_scoring.get('priority_score_id', '—')}."
+)

@@ -1,57 +1,29 @@
-from typing import Dict, Any, List, Tuple, Optional
-import math
+from __future__ import annotations
 
-
-def _score_def(settings: Dict[str, Any], score_id: str) -> Dict[str, Any]:
-    for s in settings.get("scores", []):
-        if s["id"] == score_id:
-            return s
-    raise ValueError(f"Unknown score_id: {score_id}")
+from typing import Dict, Any, List, Optional, Tuple
 
 
 def _result_of(db: Dict[str, Any], athlete_id: int, score_id: str) -> Optional[Dict[str, Any]]:
-    """
-    result schema:
-      {
-        "status": "ok" | "capped" | "wd",
-        "value": number,  # time_seconds OR reps OR weight OR capped_reps (если capped)
-      }
-    Если результата нет — None.
-    """
     return db.get("results", {}).get(str(athlete_id), {}).get(score_id)
 
 
 def _sort_key_for_score(score_type: str, result: Optional[Dict[str, Any]]) -> Tuple:
-    """
-    Общая идея сортировки:
-    - ok всегда лучше capped для time
-    - wd хуже всех (очки=0)
-    - missing (None) вообще не ранжируем (будет внизу с "—")
-
-    Возвращаем кортеж, чтобы Python мог сортировать:
-    Меньше кортеж -> выше в рейтинге.
-    """
     if result is None:
-        # missing — в самый низ
         return (9,)
 
     status = result.get("status")
     value = result.get("value")
 
     if status == "wd":
-        # снялся — хуже всех, но выше чем "missing"? можно в самый низ после всех
         return (8,)
 
     if score_type == "time":
-        # ok time: лучше меньшие секунды
         if status == "ok":
             return (0, float(value))
-        # capped: хуже любого ok time, но между capped сравниваем по reps (больше лучше)
         if status == "capped":
             return (1, -float(value))
         return (7,)
 
-    # reps/weight: больше лучше
     if score_type in ("reps", "weight"):
         if status == "ok":
             return (0, -float(value))
@@ -61,34 +33,14 @@ def _sort_key_for_score(score_type: str, result: Optional[Dict[str, Any]]) -> Tu
 
 
 def _points_for_place(place: int, n: int) -> float:
-    """
-    Очки пропорционально кол-ву участников:
-      1 место = 100
-      шаг = 100/n
-      points = 100 - (place-1)*step
-
-    place: 1..n
-    n: число участников в дивизионе (активных)
-    """
     if n <= 0:
         return 0.0
     step = 100.0 / float(n)
     pts = 100.0 - (place - 1) * step
-    # не даём уйти ниже 0
-    pts = max(0.0, pts)
-    # округление (можно поменять)
-    return round(pts, 2)
+    return round(max(0.0, pts), 2)
 
 
 def build_ranking(db: Dict[str, Any], division_id: str, score_id: str) -> List[Dict[str, Any]]:
-    """
-    Возвращает строки рейтинга по одному зачёту внутри дивизиона.
-
-    Правила:
-    - missing -> показываем "—", очков нет (None)
-    - wd -> очки 0
-    - ничьи -> вариант B: одинаковый результат => одинаковое место => одинаковые очки этого места
-    """
     settings = db["settings"]
     sdef = None
     for s in settings.get("scores", []):
@@ -99,14 +51,10 @@ def build_ranking(db: Dict[str, Any], division_id: str, score_id: str) -> List[D
         return []
 
     score_type = sdef["type"]
-
     participants = [
         p for p in db.get("participants", [])
         if p.get("division_id") == division_id and not p.get("deleted", False)
     ]
-
-    # N для формулы очков — число участников в дивизионе.
-    # Это соответствует "пропорционально количеству участников".
     n = len(participants)
 
     rows = []
@@ -120,20 +68,17 @@ def build_ranking(db: Dict[str, Any], division_id: str, score_id: str) -> List[D
             "city": p.get("city", ""),
             "age": p.get("age", ""),
             "division_id": division_id,
-            "result": res,  # raw
+            "result": res,
         })
 
-    # сортировка для ранжируемых
     rows_sorted = sorted(rows, key=lambda r: _sort_key_for_score(score_type, r["result"]))
 
-    # назначение мест с учетом ничьих (по "ключу сравнения результата")
     def cmp_value(r: Dict[str, Any]) -> Tuple:
         res = r["result"]
         if res is None:
             return ("missing",)
         status = res.get("status")
         val = res.get("value")
-        # для time: ok сравниваем по времени, capped по reps, wd отдельно
         if score_type == "time":
             if status == "ok":
                 return ("ok", float(val))
@@ -155,29 +100,20 @@ def build_ranking(db: Dict[str, Any], division_id: str, score_id: str) -> List[D
     for r in rows_sorted:
         index += 1
         cv = cmp_value(r)
-
-        # missing — места не даем (будет внизу)
         if r["result"] is None:
             r["place"] = None
             r["points"] = None
             continue
-
-        # wd — фиксируем place как "самый низ", но очки = 0
         if r["result"].get("status") == "wd":
             r["place"] = None
             r["points"] = 0.0
             continue
-
-        # обычные результаты
         if prev_cmp is None:
             place = 1
-        else:
-            if cv != prev_cmp:
-                place = index
-
+        elif cv != prev_cmp:
+            place = index
         r["place"] = place
         r["points"] = _points_for_place(place, n)
-
         prev_cmp = cv
 
     return rows_sorted
@@ -187,7 +123,6 @@ def total_points_for_athlete(db: Dict[str, Any], athlete_id: int) -> float:
     settings = db["settings"]
     score_ids = [s["id"] for s in settings.get("scores", [])]
 
-    # ищем дивизион атлета
     div_id = None
     for p in db.get("participants", []):
         if not p.get("deleted", False) and int(p["id"]) == int(athlete_id):
@@ -206,3 +141,188 @@ def total_points_for_athlete(db: Dict[str, Any], athlete_id: int) -> float:
                     total += float(pts)
                 break
     return round(total, 2)
+
+
+def _priority_points_for_athlete(db: Dict[str, Any], athlete_id: int, priority_score_id: str) -> float:
+    participant = next((p for p in db.get("participants", []) if not p.get("deleted", False) and int(p["id"]) == int(athlete_id)), None)
+    if not participant:
+        return -1.0
+    ranking = build_ranking(db, str(participant.get("division_id") or ""), priority_score_id)
+    for row in ranking:
+        if int(row["athlete_id"]) == int(athlete_id):
+            pts = row.get("points")
+            return -1.0 if pts is None else float(pts)
+    return -1.0
+
+
+def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[str, Any]]:
+    participants = [
+        p for p in db.get("participants", [])
+        if p.get("division_id") == division_id and not p.get("deleted", False)
+    ]
+    team_scoring = db.get("settings", {}).get("team_scoring", {})
+    priority_score_id = str(team_scoring.get("priority_score_id") or "").strip()
+
+    rows = []
+    for p in participants:
+        aid = int(p["id"])
+        total = total_points_for_athlete(db, aid)
+        priority_points = _priority_points_for_athlete(db, aid, priority_score_id) if priority_score_id else -1.0
+        rows.append({
+            "id": aid,
+            "athlete_id": aid,
+            "full_name": p.get("full_name", ""),
+            "sex": p.get("sex", ""),
+            "age": p.get("age", ""),
+            "category": p.get("category", ""),
+            "division_id": division_id,
+            "region": p.get("region", "") or p.get("city", ""),
+            "city": p.get("city", ""),
+            "club": p.get("club", ""),
+            "flag_path": p.get("flag_path"),
+            "total": total,
+            "priority_points": round(priority_points, 2) if priority_points >= 0 else None,
+            "place": None,
+            "place_label": None,
+        })
+
+    rows.sort(key=lambda r: (-float(r["total"]), -float(r["priority_points"] or -1), r["full_name"].lower()))
+
+    place = 0
+    prev_key = None
+    for index, row in enumerate(rows, start=1):
+        tie_key = (float(row["total"]), float(row["priority_points"] or -1))
+        if prev_key is None or tie_key != prev_key:
+            place = index
+        row["place"] = place
+        row["place_label"] = str(place)
+        prev_key = tie_key
+    return rows
+
+
+def build_club_ranking(db: Dict[str, Any]) -> Dict[str, Any]:
+    settings = db.get("settings", {})
+    team_scoring = settings.get("team_scoring", {}) if isinstance(settings.get("team_scoring"), dict) else {}
+    division_points = team_scoring.get("division_points", {}) if isinstance(team_scoring.get("division_points"), dict) else {}
+    enabled_places = {int(x) for x in team_scoring.get("places", [1, 2, 3]) if str(x).isdigit()}
+    priority_score_id = str(team_scoring.get("priority_score_id") or "").strip()
+
+    participants = [p for p in db.get("participants", []) if not p.get("deleted", False)]
+    all_club_names = []
+    seen = set()
+    for name in settings.get("clubs", []):
+        club_name = str(name or "").strip()
+        if club_name and club_name.casefold() not in seen:
+            all_club_names.append(club_name)
+            seen.add(club_name.casefold())
+    for p in participants:
+        club_name = str(p.get("club") or "").strip()
+        if club_name and club_name.casefold() not in seen:
+            all_club_names.append(club_name)
+            seen.add(club_name.casefold())
+
+    club_rows: Dict[str, Dict[str, Any]] = {
+        name: {
+            "club_name": name,
+            "team_name": name,
+            "points": 0.0,
+            "participants_count": 0,
+            "contributors": 0,
+            "first_places": 0,
+            "second_places": 0,
+            "third_places": 0,
+            "priority_sum": 0.0,
+            "breakdown": [],
+        }
+        for name in all_club_names
+    }
+
+    for p in participants:
+        club_name = str(p.get("club") or "").strip()
+        if club_name:
+            club_rows.setdefault(club_name, {
+                "club_name": club_name,
+                "team_name": club_name,
+                "points": 0.0,
+                "participants_count": 0,
+                "contributors": 0,
+                "first_places": 0,
+                "second_places": 0,
+                "third_places": 0,
+                "priority_sum": 0.0,
+                "breakdown": [],
+            })
+            club_rows[club_name]["participants_count"] += 1
+
+    for division_id, points_map in division_points.items():
+        overall_rows = build_division_overall(db, division_id)
+        for row in overall_rows:
+            place = row.get("place")
+            club_name = str(row.get("club") or "").strip()
+            if not club_name or place not in enabled_places:
+                continue
+            pts = float(points_map.get(str(place), 0) or 0)
+            if pts <= 0:
+                continue
+            club_row = club_rows.setdefault(club_name, {
+                "club_name": club_name,
+                "team_name": club_name,
+                "points": 0.0,
+                "participants_count": 0,
+                "contributors": 0,
+                "first_places": 0,
+                "second_places": 0,
+                "third_places": 0,
+                "priority_sum": 0.0,
+                "breakdown": [],
+            })
+            club_row["points"] += pts
+            club_row["contributors"] += 1
+            if place == 1:
+                club_row["first_places"] += 1
+            elif place == 2:
+                club_row["second_places"] += 1
+            elif place == 3:
+                club_row["third_places"] += 1
+            priority_pts = _priority_points_for_athlete(db, int(row["athlete_id"]), priority_score_id) if priority_score_id else -1.0
+            if priority_pts > 0:
+                club_row["priority_sum"] += priority_pts
+            club_row["breakdown"].append({
+                "athlete_id": int(row["athlete_id"]),
+                "full_name": row.get("full_name", ""),
+                "division_id": division_id,
+                "division_title": division_id,
+                "place": place,
+                "place_label": str(place) if place else "—",
+                "awarded_points": round(pts, 2),
+                "priority_points": round(priority_pts, 2) if priority_pts >= 0 else None,
+            })
+
+    division_title_map = {d["id"]: d["title"] for d in db.get("settings", {}).get("_divisions", [])}
+    # fallback to config-free titles by reading breakdown rows later in build_public/tables if needed
+    rows = list(club_rows.values())
+    for row in rows:
+        row["points"] = round(float(row["points"]), 2)
+        row["priority_sum"] = round(float(row["priority_sum"]), 2)
+        for item in row["breakdown"]:
+            item["division_title"] = division_title_map.get(item["division_id"], item["division_id"])
+        row["breakdown"].sort(key=lambda x: (-float(x.get("awarded_points") or 0), x.get("full_name", "").lower()))
+
+    rows.sort(
+        key=lambda x: (
+            -float(x["points"]),
+            -int(x["first_places"]),
+            -int(x["second_places"]),
+            -int(x["third_places"]),
+            -float(x["priority_sum"]),
+            int(x["participants_count"]),
+            x["club_name"].lower(),
+        )
+    )
+    for idx, row in enumerate(rows, start=1):
+        row["place"] = idx
+    return {
+        "rows": rows,
+        "priority_score_id": priority_score_id,
+        "places": sorted(enabled_places),
+    }

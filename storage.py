@@ -1,8 +1,34 @@
 import json
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from config import DATA_DIR, DB_FILE, DATA_FLAGS_DIR, DIVISIONS, DEFAULT_SCORES
+
+
+PODIUM_PLACES = (1, 2, 3)
+
+
+def default_display_settings() -> Dict[str, Any]:
+    return {
+        "main": {
+            "section_title_size": 18,
+            "card_title_size": 16,
+            "table_text_size": 11,
+            "meta_text_size": 10,
+            "row_height": 4,
+            "block_gap": 8,
+            "container_scale": 1.0,
+        },
+        "mobile": {
+            "section_title_size": 22,
+            "card_title_size": 18,
+            "table_text_size": 12,
+            "meta_text_size": 11,
+            "row_height": 6,
+            "block_gap": 12,
+            "container_scale": 1.0,
+        },
+    }
 
 
 def ensure_dirs() -> None:
@@ -10,29 +36,16 @@ def ensure_dirs() -> None:
     DATA_FLAGS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def default_display_settings() -> Dict[str, Any]:
+def default_team_scoring() -> Dict[str, Any]:
     return {
-        "main": {
-            "section_title_size": 30,
-            "card_title_size": 24,
-            "table_text_size": 18,
-            "meta_text_size": 14,
-            "row_height": 36,
-            "block_gap": 12,
-            "container_scale": 1.0,
-        },
-        "mobile": {
-            "section_title_size": 18,
-            "card_title_size": 16,
-            "table_text_size": 12,
-            "meta_text_size": 11,
-            "row_height": 28,
-            "block_gap": 8,
-            "container_scale": 1.0,
-            "heat_title_font_size": 16,
-            "heat_name_font_size": 13,
-            "heat_lane_font_size": 13,
-            "heat_card_width": 180,
+        "enabled": True,
+        "priority_score_id": "WOD3",
+        "places": [1, 2, 3],
+        "division_points": {
+            "BEGSCAL_M": {"1": 7, "2": 5, "3": 3},
+            "BEGSCAL_F": {"1": 7, "2": 5, "3": 3},
+            "INT_M": {"1": 10, "2": 7, "3": 5},
+            "INT_F": {"1": 10, "2": 7, "3": 5},
         },
     }
 
@@ -48,13 +61,77 @@ def default_db() -> Dict[str, Any]:
             },
             "scores": DEFAULT_SCORES,
             "display": default_display_settings(),
+            "clubs": [],
+            "team_scoring": default_team_scoring(),
         },
         "participants": [],
         "results": {},
         "heats": {},
         "meta": {
-            "version": 4,
+            "version": 5,
         },
+    }
+
+
+def _normalize_clubs(raw: Any) -> List[str]:
+    items = raw if isinstance(raw, list) else []
+    cleaned: List[str] = []
+    seen = set()
+    for item in items:
+        name = str(item or "").strip()
+        if not name:
+            continue
+        key = name.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        cleaned.append(name)
+    cleaned.sort(key=lambda x: x.casefold())
+    return cleaned
+
+
+def _normalize_division_points(raw: Any) -> Dict[str, Dict[str, int]]:
+    base = default_team_scoring()["division_points"]
+    out: Dict[str, Dict[str, int]] = {}
+    raw = raw if isinstance(raw, dict) else {}
+    for div in DIVISIONS:
+        div_id = div["id"]
+        current = raw.get(div_id) if isinstance(raw.get(div_id), dict) else {}
+        out[div_id] = {}
+        for place in PODIUM_PLACES:
+            val = current.get(str(place), base[div_id][str(place)])
+            try:
+                out[div_id][str(place)] = max(0, int(val))
+            except (TypeError, ValueError):
+                out[div_id][str(place)] = int(base[div_id][str(place)])
+    return out
+
+
+def _normalize_team_scoring(raw: Any, scores: List[Dict[str, Any]]) -> Dict[str, Any]:
+    base = default_team_scoring()
+    raw = raw if isinstance(raw, dict) else {}
+    score_ids = [str(s.get("id") or "").strip() for s in scores if str(s.get("id") or "").strip()]
+    priority_score_id = str(raw.get("priority_score_id") or base["priority_score_id"]).strip()
+    if priority_score_id not in score_ids and score_ids:
+        priority_score_id = score_ids[-1]
+
+    places_raw = raw.get("places") if isinstance(raw.get("places"), list) else list(base["places"])
+    places = []
+    for item in places_raw:
+        try:
+            iv = int(item)
+        except (TypeError, ValueError):
+            continue
+        if iv in PODIUM_PLACES and iv not in places:
+            places.append(iv)
+    if not places:
+        places = list(base["places"])
+
+    return {
+        "enabled": bool(raw.get("enabled", True)),
+        "priority_score_id": priority_score_id,
+        "places": places,
+        "division_points": _normalize_division_points(raw.get("division_points")),
     }
 
 
@@ -99,26 +176,10 @@ def _normalize_participant(raw: Any) -> Dict[str, Any] | None:
         "division_id": division_id,
         "region": str(raw.get("region") or "").strip(),
         "city": str(raw.get("city") or "").strip(),
-        "club": str(raw.get("club") or "").strip(),
+        "club": str(raw.get("club") or raw.get("team_name") or "").strip(),
         "flag_path": raw.get("flag_path") or None,
         "deleted": bool(raw.get("deleted", False)),
     }
-
-
-def _merged_display_settings(raw_display: Any) -> Dict[str, Any]:
-    base = default_display_settings()
-    if not isinstance(raw_display, dict):
-        return base
-
-    result: Dict[str, Any] = {}
-    for area, defaults in base.items():
-        current = raw_display.get(area) if isinstance(raw_display.get(area), dict) else {}
-        merged = dict(defaults)
-        for key, value in current.items():
-            if key in defaults:
-                merged[key] = value
-        result[area] = merged
-    return result
 
 
 def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
@@ -129,7 +190,9 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
     settings = db.get("settings") if isinstance(db.get("settings"), dict) else {}
     division_limits = settings.get("division_limits") if isinstance(settings.get("division_limits"), dict) else {}
     scores = settings.get("scores") if isinstance(settings.get("scores"), list) and settings.get("scores") else DEFAULT_SCORES
-    display = _merged_display_settings(settings.get("display"))
+    display = settings.get("display") if isinstance(settings.get("display"), dict) else {}
+    clubs = _normalize_clubs(settings.get("clubs"))
+    team_scoring = _normalize_team_scoring(settings.get("team_scoring"), scores)
 
     participants_raw = db.get("participants") if isinstance(db.get("participants"), list) else []
     participants = []
@@ -137,12 +200,23 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
         normalized = _normalize_participant(item)
         if normalized is not None:
             participants.append(normalized)
+            club_name = normalized.get("club", "").strip()
+            if club_name and club_name.casefold() not in {x.casefold() for x in clubs}:
+                clubs.append(club_name)
+    clubs = _normalize_clubs(clubs)
+
+    merged_display = default_display_settings()
+    for screen_key, screen_defaults in merged_display.items():
+        raw_screen = display.get(screen_key) if isinstance(display.get(screen_key), dict) else {}
+        merged_display[screen_key] = {**screen_defaults, **raw_screen}
 
     normalized = {
         "settings": {
             "division_limits": {**base["settings"]["division_limits"], **division_limits},
             "scores": scores,
-            "display": display,
+            "display": merged_display,
+            "clubs": clubs,
+            "team_scoring": team_scoring,
         },
         "participants": participants,
         "results": db.get("results") if isinstance(db.get("results"), dict) else {},
@@ -150,7 +224,7 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
         "meta": db.get("meta") if isinstance(db.get("meta"), dict) else {},
     }
 
-    normalized["meta"].setdefault("version", 4)
+    normalized["meta"].setdefault("version", 5)
     return normalized
 
 
@@ -180,19 +254,6 @@ def save_db(db: Dict[str, Any]) -> None:
     os.replace(tmp_file, DB_FILE)
 
 
-def clear_results(db: Dict[str, Any]) -> Dict[str, Any]:
-    db = _normalize_db(db)
-    db["results"] = {}
-    return db
-
-
-def clear_all_data(db: Dict[str, Any]) -> Dict[str, Any]:
-    fresh = default_db()
-    # сохраняем пользовательские настройки очков/лимитов/отображения
-    fresh["settings"] = _normalize_db(db)["settings"]
-    return fresh
-
-
 def next_participant_id(db: Dict[str, Any]) -> int:
     participants = db.get("participants", [])
     if not participants:
@@ -216,3 +277,13 @@ def delete_participant(db: Dict[str, Any], participant_id: int) -> None:
         if int(p["id"]) == int(participant_id):
             p["deleted"] = True
             break
+
+
+def clear_results(db: Dict[str, Any]) -> None:
+    db["results"] = {}
+
+
+def clear_all_data(db: Dict[str, Any]) -> None:
+    db["participants"] = []
+    db["results"] = {}
+    db["heats"] = {}

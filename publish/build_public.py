@@ -8,7 +8,7 @@ from typing import Dict, Any, List, Optional
 from config import DOCS_DIR, DOCS_RESULTS_FILE, DOCS_FLAGS_DIR, DIVISIONS
 from heats_logic import serialize_heats_for_public
 from storage import load_db, default_display_settings
-from scoring import build_ranking, total_points_for_athlete
+from scoring import build_ranking, build_division_overall, build_club_ranking
 from utils import display_result_value
 
 
@@ -56,96 +56,15 @@ def _public_result_text(score_def: Dict[str, Any], result: Optional[Dict[str, An
     return display_result_value(score_def, value)
 
 
-def _assign_places_by_total(rows: List[Dict[str, Any]]) -> None:
-    place = 0
-    prev_total = None
-
-    for index, row in enumerate(rows, start=1):
-        total = float(row.get("total") or 0.0)
-        if prev_total is None or total != prev_total:
-            place = index
-        row["place"] = place
-        row["place_label"] = str(place)
-        prev_total = total
-
-
 def _division_title_map() -> Dict[str, str]:
     return {d["id"]: d["title"] for d in DIVISIONS}
-
-
-def _build_clubs_payload(db: Dict[str, Any], division_rows: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Any]:
-    division_titles = _division_title_map()
-    participants = [
-        p for p in db.get("participants", [])
-        if not p.get("deleted", False) and str(p.get("club") or "").strip()
-    ]
-
-    clubs: Dict[str, Dict[str, Any]] = {}
-    for p in participants:
-        club_name = str(p.get("club") or "").strip()
-        aid = int(p["id"])
-        clubs.setdefault(
-            club_name,
-            {
-                "club_name": club_name,
-                "team_name": club_name,
-                "club": club_name,
-                "points": 0.0,
-                "participants_count": 0,
-                "contributors": 0,
-                "first_places": 0,
-                "breakdown": [],
-            },
-        )
-        club_row = clubs[club_name]
-        club_row["participants_count"] += 1
-        total = float(total_points_for_athlete(db, aid))
-        if total > 0:
-            club_row["contributors"] += 1
-            club_row["points"] += total
-
-        division_id = p.get("division_id")
-        division_list = division_rows.get(division_id, [])
-        person_place = None
-        for row in division_list:
-            if int(row["id"]) == aid:
-                person_place = row.get("place")
-                break
-        if person_place == 1:
-            club_row["first_places"] += 1
-
-        club_row["breakdown"].append(
-            {
-                "athlete_id": aid,
-                "full_name": p.get("full_name", ""),
-                "division_id": division_id,
-                "division_title": division_titles.get(division_id, division_id),
-                "place": person_place,
-                "place_label": str(person_place) if person_place else "—",
-                "awarded_points": round(total, 2),
-            }
-        )
-
-    rows = list(clubs.values())
-    for row in rows:
-        row["points"] = round(float(row["points"]), 2)
-        row["breakdown"].sort(
-            key=lambda x: (-float(x.get("awarded_points") or 0.0), x.get("full_name", "").lower())
-        )
-
-    rows.sort(
-        key=lambda x: (-float(x["points"]), x["participants_count"], -int(x["first_places"]), x["club_name"].lower())
-    )
-    for idx, row in enumerate(rows, start=1):
-        row["place"] = idx
-
-    return {"rows": rows}
 
 
 def build_public_payload() -> Dict[str, Any]:
     db = load_db()
     settings = db["settings"]
     scores = settings["scores"]
+    team_scoring = settings.get("team_scoring", {})
     display = settings.get("display") if isinstance(settings.get("display"), dict) else default_display_settings()
 
     payload: Dict[str, Any] = {
@@ -154,9 +73,9 @@ def build_public_payload() -> Dict[str, Any]:
         "scores": scores,
         "heats": serialize_heats_for_public(db),
         "display": display,
+        "tie_break_mode": "priority_score",
+        "priority_score_id": team_scoring.get("priority_score_id"),
     }
-
-    division_rows: Dict[str, List[Dict[str, Any]]] = {}
 
     for d in DIVISIONS:
         div_id = d["id"]
@@ -172,17 +91,16 @@ def build_public_payload() -> Dict[str, Any]:
             points_maps[s["id"]] = {r["athlete_id"]: r.get("points") for r in ranking}
             result_maps[s["id"]] = {r["athlete_id"]: r.get("result") for r in ranking}
 
-        rows = []
-        sorted_participants = sorted(
-            participants,
-            key=lambda p: (-total_points_for_athlete(db, int(p["id"])), p.get("full_name", "")),
-        )
+        overall_rows = build_division_overall(db, div_id)
+        overall_map = {int(r["athlete_id"]): r for r in overall_rows}
 
-        for p in sorted_participants:
+        rows: List[Dict[str, Any]] = []
+        for p in participants:
             aid = int(p["id"])
+            overall = overall_map.get(aid, {})
             row = {
-                "place": None,
-                "place_label": None,
+                "place": overall.get("place"),
+                "place_label": overall.get("place_label"),
                 "id": aid,
                 "full_name": p.get("full_name", ""),
                 "age": p.get("age", ""),
@@ -194,7 +112,8 @@ def build_public_payload() -> Dict[str, Any]:
                 "division_id": div_id,
                 "flag": _flag_data_uri(p.get("flag_path")),
                 "scores": {},
-                "total": total_points_for_athlete(db, aid),
+                "priority_points": overall.get("priority_points"),
+                "total": overall.get("total", 0.0),
             }
             for s in scores:
                 sid = s["id"]
@@ -206,15 +125,18 @@ def build_public_payload() -> Dict[str, Any]:
                 }
             rows.append(row)
 
-        _assign_places_by_total(rows)
-        division_rows[div_id] = rows
-
+        rows.sort(key=lambda r: (int(r.get("place") or 9999), r.get("full_name", "").lower()))
         payload["divisions"][div_id] = {
             "title": d["title"],
             "rows": rows,
         }
 
-    payload["clubs"] = _build_clubs_payload(db, division_rows)
+    club_payload = build_club_ranking(db)
+    div_titles = _division_title_map()
+    for row in club_payload.get("rows", []):
+        for item in row.get("breakdown", []):
+            item["division_title"] = div_titles.get(item.get("division_id"), item.get("division_id"))
+    payload["clubs"] = club_payload
     payload["teams"] = payload["clubs"]
     return payload
 
