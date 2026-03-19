@@ -53,6 +53,55 @@ for s in score_rows:
             s["time_cap_enabled"] = bool(new_cap)
             changed = True
 
+
+
+
+st.divider()
+st.subheader("Настройки TV / основных экранов")
+main_display = db["settings"].setdefault("display", {}).setdefault("main", {})
+
+def _main_slider(label: str, key: str, min_v: int, max_v: int, default: int, step: int = 1):
+    global changed
+    current = int(main_display.get(key, default) or default)
+    new_val = st.slider(label, min_value=min_v, max_value=max_v, value=current, step=step, key=f"main_{key}")
+    if int(new_val) != current:
+        main_display[key] = int(new_val)
+        changed = True
+
+c1, c2 = st.columns(2)
+with c1:
+    _main_slider("Размер верхнего заголовка TV", "page_title_font_size", 16, 36, 22)
+    _main_slider("Размер заголовков разделов TV", "section_title_font_size", 14, 32, 18)
+    _main_slider("Размер заголовков карточек TV", "card_title_font_size", 12, 28, 16)
+    _main_slider("Размер текста таблиц TV", "table_font_size", 9, 20, 11)
+with c2:
+    _main_slider("Размер имени атлета TV", "athlete_font_size", 10, 24, 13)
+    _main_slider("Размер вторичного текста TV", "meta_font_size", 9, 20, 11)
+    _main_slider("Размер заголовка захода TV", "heat_title_font_size", 12, 28, 16)
+    _main_slider("Размер текста в заходах TV", "heat_text_font_size", 10, 22, 12)
+
+st.divider()
+st.subheader("Настройки мобильного экрана")
+mobile_display = db["settings"].setdefault("display", {}).setdefault("mobile", {})
+
+def _slider(label: str, key: str, min_v: int, max_v: int, step: int = 1):
+    global changed
+    current = int(mobile_display.get(key, 0) or 0)
+    new_val = st.slider(label, min_value=min_v, max_value=max_v, value=current, step=step, key=f"mobile_{key}")
+    if int(new_val) != current:
+        mobile_display[key] = int(new_val)
+        changed = True
+
+c1, c2 = st.columns(2)
+with c1:
+    _slider("Размер текста таблиц (mobile)", "table_font_size", 10, 18)
+    _slider("Размер вторичного текста (mobile)", "secondary_font_size", 9, 16)
+    _slider("Размер заголовка захода (mobile)", "heat_title_font_size", 12, 24)
+with c2:
+    _slider("Размер имени атлета в заходе (mobile)", "heat_text_font_size", 11, 22)
+    _slider("Размер номера дорожки (mobile)", "heat_lane_font_size", 10, 20)
+    _slider("Ширина карточки захода (mobile)", "heat_card_width", 140, 260, step=10)
+
 st.divider()
 st.subheader("Ручная настройка отображения экранов")
 st.caption("Эти настройки попадают в public-экраны после Publish и помогают уместить больше информации на ТВ и mobile.")
