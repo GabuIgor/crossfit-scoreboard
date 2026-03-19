@@ -27,10 +27,9 @@
   <label>Таблица: <select id="divSel"></select></label>
   <label style="margin-left:8px;">Заходы: <select id="wodSel"></select></label>
   <div class="box" id="tableBox"></div>
-  <div class="box" id="teamsBox"></div>
   <div class="box" id="heatsBox"></div>
 <script>
-const DIVS = ["BEGSCAL_F","BEGSCAL_M","INT_F","INT_M"];
+const DIVS = ["BEGSCAL_F","BEGSCAL_M","INT_F","INT_M","CLUBS"];
 let cache = null;
 const divSel = document.getElementById('divSel');
 const wodSel = document.getElementById('wodSel');
@@ -39,7 +38,9 @@ function safe(s){ return s===null||s===undefined ? '' : String(s); }
 DIVS.forEach(id => { const opt=document.createElement('option'); opt.value=id; opt.textContent=id; divSel.appendChild(opt); });
 ['WOD1','WOD2','WOD3'].forEach(id => { const opt=document.createElement('option'); opt.value=id; opt.textContent=id; wodSel.appendChild(opt); });
 function renderTable(){
-  const id = divSel.value; const div = cache.divisions?.[id];
+  const id = divSel.value;
+  if(id === 'CLUBS'){ renderTeamsInline(); return; }
+  const div = cache.divisions?.[id];
   if(!div){ document.getElementById('tableBox').innerHTML='Нет данных'; return; }
   let html = `<h3>${safe(div.title)}</h3><div class="muted">ПР — место определено по приоритетному комплексу (${safe(cache.priority_score_id)})</div><table><thead><tr><th>#</th><th>Атлет</th><th class="points">W1</th><th class="points">W2A</th><th class="points">W2B</th><th class="points">W3</th><th class="points">Σ</th></tr></thead><tbody>`;
   (div.rows||[]).forEach(r => {
@@ -54,7 +55,7 @@ function renderTable(){
   });
   html += '</tbody></table>'; document.getElementById('tableBox').innerHTML = html;
 }
-function renderTeams(){
+function renderTeamsInline(){
   const rows = cache.clubs?.rows || cache.teams?.rows || [];
   let html = `<h3>Клубный зачёт</h3><table><thead><tr><th>#</th><th>Клуб</th><th class="points">Очки</th><th class="points">Участ.</th><th class="points">1х</th></tr></thead><tbody>`;
   rows.forEach(r => {
@@ -67,10 +68,13 @@ function renderTeams(){
       html += `<div class="meta2" style="margin-top:4px;">${safe(item.full_name)} · ${safe(item.division_title)} · место ${safe(item.place_label)} · +${fmt(item.awarded_points)}</div>`;
     });
   }
-  document.getElementById('teamsBox').innerHTML = html;
+  document.getElementById('tableBox').innerHTML = html;
 }
+
 function renderHeats(){
-  const divId = divSel.value; const wodId = wodSel.value; const heats = cache.heats?.[wodId]?.divisions?.[divId] || [];
+  const divId = divSel.value;
+  if(divId === 'CLUBS'){ document.getElementById('heatsBox').innerHTML = ''; return; }
+  const wodId = wodSel.value; const heats = cache.heats?.[wodId]?.divisions?.[divId] || [];
   let html = `<h3>${safe(cache.heats?.[wodId]?.title || wodId)} — заходы</h3>`;
   if(!heats.length){ document.getElementById('heatsBox').innerHTML = html + 'Нет заходов'; return; }
   html += `<div class="heats-row">`;
@@ -99,7 +103,7 @@ async function load(){
   const res = await fetch(`results.json?ts=${Date.now()}`); cache = await res.json();
   document.getElementById('meta').textContent = `Обновлено: ${cache.generated_at}`;
   applyDisplaySettings();
-  renderTable(); renderTeams(); renderHeats();
+  renderTable(); renderHeats();
 }
 divSel.onchange = () => { if(cache){ renderTable(); renderHeats(); } };
 wodSel.onchange = () => { if(cache){ renderHeats(); } };
