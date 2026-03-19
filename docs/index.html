@@ -62,21 +62,27 @@
     .score-sub { margin-top: 3px; color: var(--muted); font-size: var(--meta-text-size); line-height: 1.1; min-height: 11px; }
     .note { padding: 6px 10px; font-size: var(--meta-text-size); color: var(--muted); border-top: 1px solid var(--line); background: #fff; }
     .heats-layout { height: calc(100% - 28px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: max(4px, calc(var(--block-gap) * 0.9)); align-items: start; }
-    .heat-column { min-width: 0; display: flex; flex-direction: column; gap: max(4px, calc(var(--block-gap) * 0.65)); min-height: 0; }
-    .heat-column-title { font-size: calc(var(--card-title-size) - 1px); font-weight: 700; padding: 5px 8px; border-radius: 10px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
-    .heat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: max(4px, calc(var(--block-gap) * 0.65)); align-content: start; }
-    .workout-group { border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.72); padding: 6px; box-shadow: var(--shadow); }
-    .workout-group + .workout-group { margin-top: max(6px, calc(var(--block-gap) * 0.7)); }
-    .workout-group-title { font-size: calc(var(--card-title-size) - 2px); font-weight: 700; margin: 0 0 6px 0; padding: 2px 4px 6px; border-bottom: 1px solid var(--line); color: var(--ink); }
-    .heat-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); min-width: 0; }
-    .heat-card-head { display: flex; justify-content: space-between; gap: 6px; align-items: center; padding: 5px 7px; background: #fff; border-bottom: 1px solid var(--line); }
-    .heat-card-head strong { font-size: calc(var(--card-title-size) - 2px); line-height: 1.05; }
-    .heat-card-head span { color: var(--muted); font-size: calc(var(--meta-text-size) - 1px); display: none; }
-    .heat-table { font-size: calc(var(--table-text-size) - 1px); }
-    .heat-table td { padding: max(2px, calc(var(--row-height) - 1px)) 4px; }
-    .heat-table .athlete-line { font-size: var(--table-text-size); }
-    .heat-table .athlete-meta { font-size: calc(var(--meta-text-size) - 1px); }
-    .lane-col { width: 28px; text-align: center; font-weight: 700; }
+    .heat-column { min-width: 0; display: flex; flex-direction: column; gap: max(4px, calc(var(--block-gap) * 0.55)); min-height: 0; }
+    .heat-column-title { font-size: calc(var(--card-title-size) - 2px); font-weight: 700; padding: 4px 7px; border-radius: 9px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .workout-group { border: 2px solid var(--line); border-radius: 12px; padding: 5px; background: #fff; }
+    .workout-group + .workout-group { margin-top: max(4px, calc(var(--block-gap) * 0.5)); }
+    .workout-group.wod1 { border-color: #cfe2ff; background: #f7fbff; }
+    .workout-group.wod2 { border-color: #d6f5dd; background: #f7fdf8; }
+    .workout-group.wod3 { border-color: #ffe2c6; background: #fffaf5; }
+    .workout-group-title { font-size: calc(var(--meta-text-size) + 1px); font-weight: 800; padding: 2px 4px 5px 4px; }
+    .workout-group.wod1 .workout-group-title { color: #2456a6; }
+    .workout-group.wod2 .workout-group-title { color: #1f7a3d; }
+    .workout-group.wod3 .workout-group-title { color: #a65b19; }
+    .heat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: max(4px, calc(var(--block-gap) * 0.45)); align-content: start; }
+    .heat-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); min-width: 0; }
+    .heat-card-head { display: flex; justify-content: space-between; gap: 4px; align-items: center; padding: 3px 5px; background: #fff; border-bottom: 1px solid var(--line); }
+    .heat-card-head strong { font-size: calc(var(--table-text-size) - 1px); line-height: 1.02; font-weight: 800; }
+    .heat-card-head span { color: var(--muted); font-size: calc(var(--meta-text-size) - 2px); display: none; }
+    .heat-table { font-size: calc(var(--table-text-size) - 3px); }
+    .heat-table td { padding: 1px 3px; }
+    .heat-table .athlete-line { font-size: calc(var(--table-text-size) - 2px); line-height: 1.02; }
+    .heat-table .athlete-meta { font-size: calc(var(--meta-text-size) - 3px); line-height: 1.0; }
+    .lane-col { width: 22px; text-align: center; font-weight: 700; }
     .empty { color: var(--muted); font-size: 16px; display: flex; align-items: center; justify-content: center; height: 100%; border: 1px dashed var(--line); border-radius: 12px; background: #fff; }
     .breakdown-list { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
     .breakdown-item { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 6px 8px; }
@@ -269,22 +275,26 @@ function renderHeatsScene() {
     const groups = ['WOD1', 'WOD2', 'WOD3'].map(workoutId => {
       const heats = cache?.heats?.[workoutId]?.divisions?.[divId] || [];
       if (!heats.length) return '';
+      const match = safe(workoutNames[workoutId] || workoutId).match(/(\d+)/);
+      const workoutNum = match ? match[1] : workoutId;
       const cards = heats.map(h => `
         <div class="heat-card">
           <div class="heat-card-head">
-            <strong>${heatCardLabel(workoutId, h.heat, workoutNames)}</strong>
+            <strong>Заход ${fmt(h.heat)}</strong>
             <span>${safe(DIV_SHORT[divId])}</span>
           </div>
           <table class="heat-table"><tbody>
             ${(h.assignments || []).map(a => `<tr><td class="lane-col">${fmt(a.lane)}</td><td>${heatAthleteCell(a)}</td></tr>`).join('')}
           </tbody></table>
         </div>`).join('');
-      return `<div class="workout-group"><div class="workout-group-title">${workoutGroupLabel(workoutId, workoutNames)}</div><div class="heat-grid">${cards}</div></div>`;
-    }).filter(Boolean).join('');
-    const content = groups || '<div class="empty">Заходы ещё не сформированы</div>';
-    return `<div class="heat-column"><div class="heat-column-title">${safe(DIV_SHORT[divId])}</div>${content}</div>`;
+      return `<div class="workout-group ${workoutId.toLowerCase()}">
+        <div class="workout-group-title">Комплекс ${workoutNum}</div>
+        <div class="heat-grid">${cards}</div>
+      </div>`;
+    }).join('');
+    return `<div class="heat-column"><div class="heat-column-title">${safe(DIV_SHORT[divId])}</div>${groups || '<div class="empty">Заходы ещё не сформированы</div>'}</div>`;
   }).join('');
-  root.innerHTML = `<div class="scene-header"><h2>Заходы</h2><div class="scene-sub">Комплексы разделены по группам</div></div><div class="heats-layout">${columns}</div>`;
+  root.innerHTML = `<div class="scene-header"><h2>Заходы</h2><div class="scene-sub">Комплексы выделены по цветам и уменьшены отдельно</div></div><div class="heats-layout">${columns}</div>`;
 }
 
 function applyDisplaySettings() {
