@@ -2,7 +2,7 @@ import streamlit as st
 from storage import load_db
 from config import DIVISIONS
 from scoring import build_ranking, total_points_for_athlete, build_division_overall, build_club_ranking
-from utils import compact_page_style, display_result_value
+from utils import compact_page_style, display_result_value, participant_age
 
 st.set_page_config(page_title="Tables", layout="wide")
 compact_page_style()
@@ -53,7 +53,7 @@ for div in DIVISIONS:
         row = {
             "Место": overall.get("place_label", "—"),
             "ФИО": p.get("full_name", ""),
-            "Возраст": p.get("age", ""),
+            "Возраст": participant_age(p),
             "DIV": p.get("category", ""),
             "Регион": p.get("region", "") or p.get("city", ""),
             "Клуб": p.get("club", ""),

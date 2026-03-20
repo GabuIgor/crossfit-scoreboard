@@ -3,6 +3,7 @@ import os
 from typing import Dict, Any, List
 
 from config import DATA_DIR, DB_FILE, DATA_FLAGS_DIR, DIVISIONS, DEFAULT_SCORES
+from utils import birth_date_to_storage
 
 
 PODIUM_PLACES = (1, 2, 3)
@@ -68,7 +69,7 @@ def default_db() -> Dict[str, Any]:
         "results": {},
         "heats": {},
         "meta": {
-            "version": 5,
+            "version": 6,
         },
     }
 
@@ -171,6 +172,7 @@ def _normalize_participant(raw: Any) -> Dict[str, Any] | None:
         "id": participant_id,
         "full_name": str(raw.get("full_name") or "").strip(),
         "sex": sex,
+        "birth_date": birth_date_to_storage(raw.get("birth_date")),
         "age": age,
         "category": category,
         "division_id": division_id,
@@ -224,7 +226,7 @@ def _normalize_db(db: Dict[str, Any]) -> Dict[str, Any]:
         "meta": db.get("meta") if isinstance(db.get("meta"), dict) else {},
     }
 
-    normalized["meta"].setdefault("version", 5)
+    normalized["meta"].setdefault("version", 6)
     return normalized
 
 

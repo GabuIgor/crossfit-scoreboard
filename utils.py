@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+from datetime import date, datetime
 
 
 def display_result_value(score: dict, value) -> str:
@@ -78,3 +79,55 @@ def compact_page_style() -> None:
 
 def escape_html(value) -> str:
     return html.escape("" if value is None else str(value), quote=True)
+
+
+def parse_birth_date(value):
+    if isinstance(value, date):
+        return value
+    raw = "" if value is None else str(value).strip()
+    if not raw:
+        return None
+
+    for fmt in ("%Y-%m-%d", "%d.%m.%Y", "%d-%m-%Y", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(raw, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def birth_date_to_storage(value) -> str:
+    parsed = parse_birth_date(value)
+    return parsed.isoformat() if parsed else ""
+
+
+def display_birth_date(value) -> str:
+    parsed = parse_birth_date(value)
+    return parsed.strftime("%d.%m.%Y") if parsed else ""
+
+
+def calculate_age(birth_date_value, on_date=None):
+    born = parse_birth_date(birth_date_value)
+    if not born:
+        return None
+    ref = on_date or date.today()
+    if isinstance(ref, datetime):
+        ref = ref.date()
+    years = ref.year - born.year
+    if (ref.month, ref.day) < (born.month, born.day):
+        years -= 1
+    return max(0, years)
+
+
+def participant_age(participant: dict, on_date=None):
+    age = calculate_age(participant.get("birth_date"), on_date=on_date)
+    if age is not None:
+        return age
+
+    raw_age = participant.get("age", "")
+    if raw_age in (None, ""):
+        return ""
+    try:
+        return int(raw_age)
+    except (TypeError, ValueError):
+        return raw_age

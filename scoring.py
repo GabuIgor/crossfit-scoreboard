@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Dict, Any, List, Optional, Tuple
 
+from utils import participant_age
+
 
 def _result_of(db: Dict[str, Any], athlete_id: int, score_id: str) -> Optional[Dict[str, Any]]:
     return db.get("results", {}).get(str(athlete_id), {}).get(score_id)
@@ -66,7 +68,7 @@ def build_ranking(db: Dict[str, Any], division_id: str, score_id: str) -> List[D
             "full_name": p.get("full_name", ""),
             "club": p.get("club", ""),
             "city": p.get("city", ""),
-            "age": p.get("age", ""),
+            "age": participant_age(p),
             "division_id": division_id,
             "result": res,
         })
@@ -173,7 +175,7 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             "athlete_id": aid,
             "full_name": p.get("full_name", ""),
             "sex": p.get("sex", ""),
-            "age": p.get("age", ""),
+            "age": participant_age(p),
             "category": p.get("category", ""),
             "division_id": division_id,
             "region": p.get("region", "") or p.get("city", ""),

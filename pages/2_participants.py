@@ -4,7 +4,7 @@ from io import BytesIO
 
 from storage import load_db, save_db, next_participant_id, count_participants_in_division, delete_participant
 from config import DATA_FLAGS_DIR, MAX_FLAG_UPLOAD_BYTES, MAX_FLAG_DIMENSION
-from utils import compact_page_style
+from utils import compact_page_style, parse_birth_date, birth_date_to_storage, display_birth_date, participant_age
 
 st.set_page_config(page_title="Participants", layout="wide")
 compact_page_style()
@@ -58,7 +58,7 @@ with st.form("add_participant"):
     with c1:
         full_name = st.text_input("Фамилия Имя")
         sex = st.selectbox("Пол", ["M", "F"])
-        age = st.number_input("Возраст", min_value=1, max_value=120, step=1, value=25)
+        birth_date = st.date_input("Дата рождения", format="DD.MM.YYYY", value=None)
     with c2:
         category = st.selectbox("Категория", ["BEGSCAL", "INT"])
         region = st.text_input("Регион")
@@ -75,6 +75,8 @@ if submitted:
     name = (full_name or "").strip()
     if not name:
         st.error("ФИО пустое.")
+    elif not birth_date_to_storage(birth_date):
+        st.error("Укажи дату рождения.")
     else:
         division_id = resolve_division_id(sex, category)
         limit = int(db["settings"]["division_limits"].get(division_id, 0))
@@ -96,7 +98,8 @@ if submitted:
                 "id": pid,
                 "full_name": name,
                 "sex": sex,
-                "age": int(age),
+                "birth_date": birth_date_to_storage(birth_date),
+                "age": 0,
                 "category": category,
                 "division_id": division_id,
                 "region": (region or "").strip(),
@@ -129,7 +132,7 @@ if edit_id is not None:
             with c1:
                 edit_name = st.text_input("Фамилия Имя", value=target.get("full_name", ""))
                 edit_sex = st.selectbox("Пол", ["M", "F"], index=["M", "F"].index(target.get("sex", "M")))
-                edit_age = st.number_input("Возраст", min_value=1, max_value=120, step=1, value=int(target.get("age", 25) or 25))
+                edit_birth_date = st.date_input("Дата рождения", format="DD.MM.YYYY", value=parse_birth_date(target.get("birth_date")), key=f"edit_birth_date_{edit_id}")
             with c2:
                 edit_category = st.selectbox("Категория", ["BEGSCAL", "INT"], index=["BEGSCAL", "INT"].index(target.get("category", "BEGSCAL")))
                 edit_region = st.text_input("Регион", value=target.get("region", "") or target.get("city", ""))
@@ -163,9 +166,14 @@ if edit_id is not None:
                     st.error(f"Лимит для {new_division_id} = {limit}. Сейчас уже {current}. Перенос запрещён.")
                     st.stop()
 
+            if not birth_date_to_storage(edit_birth_date):
+                st.error("Укажи дату рождения.")
+                st.stop()
+
             target["full_name"] = (edit_name or "").strip()
             target["sex"] = edit_sex
-            target["age"] = int(edit_age)
+            target["birth_date"] = birth_date_to_storage(edit_birth_date)
+            target["age"] = 0
             target["category"] = edit_category
             target["division_id"] = new_division_id
             target["region"] = (edit_region or "").strip()
@@ -189,20 +197,20 @@ st.subheader("Список участников")
 if not participants:
     st.info("Пока участников нет.")
 else:
-    header = st.columns([0.6, 0.7, 2.6, 0.7, 0.8, 1.4, 1.4, 1.2, 0.8, 0.8])
-    labels = ["ID", "Edit", "ФИО", "Пол", "Возраст", "DIV", "Регион", "Клуб", "Флаг", "Del"]
+    header = st.columns([0.6, 0.7, 2.3, 0.7, 1.2, 0.8, 1.4, 1.2, 0.8, 0.8])
+    labels = ["ID", "Edit", "ФИО", "Пол", "Дата рожд.", "DIV", "Регион", "Клуб", "Флаг", "Del"]
     for col, label in zip(header, labels):
         col.markdown(f"**{label}**")
 
     for p in participants:
-        cols = st.columns([0.6, 0.7, 2.6, 0.7, 0.8, 1.4, 1.4, 1.2, 0.8, 0.8])
+        cols = st.columns([0.6, 0.7, 2.3, 0.7, 1.2, 0.8, 1.4, 1.2, 0.8, 0.8])
         cols[0].write(p["id"])
         if cols[1].button("✏️", key=f"edit_{p['id']}"):
             st.session_state.edit_participant_id = int(p["id"])
             st.rerun()
         cols[2].write(p.get("full_name", ""))
         cols[3].write(p.get("sex", ""))
-        cols[4].write(p.get("age", ""))
+        cols[4].write(display_birth_date(p.get("birth_date")) or "—")
         cols[5].write(p.get("division_id", ""))
         cols[6].write(p.get("region", "") or p.get("city", ""))
         cols[7].write(p.get("club", "") or "—")

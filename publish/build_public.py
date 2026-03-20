@@ -9,7 +9,7 @@ from config import DOCS_DIR, DOCS_RESULTS_FILE, DOCS_FLAGS_DIR, DIVISIONS
 from heats_logic import serialize_heats_for_public
 from storage import load_db, default_display_settings
 from scoring import build_ranking, build_division_overall, build_club_ranking
-from utils import display_result_value
+from utils import display_result_value, participant_age
 
 
 def ensure_docs_dirs() -> None:
@@ -103,7 +103,7 @@ def build_public_payload() -> Dict[str, Any]:
                 "place_label": overall.get("place_label"),
                 "id": aid,
                 "full_name": p.get("full_name", ""),
-                "age": p.get("age", ""),
+                "age": participant_age(p),
                 "club": p.get("club", ""),
                 "team_name": p.get("club", ""),
                 "region": p.get("region", "") or p.get("city", ""),
