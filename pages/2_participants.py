@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 from io import BytesIO
+from datetime import date
 
 from storage import load_db, save_db, next_participant_id, count_participants_in_division, delete_participant
 from config import DATA_FLAGS_DIR, MAX_FLAG_UPLOAD_BYTES, MAX_FLAG_DIMENSION
@@ -58,7 +59,13 @@ with st.form("add_participant"):
     with c1:
         full_name = st.text_input("Фамилия Имя")
         sex = st.selectbox("Пол", ["M", "F"])
-        birth_date = st.date_input("Дата рождения", format="DD.MM.YYYY", value=None)
+        birth_date = st.date_input(
+            "Дата рождения",
+            format="DD.MM.YYYY",
+            value=date(2000, 1, 1),
+            min_value=date(1950, 1, 1),
+            max_value=date.today(),
+        )
     with c2:
         category = st.selectbox("Категория", ["BEGSCAL", "INT"])
         region = st.text_input("Регион")
@@ -132,7 +139,14 @@ if edit_id is not None:
             with c1:
                 edit_name = st.text_input("Фамилия Имя", value=target.get("full_name", ""))
                 edit_sex = st.selectbox("Пол", ["M", "F"], index=["M", "F"].index(target.get("sex", "M")))
-                edit_birth_date = st.date_input("Дата рождения", format="DD.MM.YYYY", value=parse_birth_date(target.get("birth_date")), key=f"edit_birth_date_{edit_id}")
+                edit_birth_date = st.date_input(
+                    "Дата рождения",
+                    format="DD.MM.YYYY",
+                    value=parse_birth_date(target.get("birth_date")) or date(2000, 1, 1),
+                    min_value=date(1950, 1, 1),
+                    max_value=date.today(),
+                    key=f"edit_birth_date_{edit_id}",
+                )
             with c2:
                 edit_category = st.selectbox("Категория", ["BEGSCAL", "INT"], index=["BEGSCAL", "INT"].index(target.get("category", "BEGSCAL")))
                 edit_region = st.text_input("Регион", value=target.get("region", "") or target.get("city", ""))
@@ -143,7 +157,7 @@ if edit_id is not None:
                     club_options = club_options + [current_club]
                 edit_club = st.selectbox("Клуб", club_options, index=club_options.index(current_club))
                 edit_flag_file = st.file_uploader(
-                    f"Новый флаг (необязательно)",
+                    "Новый флаг (необязательно)",
                     type=["png", "jpg", "jpeg"],
                     key=f"edit_flag_{edit_id}",
                 )
