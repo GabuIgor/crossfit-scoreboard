@@ -1,9 +1,47 @@
 {
-  "generated_at": "2026-03-20T13:38:31.158210+00:00",
+  "generated_at": "2026-03-20T13:42:30.332355+00:00",
   "divisions": {
     "BEGSCAL_F": {
       "title": "Beginners/Scaled — Women",
       "rows": [
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 7,
+          "full_name": "Авакова Кристина",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
         {
           "place": 1,
           "place_label": "1",
@@ -19,44 +57,32 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 71.43,
-              "result": {
-                "status": "ok",
-                "value": 70.0
-              },
-              "result_text": "70"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 58
-              },
-              "result_text": "58"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2B": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 171
-              },
-              "result_text": "171"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD3": {
-              "points": 85.71,
-              "result": {
-                "status": "ok",
-                "value": 385
-              },
-              "result_text": "6:25"
+              "points": null,
+              "result": null,
+              "result_text": ""
             }
           },
-          "priority_points": 85.71,
-          "total": 357.14
+          "priority_points": null,
+          "total": 0.0
         },
         {
-          "place": 2,
-          "place_label": "2",
+          "place": 1,
+          "place_label": "1",
           "id": 6,
           "full_name": "Жегулева Ксения",
           "age": 25,
@@ -69,144 +95,32 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 42.86,
-              "result": {
-                "status": "ok",
-                "value": 65.0
-              },
-              "result_text": "65"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 58
-              },
-              "result_text": "58"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2B": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 171
-              },
-              "result_text": "171"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD3": {
-              "points": 71.43,
-              "result": {
-                "status": "ok",
-                "value": 423
-              },
-              "result_text": "7:03"
+              "points": null,
+              "result": null,
+              "result_text": ""
             }
           },
-          "priority_points": 71.43,
-          "total": 314.29
+          "priority_points": null,
+          "total": 0.0
         },
         {
-          "place": 3,
-          "place_label": "3",
-          "id": 5,
-          "full_name": "Постникова Юлия",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "BEGSCAL",
-          "division_id": "BEGSCAL_F",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 71.43,
-              "result": {
-                "status": "ok",
-                "value": 70.0
-              },
-              "result_text": "70"
-            },
-            "WOD2A": {
-              "points": 57.14,
-              "result": {
-                "status": "ok",
-                "value": 48
-              },
-              "result_text": "48"
-            },
-            "WOD2B": {
-              "points": 71.43,
-              "result": {
-                "status": "ok",
-                "value": 167
-              },
-              "result_text": "167"
-            },
-            "WOD3": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 362
-              },
-              "result_text": "6:02"
-            }
-          },
-          "priority_points": 100.0,
-          "total": 300.0
-        },
-        {
-          "place": 4,
-          "place_label": "4",
-          "id": 7,
-          "full_name": "Авакова Кристина",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "BEGSCAL",
-          "division_id": "BEGSCAL_F",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 90.0
-              },
-              "result_text": "90"
-            },
-            "WOD2A": {
-              "points": 71.43,
-              "result": {
-                "status": "ok",
-                "value": 49
-              },
-              "result_text": "49"
-            },
-            "WOD2B": {
-              "points": 42.86,
-              "result": {
-                "status": "ok",
-                "value": 153
-              },
-              "result_text": "153"
-            },
-            "WOD3": {
-              "points": 42.86,
-              "result": {
-                "status": "ok",
-                "value": 436
-              },
-              "result_text": "7:16"
-            }
-          },
-          "priority_points": 42.86,
-          "total": 257.15
-        },
-        {
-          "place": 5,
-          "place_label": "5",
+          "place": 1,
+          "place_label": "1",
           "id": 9,
           "full_name": "Лукьяненко Виктория",
           "age": 25,
@@ -219,94 +133,32 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 85.71,
-              "result": {
-                "status": "ok",
-                "value": 85.0
-              },
-              "result_text": "85"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
-              "points": 42.86,
-              "result": {
-                "status": "ok",
-                "value": 47
-              },
-              "result_text": "47"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2B": {
-              "points": 57.14,
-              "result": {
-                "status": "ok",
-                "value": 163
-              },
-              "result_text": "163"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD3": {
-              "points": 57.14,
-              "result": {
-                "status": "ok",
-                "value": 433
-              },
-              "result_text": "7:13"
+              "points": null,
+              "result": null,
+              "result_text": ""
             }
           },
-          "priority_points": 57.14,
-          "total": 242.85
+          "priority_points": null,
+          "total": 0.0
         },
         {
-          "place": 6,
-          "place_label": "6",
-          "id": 10,
-          "full_name": "Тедеева Моника",
-          "age": 25,
-          "club": "QLUKVA",
-          "team_name": "QLUKVA",
-          "region": "РСО-А, Владикавказ",
-          "city": "РСО-А, Владикавказ",
-          "category": "BEGSCAL",
-          "division_id": "BEGSCAL_F",
-          "flag": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAACfCAYAAABgD7XPAAACRklEQVR4nO3YsRECMRAEwXvqyYP8YyAZksDBEFlIxnQncGtNlXSttdYAhDxODwDYTfiAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyLneM+v0CICd7ue8th4EOM1TF8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiDn/s11egPAVtf6zNp7EuCse76HFwBs5o8PyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gKn5A9usC+/AxhPMAAAAAElFTkSuQmCC",
-          "scores": {
-            "WOD1": {
-              "points": 42.86,
-              "result": {
-                "status": "ok",
-                "value": 65.0
-              },
-              "result_text": "65"
-            },
-            "WOD2A": {
-              "points": 14.29,
-              "result": {
-                "status": "ok",
-                "value": 40
-              },
-              "result_text": "40"
-            },
-            "WOD2B": {
-              "points": 28.57,
-              "result": {
-                "status": "ok",
-                "value": 126
-              },
-              "result_text": "126"
-            },
-            "WOD3": {
-              "points": 14.29,
-              "result": {
-                "status": "capped",
-                "value": 148
-              },
-              "result_text": "CAP 2:28"
-            }
-          },
-          "priority_points": 14.29,
-          "total": 100.01
-        },
-        {
-          "place": 7,
-          "place_label": "7",
+          "place": 1,
+          "place_label": "1",
           "id": 11,
           "full_name": "Мелкумова Яна",
           "age": 25,
@@ -319,40 +171,104 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 14.29,
-              "result": {
-                "status": "ok",
-                "value": 55.0
-              },
-              "result_text": "55"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
-              "points": 28.57,
-              "result": {
-                "status": "ok",
-                "value": 43
-              },
-              "result_text": "43"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2B": {
-              "points": 14.29,
-              "result": {
-                "status": "ok",
-                "value": 121
-              },
-              "result_text": "121"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD3": {
-              "points": 28.57,
-              "result": {
-                "status": "ok",
-                "value": 553
-              },
-              "result_text": "9:13"
+              "points": null,
+              "result": null,
+              "result_text": ""
             }
           },
-          "priority_points": 28.57,
-          "total": 85.72
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 5,
+          "full_name": "Постникова Юлия",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 10,
+          "full_name": "Тедеева Моника",
+          "age": 25,
+          "club": "QLUKVA",
+          "team_name": "QLUKVA",
+          "region": "РСО-А, Владикавказ",
+          "city": "РСО-А, Владикавказ",
+          "category": "BEGSCAL",
+          "division_id": "BEGSCAL_F",
+          "flag": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAACfCAYAAABgD7XPAAACRklEQVR4nO3YsRECMRAEwXvqyYP8YyAZksDBEFlIxnQncGtNlXSttdYAhDxODwDYTfiAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyLneM+v0CICd7ue8th4EOM1TF8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiDn/s11egPAVtf6zNp7EuCse76HFwBs5o8PyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gBzhA3KED8gRPiBH+IAc4QNyhA/IET4gR/iAHOEDcoQPyBE+IEf4gKn5A9usC+/AxhPMAAAAAElFTkSuQmCC",
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
         }
       ]
     },
@@ -374,12 +290,9 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 21.0
-              },
-              "result_text": "21"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
               "points": null,
@@ -398,7 +311,7 @@
             }
           },
           "priority_points": null,
-          "total": 100.0
+          "total": 0.0
         }
       ]
     },
@@ -409,6 +322,234 @@
     "INT_M": {
       "title": "Intermediate — Men",
       "rows": [
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 18,
+          "full_name": "ввввясвясяч",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 13,
+          "full_name": "Индиго Гиго",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 17,
+          "full_name": "йцуйцйййй",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 12,
+          "full_name": "Санек Сашок",
+          "age": 25,
+          "club": "Urban",
+          "team_name": "Urban",
+          "region": "Волгоград",
+          "city": "Волгоград",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 26,
+          "full_name": "сячсфвы",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 16,
+          "full_name": "фыввфв",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
         {
           "place": 1,
           "place_label": "1",
@@ -424,12 +565,9 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 100.0,
-              "result": {
-                "status": "ok",
-                "value": 222.0
-              },
-              "result_text": "222"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
               "points": null,
@@ -448,462 +586,11 @@
             }
           },
           "priority_points": null,
-          "total": 100.0
+          "total": 0.0
         },
         {
-          "place": 2,
-          "place_label": "2",
-          "id": 23,
-          "full_name": "ясчячсячсячс",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 93.75,
-              "result": {
-                "status": "ok",
-                "value": 145.0
-              },
-              "result_text": "145"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 93.75
-        },
-        {
-          "place": 3,
-          "place_label": "3",
-          "id": 26,
-          "full_name": "сячсфвы",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 87.5,
-              "result": {
-                "status": "ok",
-                "value": 142.0
-              },
-              "result_text": "142"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 87.5
-        },
-        {
-          "place": 4,
-          "place_label": "4",
-          "id": 28,
-          "full_name": "ыфвфычс",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 81.25,
-              "result": {
-                "status": "ok",
-                "value": 131.0
-              },
-              "result_text": "131"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 81.25
-        },
-        {
-          "place": 4,
-          "place_label": "4",
-          "id": 21,
-          "full_name": "ячсчясяя",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 81.25,
-              "result": {
-                "status": "ok",
-                "value": 131.0
-              },
-              "result_text": "131"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 81.25
-        },
-        {
-          "place": 6,
-          "place_label": "6",
-          "id": 24,
-          "full_name": "ясячсячсчя",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 68.75,
-              "result": {
-                "status": "ok",
-                "value": 123.0
-              },
-              "result_text": "123"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 68.75
-        },
-        {
-          "place": 7,
-          "place_label": "7",
-          "id": 20,
-          "full_name": "ясячсячсяч",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 62.5,
-              "result": {
-                "status": "ok",
-                "value": 121.0
-              },
-              "result_text": "121"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 62.5
-        },
-        {
-          "place": 8,
-          "place_label": "8",
-          "id": 12,
-          "full_name": "Санек Сашок",
-          "age": 25,
-          "club": "Urban",
-          "team_name": "Urban",
-          "region": "Волгоград",
-          "city": "Волгоград",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 56.25,
-              "result": {
-                "status": "ok",
-                "value": 120.0
-              },
-              "result_text": "120"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 56.25
-        },
-        {
-          "place": 9,
-          "place_label": "9",
-          "id": 13,
-          "full_name": "Индиго Гиго",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 50.0,
-              "result": {
-                "status": "ok",
-                "value": 100.0
-              },
-              "result_text": "100"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 50.0
-        },
-        {
-          "place": 10,
-          "place_label": "10",
-          "id": 27,
-          "full_name": "ячсвыявчс",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 43.75,
-              "result": {
-                "status": "ok",
-                "value": 95.0
-              },
-              "result_text": "95"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 43.75
-        },
-        {
-          "place": 11,
-          "place_label": "11",
-          "id": 22,
-          "full_name": "ячсммаымв",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 37.5,
-              "result": {
-                "status": "ok",
-                "value": 83.0
-              },
-              "result_text": "83"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 37.5
-        },
-        {
-          "place": 12,
-          "place_label": "12",
-          "id": 18,
-          "full_name": "ввввясвясяч",
-          "age": 25,
-          "club": "",
-          "team_name": "",
-          "region": "",
-          "city": "",
-          "category": "INT",
-          "division_id": "INT_M",
-          "flag": null,
-          "scores": {
-            "WOD1": {
-              "points": 31.25,
-              "result": {
-                "status": "ok",
-                "value": 50.0
-              },
-              "result_text": "50"
-            },
-            "WOD2A": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD2B": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            },
-            "WOD3": {
-              "points": null,
-              "result": null,
-              "result_text": ""
-            }
-          },
-          "priority_points": null,
-          "total": 31.25
-        },
-        {
-          "place": 13,
-          "place_label": "13",
+          "place": 1,
+          "place_label": "1",
           "id": 15,
           "full_name": "ццйвцв",
           "age": 25,
@@ -916,12 +603,9 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 25.0,
-              "result": {
-                "status": "ok",
-                "value": 45.0
-              },
-              "result_text": "45"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
               "points": null,
@@ -940,11 +624,11 @@
             }
           },
           "priority_points": null,
-          "total": 25.0
+          "total": 0.0
         },
         {
-          "place": 14,
-          "place_label": "14",
+          "place": 1,
+          "place_label": "1",
           "id": 19,
           "full_name": "ывфвячс",
           "age": 25,
@@ -957,12 +641,9 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 18.75,
-              "result": {
-                "status": "ok",
-                "value": 34.0
-              },
-              "result_text": "34"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
               "points": null,
@@ -981,13 +662,13 @@
             }
           },
           "priority_points": null,
-          "total": 18.75
+          "total": 0.0
         },
         {
-          "place": 15,
-          "place_label": "15",
-          "id": 17,
-          "full_name": "йцуйцйййй",
+          "place": 1,
+          "place_label": "1",
+          "id": 28,
+          "full_name": "ыфвфычс",
           "age": 25,
           "club": "",
           "team_name": "",
@@ -998,12 +679,9 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 12.5,
-              "result": {
-                "status": "ok",
-                "value": 14.0
-              },
-              "result_text": "14"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
               "points": null,
@@ -1022,13 +700,13 @@
             }
           },
           "priority_points": null,
-          "total": 12.5
+          "total": 0.0
         },
         {
-          "place": 16,
-          "place_label": "16",
-          "id": 16,
-          "full_name": "фыввфв",
+          "place": 1,
+          "place_label": "1",
+          "id": 23,
+          "full_name": "ясчячсячсячс",
           "age": 25,
           "club": "",
           "team_name": "",
@@ -1039,12 +717,9 @@
           "flag": null,
           "scores": {
             "WOD1": {
-              "points": 6.25,
-              "result": {
-                "status": "ok",
-                "value": 0.0
-              },
-              "result_text": "0"
+              "points": null,
+              "result": null,
+              "result_text": ""
             },
             "WOD2A": {
               "points": null,
@@ -1063,7 +738,197 @@
             }
           },
           "priority_points": null,
-          "total": 6.25
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 24,
+          "full_name": "ясячсячсчя",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 20,
+          "full_name": "ясячсячсяч",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 27,
+          "full_name": "ячсвыявчс",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 22,
+          "full_name": "ячсммаымв",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
+        },
+        {
+          "place": 1,
+          "place_label": "1",
+          "id": 21,
+          "full_name": "ячсчясяя",
+          "age": 25,
+          "club": "",
+          "team_name": "",
+          "region": "",
+          "city": "",
+          "category": "INT",
+          "division_id": "INT_M",
+          "flag": null,
+          "scores": {
+            "WOD1": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2A": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD2B": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            },
+            "WOD3": {
+              "points": null,
+              "result": null,
+              "result_text": ""
+            }
+          },
+          "priority_points": null,
+          "total": 0.0
         }
       ]
     }
@@ -1878,6 +1743,54 @@
   "clubs": {
     "rows": [
       {
+        "club_name": "Urban",
+        "team_name": "Urban",
+        "points": 10.0,
+        "participants_count": 1,
+        "contributors": 1,
+        "first_places": 1,
+        "second_places": 0,
+        "third_places": 0,
+        "priority_sum": 0.0,
+        "breakdown": [
+          {
+            "athlete_id": 12,
+            "full_name": "Санек Сашок",
+            "division_id": "INT_M",
+            "division_title": "Intermediate — Men",
+            "place": 1,
+            "place_label": "1",
+            "awarded_points": 10.0,
+            "priority_points": null
+          }
+        ],
+        "place": 1
+      },
+      {
+        "club_name": "QLUKVA",
+        "team_name": "QLUKVA",
+        "points": 7.0,
+        "participants_count": 1,
+        "contributors": 1,
+        "first_places": 1,
+        "second_places": 0,
+        "third_places": 0,
+        "priority_sum": 0.0,
+        "breakdown": [
+          {
+            "athlete_id": 10,
+            "full_name": "Тедеева Моника",
+            "division_id": "BEGSCAL_F",
+            "division_title": "Beginners/Scaled — Women",
+            "place": 1,
+            "place_label": "1",
+            "awarded_points": 7.0,
+            "priority_points": null
+          }
+        ],
+        "place": 2
+      },
+      {
         "club_name": "Ава",
         "team_name": "Ава",
         "points": 0.0,
@@ -1888,7 +1801,7 @@
         "third_places": 0,
         "priority_sum": 0.0,
         "breakdown": [],
-        "place": 1
+        "place": 3
       },
       {
         "club_name": "Байрон",
@@ -1901,39 +1814,13 @@
         "third_places": 0,
         "priority_sum": 0.0,
         "breakdown": [],
-        "place": 2
+        "place": 4
       },
       {
         "club_name": "Чунька",
         "team_name": "Чунька",
         "points": 0.0,
         "participants_count": 0,
-        "contributors": 0,
-        "first_places": 0,
-        "second_places": 0,
-        "third_places": 0,
-        "priority_sum": 0.0,
-        "breakdown": [],
-        "place": 3
-      },
-      {
-        "club_name": "QLUKVA",
-        "team_name": "QLUKVA",
-        "points": 0.0,
-        "participants_count": 1,
-        "contributors": 0,
-        "first_places": 0,
-        "second_places": 0,
-        "third_places": 0,
-        "priority_sum": 0.0,
-        "breakdown": [],
-        "place": 4
-      },
-      {
-        "club_name": "Urban",
-        "team_name": "Urban",
-        "points": 0.0,
-        "participants_count": 1,
         "contributors": 0,
         "first_places": 0,
         "second_places": 0,
@@ -1953,6 +1840,54 @@
   "teams": {
     "rows": [
       {
+        "club_name": "Urban",
+        "team_name": "Urban",
+        "points": 10.0,
+        "participants_count": 1,
+        "contributors": 1,
+        "first_places": 1,
+        "second_places": 0,
+        "third_places": 0,
+        "priority_sum": 0.0,
+        "breakdown": [
+          {
+            "athlete_id": 12,
+            "full_name": "Санек Сашок",
+            "division_id": "INT_M",
+            "division_title": "Intermediate — Men",
+            "place": 1,
+            "place_label": "1",
+            "awarded_points": 10.0,
+            "priority_points": null
+          }
+        ],
+        "place": 1
+      },
+      {
+        "club_name": "QLUKVA",
+        "team_name": "QLUKVA",
+        "points": 7.0,
+        "participants_count": 1,
+        "contributors": 1,
+        "first_places": 1,
+        "second_places": 0,
+        "third_places": 0,
+        "priority_sum": 0.0,
+        "breakdown": [
+          {
+            "athlete_id": 10,
+            "full_name": "Тедеева Моника",
+            "division_id": "BEGSCAL_F",
+            "division_title": "Beginners/Scaled — Women",
+            "place": 1,
+            "place_label": "1",
+            "awarded_points": 7.0,
+            "priority_points": null
+          }
+        ],
+        "place": 2
+      },
+      {
         "club_name": "Ава",
         "team_name": "Ава",
         "points": 0.0,
@@ -1963,7 +1898,7 @@
         "third_places": 0,
         "priority_sum": 0.0,
         "breakdown": [],
-        "place": 1
+        "place": 3
       },
       {
         "club_name": "Байрон",
@@ -1976,39 +1911,13 @@
         "third_places": 0,
         "priority_sum": 0.0,
         "breakdown": [],
-        "place": 2
+        "place": 4
       },
       {
         "club_name": "Чунька",
         "team_name": "Чунька",
         "points": 0.0,
         "participants_count": 0,
-        "contributors": 0,
-        "first_places": 0,
-        "second_places": 0,
-        "third_places": 0,
-        "priority_sum": 0.0,
-        "breakdown": [],
-        "place": 3
-      },
-      {
-        "club_name": "QLUKVA",
-        "team_name": "QLUKVA",
-        "points": 0.0,
-        "participants_count": 1,
-        "contributors": 0,
-        "first_places": 0,
-        "second_places": 0,
-        "third_places": 0,
-        "priority_sum": 0.0,
-        "breakdown": [],
-        "place": 4
-      },
-      {
-        "club_name": "Urban",
-        "team_name": "Urban",
-        "points": 0.0,
-        "participants_count": 1,
         "contributors": 0,
         "first_places": 0,
         "second_places": 0,
