@@ -1,7 +1,7 @@
 import streamlit as st
 from storage import load_db
 from config import DIVISIONS
-from scoring import build_ranking, total_points_for_athlete, build_division_overall, build_club_ranking
+from scoring import build_ranking, build_division_overall, build_club_ranking
 from utils import compact_page_style, display_result_value, participant_age
 
 st.set_page_config(page_title="Tables", layout="wide")
@@ -46,10 +46,14 @@ for div in DIVISIONS:
     overall_rows = build_division_overall(db, div_id)
     overall_map = {int(r["athlete_id"]): r for r in overall_rows}
 
+    has_live_places = any(r.get("place") is not None for r in overall_rows)
+
     table_rows = []
     for p in participants:
         aid = int(p["id"])
         overall = overall_map.get(aid, {})
+        total_value = overall.get("total")
+        priority_value = overall.get("priority_points")
         row = {
             "Место": overall.get("place_label", "—"),
             "ФИО": p.get("full_name", ""),
@@ -65,11 +69,21 @@ for div in DIVISIONS:
             res = result_maps[sid].get(aid)
             row[f"{sid}"] = "—" if pts is None else pts
             row[f"{sid}_res"] = display_value_for_public(s, res)
-        row["Приоритет"] = overall.get("priority_points", "—") if overall.get("priority_points") is not None else "—"
-        row["ИТОГО"] = total_points_for_athlete(db, aid)
+        row["Приоритет"] = priority_value if priority_value is not None else "—"
+        row["ИТОГО"] = total_value if total_value is not None else "—"
         table_rows.append(row)
 
-    table_rows.sort(key=lambda r: (-float(r["ИТОГО"]), -float(r["Приоритет"]) if isinstance(r["Приоритет"], (int, float)) else 1, r["ФИО"]))
+    if has_live_places:
+        table_rows.sort(
+            key=lambda r: (
+                0 if isinstance(r["ИТОГО"], (int, float)) else 1,
+                -float(r["ИТОГО"] if isinstance(r["ИТОГО"], (int, float)) else 0.0),
+                -float(r["Приоритет"]) if isinstance(r["Приоритет"], (int, float)) else 1,
+                r["ФИО"].lower(),
+            )
+        )
+    else:
+        table_rows.sort(key=lambda r: r["ФИО"].lower())
     st.dataframe(table_rows, use_container_width=True, hide_index=True)
     st.divider()
 
@@ -91,8 +105,8 @@ for row in club_payload.get("rows", []):
 if club_rows:
     st.dataframe(club_rows, use_container_width=True, hide_index=True)
 else:
-    st.info("Клубов пока нет.")
+    st.info("Клубный зачёт появится после полного ввода хотя бы одного комплекса в зачётном дивизионе.")
 
 st.caption(
-    f"Командный зачёт считает призовые места по категориям. Приоритетный комплекс для тай-брейка: {team_scoring.get('priority_score_id', '—')}."
+    f"Командный зачёт обновляется после полного закрытия комплекса в дивизионе. Приоритетный комплекс для тай-брейка: {team_scoring.get('priority_score_id', '—')}."
 )

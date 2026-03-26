@@ -9,6 +9,12 @@ st.title("⚙️ Settings")
 
 db = load_db()
 settings = db["settings"]
+
+if "confirm_clear_results" not in st.session_state:
+    st.session_state.confirm_clear_results = False
+if "confirm_clear_all" not in st.session_state:
+    st.session_state.confirm_clear_all = False
+
 settings.setdefault("display", default_display_settings())
 settings.setdefault("clubs", [])
 settings.setdefault("team_scoring", default_team_scoring())
@@ -181,18 +187,40 @@ st.subheader("Сервисные действия")
 left, right = st.columns(2)
 with left:
     st.warning("Очистить только результаты: атлеты, клубы и заходы останутся.")
-    if st.button("🧹 Очистить результаты", key="clear_results_btn"):
-        clear_results(db)
-        save_db(db)
-        st.success("Результаты очищены. Атлеты, клубы и заходы сохранены.")
-        st.rerun()
+    if not st.session_state.confirm_clear_results:
+        if st.button("🧹 Очистить результаты", key="clear_results_btn"):
+            st.session_state.confirm_clear_results = True
+            st.rerun()
+    else:
+        st.error("Подтверди очистку результатов. Это действие нельзя отменить.")
+        confirm_cols = st.columns(2)
+        if confirm_cols[0].button("✅ Да, очистить результаты", key="confirm_clear_results_yes"):
+            clear_results(db)
+            save_db(db)
+            st.session_state.confirm_clear_results = False
+            st.success("Результаты очищены. Атлеты, клубы и заходы сохранены.")
+            st.rerun()
+        if confirm_cols[1].button("❌ Отмена", key="confirm_clear_results_no"):
+            st.session_state.confirm_clear_results = False
+            st.rerun()
 with right:
     st.error("Полное удаление данных: атлеты, результаты и заходы будут очищены.")
-    if st.button("🗑️ Удалить всё", key="clear_all_btn"):
-        clear_all_data(db)
-        save_db(db)
-        st.success("Все данные очищены.")
-        st.rerun()
+    if not st.session_state.confirm_clear_all:
+        if st.button("🗑️ Удалить всё", key="clear_all_btn"):
+            st.session_state.confirm_clear_all = True
+            st.rerun()
+    else:
+        st.error("Подтверди полное удаление. Это действие нельзя отменить.")
+        confirm_cols = st.columns(2)
+        if confirm_cols[0].button("✅ Да, удалить всё", key="confirm_clear_all_yes"):
+            clear_all_data(db)
+            save_db(db)
+            st.session_state.confirm_clear_all = False
+            st.success("Все данные очищены.")
+            st.rerun()
+        if confirm_cols[1].button("❌ Отмена", key="confirm_clear_all_no"):
+            st.session_state.confirm_clear_all = False
+            st.rerun()
 
 st.divider()
 if st.button("💾 Save Settings", type="primary"):

@@ -2,11 +2,42 @@ from __future__ import annotations
 
 from typing import Dict, Any, List, Optional, Tuple
 
+
 from utils import participant_age
 
 
 def _result_of(db: Dict[str, Any], athlete_id: int, score_id: str) -> Optional[Dict[str, Any]]:
     return db.get("results", {}).get(str(athlete_id), {}).get(score_id)
+
+
+def _active_division_participants(db: Dict[str, Any], division_id: str) -> List[Dict[str, Any]]:
+    return [
+        p for p in db.get("participants", [])
+        if p.get("division_id") == division_id and not p.get("deleted", False)
+    ]
+
+
+def is_score_complete_for_division(db: Dict[str, Any], division_id: str, score_id: str) -> bool:
+    participants = _active_division_participants(db, division_id)
+    if not participants:
+        return False
+    return all(_result_of(db, int(p["id"]), score_id) is not None for p in participants)
+
+
+def completed_score_ids_for_division(db: Dict[str, Any], division_id: str) -> List[str]:
+    score_ids = [str(s.get("id") or "") for s in db.get("settings", {}).get("scores", []) if str(s.get("id") or "").strip()]
+    return [sid for sid in score_ids if is_score_complete_for_division(db, division_id, sid)]
+
+
+def has_completed_scores_for_division(db: Dict[str, Any], division_id: str) -> bool:
+    return bool(completed_score_ids_for_division(db, division_id))
+
+
+def is_division_overall_ready(db: Dict[str, Any], division_id: str) -> bool:
+    score_ids = [str(s.get("id") or "") for s in db.get("settings", {}).get("scores", []) if str(s.get("id") or "").strip()]
+    if not score_ids:
+        return False
+    return len(completed_score_ids_for_division(db, division_id)) == len(score_ids)
 
 
 def _sort_key_for_score(score_type: str, result: Optional[Dict[str, Any]]) -> Tuple:
@@ -121,27 +152,31 @@ def build_ranking(db: Dict[str, Any], division_id: str, score_id: str) -> List[D
     return rows_sorted
 
 
-def total_points_for_athlete(db: Dict[str, Any], athlete_id: int) -> float:
-    settings = db["settings"]
-    score_ids = [s["id"] for s in settings.get("scores", [])]
-
+def total_points_for_athlete(db: Dict[str, Any], athlete_id: int) -> Optional[float]:
     div_id = None
     for p in db.get("participants", []):
         if not p.get("deleted", False) and int(p["id"]) == int(athlete_id):
             div_id = p.get("division_id")
             break
     if div_id is None:
-        return 0.0
+        return None
+
+    score_ids = [str(s.get("id") or "") for s in db.get("settings", {}).get("scores", []) if str(s.get("id") or "").strip()]
 
     total = 0.0
+    has_any_points = False
     for sid in score_ids:
-        ranking = build_ranking(db, div_id, sid)
+        ranking = build_ranking(db, str(div_id), sid)
         for r in ranking:
             if int(r["athlete_id"]) == int(athlete_id):
                 pts = r.get("points")
                 if pts is not None:
                     total += float(pts)
+                    has_any_points = True
                 break
+
+    if not has_any_points:
+        return None
     return round(total, 2)
 
 
@@ -158,18 +193,21 @@ def _priority_points_for_athlete(db: Dict[str, Any], athlete_id: int, priority_s
 
 
 def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[str, Any]]:
-    participants = [
-        p for p in db.get("participants", [])
-        if p.get("division_id") == division_id and not p.get("deleted", False)
-    ]
+    participants = _active_division_participants(db, division_id)
     team_scoring = db.get("settings", {}).get("team_scoring", {})
     priority_score_id = str(team_scoring.get("priority_score_id") or "").strip()
+    completed_score_ids = completed_score_ids_for_division(db, division_id)
 
     rows = []
     for p in participants:
         aid = int(p["id"])
         total = total_points_for_athlete(db, aid)
-        priority_points = _priority_points_for_athlete(db, aid, priority_score_id) if priority_score_id else -1.0
+        priority_points = None
+        if priority_score_id:
+            raw_priority_points = _priority_points_for_athlete(db, aid, priority_score_id)
+            if raw_priority_points >= 0:
+                priority_points = round(raw_priority_points, 2)
+
         rows.append({
             "id": aid,
             "athlete_id": aid,
@@ -183,19 +221,32 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             "club": p.get("club", ""),
             "flag_path": p.get("flag_path"),
             "total": total,
-            "priority_points": round(priority_points, 2) if priority_points >= 0 else None,
+            "priority_points": priority_points,
             "place": None,
             "place_label": None,
         })
 
-    rows.sort(key=lambda r: (-float(r["total"]), -float(r["priority_points"] or -1), r["full_name"].lower()))
+    rows.sort(
+        key=lambda r: (
+            0 if r["total"] is not None else 1,
+            -float(r["total"] or 0.0),
+            -float(r["priority_points"] or -1),
+            r["full_name"].lower(),
+        )
+    )
 
     place = 0
+    placed_index = 0
     prev_key = None
-    for index, row in enumerate(rows, start=1):
-        tie_key = (float(row["total"]), float(row["priority_points"] or -1))
+    for row in rows:
+        if row["total"] is None:
+            row["place"] = None
+            row["place_label"] = None
+            continue
+        placed_index += 1
+        tie_key = (float(row["total"] or 0.0), float(row["priority_points"] or -1))
         if prev_key is None or tie_key != prev_key:
-            place = index
+            place = placed_index
         row["place"] = place
         row["place_label"] = str(place)
         prev_key = tie_key
@@ -257,6 +308,8 @@ def build_club_ranking(db: Dict[str, Any]) -> Dict[str, Any]:
             club_rows[club_name]["participants_count"] += 1
 
     for division_id, points_map in division_points.items():
+        if not has_completed_scores_for_division(db, division_id):
+            continue
         overall_rows = build_division_overall(db, division_id)
         for row in overall_rows:
             place = row.get("place")

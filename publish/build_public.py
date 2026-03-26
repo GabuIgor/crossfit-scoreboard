@@ -113,7 +113,7 @@ def build_public_payload() -> Dict[str, Any]:
                 "flag": _flag_data_uri(p.get("flag_path")),
                 "scores": {},
                 "priority_points": overall.get("priority_points"),
-                "total": overall.get("total", 0.0),
+                "total": overall.get("total"),
             }
             for s in scores:
                 sid = s["id"]
@@ -125,7 +125,7 @@ def build_public_payload() -> Dict[str, Any]:
                 }
             rows.append(row)
 
-        rows.sort(key=lambda r: (int(r.get("place") or 9999), r.get("full_name", "").lower()))
+        rows.sort(key=lambda r: (int(r.get("place") or 9999), r.get("full_name", "").lower()) if r.get("place") is not None else (9999, r.get("full_name", "").lower()))
         payload["divisions"][div_id] = {
             "title": d["title"],
             "rows": rows,
