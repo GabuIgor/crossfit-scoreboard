@@ -55,7 +55,7 @@ for div in DIVISIONS:
         total_value = overall.get("total")
         priority_value = overall.get("priority_points")
         row = {
-            "Место": overall.get("place_label", "—"),
+            "Место": overall.get("display_place_label") or overall.get("place_label") or "—",
             "ФИО": p.get("full_name", ""),
             "Возраст": participant_age(p),
             "DIV": p.get("category", ""),

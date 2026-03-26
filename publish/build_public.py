@@ -99,8 +99,10 @@ def build_public_payload() -> Dict[str, Any]:
             aid = int(p["id"])
             overall = overall_map.get(aid, {})
             row = {
-                "place": overall.get("place"),
-                "place_label": overall.get("place_label"),
+                "place": overall.get("display_place", overall.get("place")),
+                "place_label": overall.get("display_place_label") or overall.get("place_label"),
+                "sport_place": overall.get("place"),
+                "sport_place_label": overall.get("place_label"),
                 "id": aid,
                 "full_name": p.get("full_name", ""),
                 "age": participant_age(p),

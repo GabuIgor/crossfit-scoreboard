@@ -224,6 +224,8 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             "priority_points": priority_points,
             "place": None,
             "place_label": None,
+            "display_place": None,
+            "display_place_label": None,
         })
 
     rows.sort(
@@ -249,7 +251,17 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             place = placed_index
         row["place"] = place
         row["place_label"] = str(place)
+        row["display_place"] = place
+        row["display_place_label"] = str(place)
         prev_key = tie_key
+
+    next_display_place = placed_index
+    for row in rows:
+        if row["place"] is not None:
+            continue
+        next_display_place += 1
+        row["display_place"] = next_display_place
+        row["display_place_label"] = str(next_display_place)
     return rows
 
 
