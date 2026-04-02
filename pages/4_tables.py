@@ -1,4 +1,5 @@
-import pandas as pd
+import html
+
 import streamlit as st
 from storage import load_db
 from config import DIVISIONS
@@ -21,11 +22,83 @@ def display_value_for_public(sdef, res):
     status = res.get("status")
     val = res.get("value")
     if status == "wd":
-        return "Снялся"
+        return "WD"
     if status == "capped":
-        pretty = display_result_value({"type": "reps"}, val)
+        pretty = display_result_value(sdef, val)
         return f"CAP {pretty}" if pretty else "CAP"
     return display_result_value(sdef, val)
+
+
+def esc(value):
+    if value is None:
+        return ""
+    return html.escape(str(value))
+
+
+def render_admin_table(rows, score_ids):
+    if not rows:
+        st.info("Нет данных")
+        return
+
+    head = [
+        "<tr>",
+        "<th>Место</th>",
+        "<th>ФИО</th>",
+        "<th>Возраст</th>",
+        "<th>DIV</th>",
+        "<th>Регион</th>",
+        "<th>Клуб</th>",
+        "<th>Флаг</th>",
+    ]
+    for sid in score_ids:
+        head.append(f"<th>{esc(sid)}</th>")
+        head.append(f"<th>{esc(sid)} рез.</th>")
+    head.append("<th>Приоритет</th>")
+    head.append("<th>ИТОГО</th>")
+    head.append("</tr>")
+
+    body_rows = []
+    for row in rows:
+        parts = [
+            "<tr>",
+            f"<td>{esc(row.get('Место', '—'))}</td>",
+            f"<td>{esc(row.get('ФИО', ''))}</td>",
+            f"<td>{esc(row.get('Возраст', ''))}</td>",
+            f"<td>{esc(row.get('DIV', ''))}</td>",
+            f"<td>{esc(row.get('Регион', ''))}</td>",
+            f"<td><strong>{esc(row.get('Клуб', ''))}</strong></td>",
+            f"<td>{esc(row.get('Флаг', '—'))}</td>",
+        ]
+        for sid in score_ids:
+            parts.append(f"<td>{esc(row.get(sid, '—'))}</td>")
+            parts.append(f"<td>{esc(row.get(f'{sid}_res', '—'))}</td>")
+        parts.append(f"<td>{esc(row.get('Приоритет', '—'))}</td>")
+        parts.append(f"<td><strong>{esc(row.get('ИТОГО', '—'))}</strong></td>")
+        parts.append("</tr>")
+        body_rows.append(''.join(parts))
+
+    st.markdown(
+        """
+        <style>
+        .admin-results-table-wrap{overflow-x:auto;margin-bottom:8px;}
+        .admin-results-table{width:100%;border-collapse:collapse;font-size:14px;}
+        .admin-results-table th,.admin-results-table td{border-bottom:1px solid #e9eef5;padding:6px 8px;text-align:left;vertical-align:top;white-space:nowrap;}
+        .admin-results-table th{background:#f7f9fc;font-weight:700;}
+        .admin-results-table tbody tr:hover{background:#fafcff;}
+        .admin-results-table td:nth-child(7){font-weight:700;color:#111827;}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    html_table = (
+        '<div class="admin-results-table-wrap"><table class="admin-results-table"><thead>'
+        + ''.join(head)
+        + '</thead><tbody>'
+        + ''.join(body_rows)
+        + '</tbody></table></div>'
+    )
+    st.markdown(html_table, unsafe_allow_html=True)
 
 
 for div in DIVISIONS:
@@ -61,7 +134,7 @@ for div in DIVISIONS:
             "Возраст": participant_age(p),
             "DIV": p.get("category", ""),
             "Регион": p.get("region", "") or p.get("city", ""),
-            "Клуб": p.get("club", "") or "—",
+            "Клуб": p.get("club", ""),
             "Флаг": "✅" if p.get("flag_path") else "—",
         }
         for s in scores:
@@ -86,9 +159,7 @@ for div in DIVISIONS:
     else:
         table_rows.sort(key=lambda r: r["ФИО"].lower())
 
-    df = pd.DataFrame(table_rows)
-    styled = df.style.set_properties(subset=["Клуб"], **{"font-weight": "700"})
-    st.dataframe(styled, use_container_width=True, hide_index=True)
+    render_admin_table(table_rows, [s["id"] for s in scores])
     st.divider()
 
 st.subheader("Клубный зачёт")

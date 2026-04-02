@@ -6,8 +6,8 @@
   <title>Scoreboard Mobile</title>
   <style>
     :root { --section-title-size: 22px; --card-title-size: 18px; --table-text-size: 12px; --meta-text-size: 11px; --row-height: 6px; --block-gap: 12px; --container-scale: 1; }
-    body { font-family: Arial, sans-serif; margin: var(--block-gap, 12px); background:#f7f9fc; color:#1b1f23; }
-    .box { border: 1px solid #d4deee; background:#fff; border-radius: 12px; padding: calc(10px * var(--container-scale)); margin-bottom: var(--block-gap); box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06); }
+    body { font-family: Arial, sans-serif; margin: var(--block-gap, 12px); }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: calc(10px * var(--container-scale)); margin-bottom: var(--block-gap); }
     .muted { color: #777; font-size: var(--meta-text-size); }
     .flag { width: 18px; height: 12px; object-fit: cover; border: 1px solid #ddd; border-radius: 3px; vertical-align: middle; margin-left: 4px; }
     table { width: 100%; border-collapse: collapse; font-size: var(--table-text-size); }
@@ -20,17 +20,25 @@
     .heat-title { margin-bottom:6px; font-weight:700; font-size: var(--table-text-size); line-height: 1.15; }
     .lane { display:grid; grid-template-columns: 24px 1fr; gap: max(4px, calc(var(--block-gap) * 0.5)); padding: var(--row-height) 0; border-bottom:1px dashed #eee; font-size: var(--table-text-size); line-height: 1.15; }
     .lane:last-child { border-bottom:none; }
-    .controls { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 12px; }
-    .control { display:flex; flex-direction:column; gap:4px; font-size: var(--meta-text-size); color:#425466; font-weight:700; }
-    .control select { appearance:none; -webkit-appearance:none; min-width:150px; border:2px solid #6c9cff; border-radius:10px; background:#eef4ff; color:#14325c; font-weight:700; padding:10px 36px 10px 12px; box-shadow: 0 2px 8px rgba(41, 98, 255, 0.15); }
-    .control select:focus { outline:none; border-color:#2f6bff; background:#fff; box-shadow:0 0 0 3px rgba(47, 107, 255, 0.18); }
+    .club-pill { font-weight: 700; color: #111827; }
+    .selectors { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 12px; }
+    .selector { display:flex; flex-direction:column; gap:4px; font-size:12px; color:#374151; }
+    .selector select { min-width:160px; padding:10px 12px; border:2px solid #4f8cff; border-radius:10px; background:#eef5ff; color:#111827; font-weight:700; box-shadow:0 1px 0 rgba(0,0,0,.04); }
+    .selector select:focus { outline:none; border-color:#1d4ed8; background:#e0edff; box-shadow:0 0 0 3px rgba(79,140,255,.18); }
+    .selector select:hover { background:#e8f0ff; }
   </style>
 </head>
 <body>
   <div class="muted" id="meta">Loading...</div>
-  <div class="controls">
-    <label class="control">Таблица<select id="divSel"></select></label>
-    <label class="control">Заходы<select id="wodSel"></select></label>
+  <div class="selectors">
+    <label class="selector">
+      <span>Таблица</span>
+      <select id="divSel"></select>
+    </label>
+    <label class="selector">
+      <span>Заходы</span>
+      <select id="wodSel"></select>
+    </label>
   </div>
   <div class="box" id="tableBox"></div>
   <div class="box" id="heatsBox"></div>
@@ -87,14 +95,21 @@ function renderTable(){
 
   (div.rows||[]).forEach(r => {
     const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : '';
-    const metaParts = [];
-    if (r.age) metaParts.push(`${r.age}`);
-    if (r.club || r.club_name) metaParts.push(`<strong>${safe(r.club || r.club_name)}</strong>`);
-    if (r.region || r.city) metaParts.push(safe(r.region || r.city));
-    if (r.team_name && r.team_name !== '--' && r.team_name !== (r.club || r.club_name || '')) metaParts.push(safe(r.team_name));
-    const meta = metaParts.join(' · ');
+    const meta = [
+      r.age ? `${r.age}` : '',
+      r.club || r.club_name || '',
+      r.region || r.city || '',
+      r.team_name && r.team_name !== '--' ? r.team_name : ''
+    ].filter(Boolean).join(' · ');
+    const club = (r.club || r.club_name || '').trim();
+    const metaHtml = [
+      r.age ? `${r.age}` : '',
+      club ? `<span class="club-pill">${safe(club)}</span>` : '',
+      safe(r.region || r.city || ''),
+      r.team_name && r.team_name !== '--' ? safe(r.team_name) : ''
+    ].filter(Boolean).join(' · ');
 
-    html += `<tr><td>${safe(r.place_label || fmt(r.place))}</td><td>${safe(r.full_name)}${flag}<div class="meta2">${safe(meta)}</div></td>` +
+    html += `<tr><td>${safe(r.place_label || fmt(r.place))}</td><td>${safe(r.full_name)}${flag}<div class="meta2">${metaHtml}</div></td>` +
       `<td class="points">${fmt(r.scores?.WOD1?.points)}<span class="res">${safe(r.scores?.WOD1?.result_text)}</span></td>` +
       `<td class="points">${fmt(r.scores?.WOD2A?.points)}<span class="res">${safe(r.scores?.WOD2A?.result_text)}</span></td>` +
       `<td class="points">${fmt(r.scores?.WOD2B?.points)}<span class="res">${safe(r.scores?.WOD2B?.result_text)}</span></td>` +
