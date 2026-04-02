@@ -306,6 +306,30 @@ def build_current_values(
     return current_values
 
 
+def materialize_heats_from_session(key_prefix: str, source_heats: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    normalized_source = normalize_heats(copy.deepcopy(source_heats))
+    current_values = build_current_values(key_prefix, normalized_source)
+
+    result: List[Dict[str, Any]] = []
+    for heat_idx, heat in enumerate(normalized_source):
+        size_default = max(1, len(heat.get("assignments", [])) or MAX_LANES)
+        size_key = f"{key_prefix}_size_{heat_idx}"
+        size = int(st.session_state.get(size_key, size_default))
+
+        assignments: List[Dict[str, Any]] = []
+        for lane in range(1, size + 1):
+            assignments.append(
+                {
+                    "lane": lane,
+                    "athlete_id": current_values.get((heat_idx, lane)),
+                }
+            )
+
+        result.append({"heat": heat_idx + 1, "assignments": assignments})
+
+    return normalize_heats(result)
+
+
 def render_editor(db: Dict[str, Any], division_id: str, heats_list: List[Dict[str, Any]], key_prefix: str) -> List[Dict[str, Any]]:
     pmap = participant_map(db)
     all_athlete_ids = option_ids(db, division_id)
@@ -426,11 +450,19 @@ def main() -> None:
     )
 
     key_prefix = f"{selected_wod}_{selected_division}"
+    draft_key = f"draft_heats::{key_prefix}"
+
     db_heats = get_division_heats(db, selected_wod, selected_division)
-    working_heats = copy.deepcopy(db_heats)
+
+    if draft_key not in st.session_state:
+        st.session_state[draft_key] = copy.deepcopy(db_heats)
 
     if f"pending_heats::{key_prefix}" in st.session_state:
-        working_heats = normalize_heats(st.session_state.pop(f"pending_heats::{key_prefix}"))
+        st.session_state[draft_key] = normalize_heats(
+            copy.deepcopy(st.session_state.pop(f"pending_heats::{key_prefix}"))
+        )
+
+    working_heats = normalize_heats(copy.deepcopy(st.session_state[draft_key]))
 
     athletes = active_participants(db, selected_division)
     pmap = participant_map(db)
@@ -462,17 +494,19 @@ def main() -> None:
         reset_from_db = b3.button("Сбросить из базы", use_container_width=True)
 
     if reset_from_db:
+        st.session_state[draft_key] = copy.deepcopy(db_heats)
         st.rerun()
 
     if add_heat:
-        pending = normalize_heats(copy.deepcopy(working_heats))
-        pending.append(
+        base = materialize_heats_from_session(key_prefix, working_heats) if working_heats else []
+        base = normalize_heats(copy.deepcopy(base))
+        base.append(
             {
-                "heat": len(pending) + 1,
-                "assignments": [{"lane": lane, "athlete_id": None} for lane in range(1, MAX_LANES + 1)],
+                "heat": len(base) + 1,
+                "assignments": [],
             }
         )
-        st.session_state[f"pending_heats::{key_prefix}"] = pending
+        st.session_state[draft_key] = normalize_heats(base)
         st.rerun()
 
     try:
@@ -482,6 +516,7 @@ def main() -> None:
             validate_layout_exact(layout, len(athlete_ids))
             random.shuffle(athlete_ids)
             generated = pack_into_heats(athlete_ids, layout)
+            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
             save_division_heats(db, selected_wod, selected_division, generated)
             st.success("WOD1 заполнен случайным образом")
             st.rerun()
@@ -491,6 +526,7 @@ def main() -> None:
             ranked_ids = ranking_for_wod2(db, selected_division)
             validate_layout_exact(layout, len(ranked_ids))
             generated = pack_into_heats(ranked_ids, layout)
+            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
             save_division_heats(db, "WOD2", selected_division, generated)
             st.success("WOD2 собран по результатам WOD1: сильнейшие поставлены в поздние heats")
             st.rerun()
@@ -500,18 +536,19 @@ def main() -> None:
             ranked_ids = ranking_for_wod3(db, selected_division)
             validate_layout_exact(layout, len(ranked_ids))
             generated = pack_into_heats(ranked_ids, layout)
+            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
             save_division_heats(db, "WOD3", selected_division, generated)
             st.success("WOD3 собран по сумме WOD1 + WOD2")
             st.rerun()
 
         if apply_layout:
             layout = parse_layout(layout_text)
-            ordered = flatten_athletes_from_heats(working_heats)
+            ordered = flatten_athletes_from_heats(materialize_heats_from_session(key_prefix, working_heats))
             if not ordered:
                 ordered = [int(p["id"]) for p in athletes]
             validate_layout_exact(layout, len(ordered))
             generated = pack_into_heats(ordered, layout)
-            st.session_state[f"pending_heats::{key_prefix}"] = generated
+            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
             st.rerun()
 
     except ValueError as e:
@@ -525,6 +562,7 @@ def main() -> None:
         edited_heats: List[Dict[str, Any]] = []
     else:
         edited_heats = render_editor(db, selected_division, working_heats, key_prefix)
+        st.session_state[draft_key] = normalize_heats(copy.deepcopy(edited_heats))
 
     duplicates = duplicate_messages(edited_heats, pmap)
     if duplicates:
@@ -545,6 +583,7 @@ def main() -> None:
     s1, s2 = st.columns([1, 1])
     if s1.button("Сохранить текущие изменения", type="primary", use_container_width=True):
         save_division_heats(db, selected_wod, selected_division, edited_heats)
+        st.session_state[draft_key] = normalize_heats(copy.deepcopy(edited_heats))
         st.success("Heats сохранены")
         st.rerun()
 
