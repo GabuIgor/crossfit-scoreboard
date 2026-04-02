@@ -9,13 +9,15 @@ import streamlit as st
 from config import DIVISIONS
 from scoring import build_ranking
 from storage import load_db, save_db
+from utils import compact_page_style, participant_age
 
 st.set_page_config(page_title="Heats", page_icon="🏁", layout="wide")
-from utils import compact_page_style
 compact_page_style()
 
 HEAT_WODS = ["WOD1", "WOD2", "WOD3"]
 MAX_LANES = 4
+AUTO_REQUEST_KEY = "pending_auto_build::heats"
+AUTO_CONFIRM_KEY = "confirm_auto_build::heats"
 
 
 def division_title_map() -> Dict[str, str]:
@@ -215,21 +217,86 @@ def option_ids(db: Dict[str, Any], division_id: str) -> List[Optional[int]]:
     return ids
 
 
+def score_result_exists(db: Dict[str, Any], athlete_id: int, score_id: str) -> bool:
+    results = db.get("results", {})
+    athlete_results = results.get(str(athlete_id), {})
+    return athlete_results.get(score_id) is not None
+
+
+def required_previous_scores(wod_id: str) -> List[str]:
+    if wod_id == "WOD2":
+        return ["WOD1"]
+    if wod_id == "WOD3":
+        return ["WOD2A", "WOD2B"]
+    return []
+
+
+def previous_wod_label(wod_id: str) -> str:
+    if wod_id == "WOD2":
+        return "WOD1"
+    if wod_id == "WOD3":
+        return "WOD2A и WOD2B"
+    return "предыдущий WOD"
+
+
+def missing_required_results(db: Dict[str, Any], division_id: str, wod_id: str) -> List[Dict[str, Any]]:
+    required_scores = required_previous_scores(wod_id)
+    if not required_scores:
+        return []
+
+    missing: List[Dict[str, Any]] = []
+    for p in active_participants(db, division_id):
+        athlete_id = int(p["id"])
+        missing_scores = [sid for sid in required_scores if not score_result_exists(db, athlete_id, sid)]
+        if missing_scores:
+            missing.append({"participant": p, "scores": missing_scores})
+    return missing
+
+
+def previous_heat_position(db: Dict[str, Any], prev_wod_id: str, division_id: str) -> Dict[int, Tuple[int, int]]:
+    heats = get_division_heats(db, prev_wod_id, division_id)
+    positions: Dict[int, Tuple[int, int]] = {}
+    for heat in heats:
+        heat_no = int(heat.get("heat") or 0)
+        for assignment in heat.get("assignments", []):
+            athlete_id = assignment.get("athlete_id")
+            lane = int(assignment.get("lane") or 0)
+            if athlete_id is None:
+                continue
+            positions[int(athlete_id)] = (heat_no, lane)
+    return positions
+
+
 def ranking_for_wod2(db: Dict[str, Any], division_id: str) -> List[int]:
     rows = build_ranking(db, division_id, "WOD1")
-    valid = [r for r in rows if r.get("result") is not None]
-    valid.sort(key=lambda r: (float(r.get("points") or 0.0), (r.get("full_name") or "").lower()))
-    ranked_ids = [int(r["athlete_id"]) for r in valid]
+    pmap = participant_map(db)
+    prev_positions = previous_heat_position(db, "WOD1", division_id)
 
     all_ids = [int(p["id"]) for p in active_participants(db, division_id)]
-    missing = [aid for aid in all_ids if aid not in ranked_ids]
-    return missing + ranked_ids
+    rows_by_id = {int(r["athlete_id"]): r for r in rows}
+
+    def sort_key(aid: int) -> Tuple[float, int, int, int, int]:
+        row = rows_by_id.get(aid, {})
+        points = float(row.get("points") or 0.0)
+        prev_heat, prev_lane = prev_positions.get(aid, (999, 999))
+        age = participant_age(pmap.get(aid) or {})
+        age_value = int(age) if age is not None else -1
+        return (
+            points,
+            -prev_heat,
+            -age_value,
+            prev_lane,
+            aid,
+        )
+
+    return sorted(all_ids, key=sort_key)
 
 
 def ranking_for_wod3(db: Dict[str, Any], division_id: str) -> List[int]:
     score_ids = ["WOD1", "WOD2A", "WOD2B"]
     totals: Dict[int, float] = {}
     pmap = participant_map(db)
+    prev_positions = previous_heat_position(db, "WOD2", division_id)
 
     for sid in score_ids:
         for row in build_ranking(db, division_id, sid):
@@ -243,11 +310,19 @@ def ranking_for_wod3(db: Dict[str, Any], division_id: str) -> List[int]:
     for aid in all_ids:
         totals.setdefault(aid, 0.0)
 
-    ordered = sorted(
-        all_ids,
-        key=lambda aid: (totals.get(aid, 0.0), (pmap.get(aid, {}).get("full_name") or "").lower()),
-    )
-    return ordered
+    def sort_key(aid: int) -> Tuple[float, int, int, int, int]:
+        prev_heat, prev_lane = prev_positions.get(aid, (999, 999))
+        age = participant_age(pmap.get(aid) or {})
+        age_value = int(age) if age is not None else -1
+        return (
+            totals.get(aid, 0.0),
+            -prev_heat,
+            -age_value,
+            prev_lane,
+            aid,
+        )
+
+    return sorted(all_ids, key=sort_key)
 
 
 def duplicate_messages(heats_list: List[Dict[str, Any]], pmap: Dict[int, Dict[str, Any]]) -> List[str]:
@@ -328,6 +403,39 @@ def materialize_heats_from_session(key_prefix: str, source_heats: List[Dict[str,
         result.append({"heat": heat_idx + 1, "assignments": assignments})
 
     return normalize_heats(result)
+
+
+def has_any_assigned_athletes(heats_list: List[Dict[str, Any]]) -> bool:
+    for heat in normalize_heats(heats_list):
+        for assignment in heat.get("assignments", []):
+            if assignment.get("athlete_id") is not None:
+                return True
+    return False
+
+
+def perform_autobuild(db: Dict[str, Any], wod_id: str, division_id: str, layout_text: str) -> Tuple[List[Dict[str, Any]], str]:
+    layout = parse_layout(layout_text)
+
+    if wod_id == "WOD1":
+        athlete_ids = [int(p["id"]) for p in active_participants(db, division_id)]
+        validate_layout_exact(layout, len(athlete_ids))
+        random.shuffle(athlete_ids)
+        generated = pack_into_heats(athlete_ids, layout)
+        return generated, "WOD1 заполнен случайным образом"
+
+    if wod_id == "WOD2":
+        ranked_ids = ranking_for_wod2(db, division_id)
+        validate_layout_exact(layout, len(ranked_ids))
+        generated = pack_into_heats(ranked_ids, layout)
+        return generated, "WOD2 собран по результатам WOD1: сильнейшие поставлены в поздние heats"
+
+    if wod_id == "WOD3":
+        ranked_ids = ranking_for_wod3(db, division_id)
+        validate_layout_exact(layout, len(ranked_ids))
+        generated = pack_into_heats(ranked_ids, layout)
+        return generated, "WOD3 собран по сумме WOD1 + WOD2"
+
+    raise ValueError("Неизвестный WOD для автосборки")
 
 
 def render_editor(db: Dict[str, Any], division_id: str, heats_list: List[Dict[str, Any]], key_prefix: str) -> List[Dict[str, Any]]:
@@ -510,38 +618,81 @@ def main() -> None:
         st.session_state[draft_key] = normalize_heats(base)
         st.rerun()
 
+    requested_auto: Optional[str] = None
+    if random_wod1:
+        requested_auto = "WOD1"
+    elif auto_wod2:
+        requested_auto = "WOD2"
+    elif auto_wod3:
+        requested_auto = "WOD3"
+
+    if requested_auto in {"WOD2", "WOD3"}:
+        missing_prev = missing_required_results(db, selected_division, requested_auto)
+        if missing_prev:
+            st.error(
+                f"Автосборка {requested_auto} недоступна: не у всех атлетов заполнены результаты для {previous_wod_label(requested_auto)}."
+            )
+            for item in missing_prev:
+                st.write(f"- {athlete_label(item['participant'])}: нет {', '.join(item['scores'])}")
+            requested_auto = None
+
+    if requested_auto:
+        current_target_heats = get_division_heats(db, requested_auto, selected_division)
+        if has_any_assigned_athletes(current_target_heats):
+            st.session_state[AUTO_REQUEST_KEY] = {
+                "wod_id": requested_auto,
+                "division_id": selected_division,
+                "layout_text": layout_text,
+                "message": f"У категории {title_map.get(selected_division, selected_division)} уже есть heats для {requested_auto}. Автосборка перезапишет их полностью.",
+            }
+        else:
+            try:
+                generated, success_message = perform_autobuild(db, requested_auto, selected_division, layout_text)
+                st.session_state[f"draft_heats::{requested_auto}_{selected_division}"] = normalize_heats(copy.deepcopy(generated))
+                save_division_heats(db, requested_auto, selected_division, generated)
+                st.success(success_message)
+                if requested_auto == selected_wod:
+                    st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
+                st.rerun()
+            except ValueError as e:
+                st.error(str(e))
+
+    pending_auto = st.session_state.get(AUTO_REQUEST_KEY)
+    if isinstance(pending_auto, dict):
+        if pending_auto.get("division_id") == selected_division:
+            st.warning(str(pending_auto.get("message") or "Автосборка перезапишет текущие heats."))
+            c1, c2 = st.columns(2)
+            if c1.button("Подтвердить перезапись heats", key=f"confirm_auto_{selected_division}_{selected_wod}", type="primary", use_container_width=True):
+                st.session_state[AUTO_CONFIRM_KEY] = pending_auto
+                st.session_state.pop(AUTO_REQUEST_KEY, None)
+                st.rerun()
+            if c2.button("Отмена", key=f"cancel_auto_{selected_division}_{selected_wod}", use_container_width=True):
+                st.session_state.pop(AUTO_REQUEST_KEY, None)
+                st.session_state.pop(AUTO_CONFIRM_KEY, None)
+                st.rerun()
+        else:
+            st.info("Есть ожидающая автосборка для другой категории. Вернись в неё и подтверди или отмени перезапись.")
+
+    confirmed_auto = st.session_state.pop(AUTO_CONFIRM_KEY, None)
+    if isinstance(confirmed_auto, dict):
+        try:
+            generated, success_message = perform_autobuild(
+                db,
+                str(confirmed_auto["wod_id"]),
+                str(confirmed_auto["division_id"]),
+                str(confirmed_auto["layout_text"]),
+            )
+            confirmed_key = f"draft_heats::{confirmed_auto['wod_id']}_{confirmed_auto['division_id']}"
+            st.session_state[confirmed_key] = normalize_heats(copy.deepcopy(generated))
+            save_division_heats(db, str(confirmed_auto["wod_id"]), str(confirmed_auto["division_id"]), generated)
+            if str(confirmed_auto["wod_id"]) == selected_wod and str(confirmed_auto["division_id"]) == selected_division:
+                st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
+            st.success(success_message)
+            st.rerun()
+        except ValueError as e:
+            st.error(str(e))
+
     try:
-        if random_wod1:
-            layout = parse_layout(layout_text)
-            athlete_ids = [int(p["id"]) for p in athletes]
-            validate_layout_exact(layout, len(athlete_ids))
-            random.shuffle(athlete_ids)
-            generated = pack_into_heats(athlete_ids, layout)
-            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
-            save_division_heats(db, selected_wod, selected_division, generated)
-            st.success("WOD1 заполнен случайным образом")
-            st.rerun()
-
-        if auto_wod2:
-            layout = parse_layout(layout_text)
-            ranked_ids = ranking_for_wod2(db, selected_division)
-            validate_layout_exact(layout, len(ranked_ids))
-            generated = pack_into_heats(ranked_ids, layout)
-            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
-            save_division_heats(db, "WOD2", selected_division, generated)
-            st.success("WOD2 собран по результатам WOD1: сильнейшие поставлены в поздние heats")
-            st.rerun()
-
-        if auto_wod3:
-            layout = parse_layout(layout_text)
-            ranked_ids = ranking_for_wod3(db, selected_division)
-            validate_layout_exact(layout, len(ranked_ids))
-            generated = pack_into_heats(ranked_ids, layout)
-            st.session_state[draft_key] = normalize_heats(copy.deepcopy(generated))
-            save_division_heats(db, "WOD3", selected_division, generated)
-            st.success("WOD3 собран по сумме WOD1 + WOD2")
-            st.rerun()
-
         if apply_layout:
             layout = parse_layout(layout_text)
             ordered = flatten_athletes_from_heats(materialize_heats_from_session(key_prefix, working_heats))
