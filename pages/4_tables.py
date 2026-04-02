@@ -20,10 +20,9 @@ def display_value_for_public(sdef, res):
     status = res.get("status")
     val = res.get("value")
     if status == "wd":
-        return "WD"
+        return "СНЯЛСЯ"
     if status == "capped":
-        pretty = display_result_value(sdef, val)
-        return f"CAP {pretty}" if pretty else "CAP"
+        return "CAP"
     return display_result_value(sdef, val)
 
 

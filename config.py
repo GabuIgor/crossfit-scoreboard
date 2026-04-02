@@ -20,10 +20,10 @@ MAX_FLAG_DIMENSION = 512
 
 # Дивизионы (4 таблицы)
 DIVISIONS = [
-    {"id": "BEGSCAL_F", "title": "Beginners/Scaled — Women", "sex": "F", "category": "BEGSCAL"},
-    {"id": "BEGSCAL_M", "title": "Beginners/Scaled — Men", "sex": "M", "category": "BEGSCAL"},
-    {"id": "INT_F",     "title": "Intermediate — Women",     "sex": "F", "category": "INT"},
-    {"id": "INT_M",     "title": "Intermediate — Men",       "sex": "M", "category": "INT"},
+    {"id": "BEGSCAL_F", "title": "Beginners/Scaled — ЖЕНЩИНЫ", "sex": "F", "category": "BEGSCAL"},
+    {"id": "BEGSCAL_M", "title": "Beginners/Scaled — МУЖЧИНЫ", "sex": "M", "category": "BEGSCAL"},
+    {"id": "INT_F",     "title": "Intermediate — ЖЕНЩИНЫ",     "sex": "F", "category": "INT"},
+    {"id": "INT_M",     "title": "Intermediate — МУЖЧИНЫ",       "sex": "M", "category": "INT"},
 ]
 
 DEFAULT_SCORES = [

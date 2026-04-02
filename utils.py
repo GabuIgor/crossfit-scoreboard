@@ -131,3 +131,31 @@ def participant_age(participant: dict, on_date=None):
         return int(raw_age)
     except (TypeError, ValueError):
         return raw_age
+
+
+def parse_time_to_seconds(value):
+    raw = "" if value is None else str(value).strip()
+    if not raw or ":" not in raw:
+        return None
+    parts = raw.split(":")
+    if len(parts) != 2:
+        return None
+    mm, ss = parts
+    if not mm.isdigit() or not ss.isdigit():
+        return None
+    sec = int(ss)
+    if sec < 0 or sec > 59:
+        return None
+    return int(mm) * 60 + sec
+
+
+def format_time_input_value(value) -> str:
+    if value in (None, ""):
+        return ""
+    try:
+        total_seconds = int(float(value))
+    except (TypeError, ValueError):
+        return str(value)
+    minutes = total_seconds // 60
+    seconds = total_seconds % 60
+    return f"{minutes}:{seconds:02d}"
