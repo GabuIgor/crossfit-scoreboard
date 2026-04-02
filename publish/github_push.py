@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -10,9 +11,24 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
 
 
+def _safe_print(text: str = "") -> None:
+    try:
+        print(text)
+    except UnicodeEncodeError:
+        encoded = text.encode("utf-8", errors="replace").decode("utf-8", errors="replace")
+        try:
+            sys.stdout.buffer.write((encoded + "\n").encode("utf-8", errors="replace"))
+        except Exception:
+            print(encoded.encode("ascii", errors="replace").decode("ascii"))
+
+
 def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess:
     workdir = cwd or REPO_ROOT
-    print(f"$ {' '.join(cmd)}")
+    _safe_print(f"$ {' '.join(cmd)}")
+
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
+
     completed = subprocess.run(
         cmd,
         cwd=workdir,
@@ -20,12 +36,13 @@ def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproce
         encoding="utf-8",
         errors="replace",
         capture_output=True,
+        env=env,
     )
 
     if completed.stdout:
-        print(completed.stdout.rstrip())
+        _safe_print(completed.stdout.rstrip())
     if completed.stderr:
-        print(completed.stderr.rstrip())
+        _safe_print(completed.stderr.rstrip())
 
     if check and completed.returncode != 0:
         raise RuntimeError(f"Command failed with exit code {completed.returncode}: {' '.join(cmd)}")
@@ -127,11 +144,11 @@ def ensure_remote_exists() -> None:
 
 
 def sync_with_remote_before_build() -> None:
-    print("\n=== REMOTE CHECK ===")
+    _safe_print("\n=== REMOTE CHECK ===")
     ensure_remote_exists()
     git("remote", "get-url", "origin")
 
-    print("\n=== GIT FETCH ===")
+    _safe_print("\n=== GIT FETCH ===")
     git("fetch", "origin")
 
     local_sha = git("rev-parse", "HEAD").stdout.strip()
@@ -139,11 +156,11 @@ def sync_with_remote_before_build() -> None:
     base_sha = git("merge-base", "HEAD", "origin/main").stdout.strip()
 
     if local_sha == remote_sha:
-        print("Локальная ветка уже синхронизирована с origin/main")
+        _safe_print("Локальная ветка уже синхронизирована с origin/main")
         return
 
     if local_sha == base_sha:
-        print("\n=== FAST-FORWARD PULL ===")
+        _safe_print("\n=== FAST-FORWARD PULL ===")
         git("pull", "--ff-only", "origin", "main")
         return
 
@@ -161,24 +178,24 @@ def sync_with_remote_before_build() -> None:
 
 
 def build_public() -> None:
-    print("\n=== BUILD ===")
+    _safe_print("\n=== BUILD ===")
     python_cmd("-m", "publish.build_public")
 
 
 def stage_docs() -> None:
-    print("\n=== GIT ADD ===")
+    _safe_print("\n=== GIT ADD ===")
     git("add", "-A", "docs")
 
 
 def show_status() -> None:
-    print("\n=== GIT STATUS ===")
+    _safe_print("\n=== GIT STATUS ===")
     git("status", "--porcelain")
 
 
 def commit_docs_if_needed() -> bool:
-    print("\n=== STAGED CHECK ===")
+    _safe_print("\n=== STAGED CHECK ===")
     if not has_staged_changes():
-        print("Нет изменений в docs — коммит не требуется.")
+        _safe_print("Нет изменений в docs — коммит не требуется.")
         return False
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -186,13 +203,13 @@ def commit_docs_if_needed() -> bool:
 
     show_status()
 
-    print("\n=== GIT COMMIT ===")
+    _safe_print("\n=== GIT COMMIT ===")
     git("commit", "-m", message)
     return True
 
 
 def push_docs() -> None:
-    print("\n=== GIT PUSH ===")
+    _safe_print("\n=== GIT PUSH ===")
     git("push", "origin", "main")
 
 
@@ -210,11 +227,11 @@ def main() -> None:
 
         if committed:
             push_docs()
-            print("\nПубликация завершена")
+            _safe_print("\nПубликация завершена")
         else:
-            print("\nПубликовать нечего")
+            _safe_print("\nПубликовать нечего")
     except Exception as exc:
-        print(f"\nОШИБКА: {exc}")
+        _safe_print(f"\nОШИБКА: {exc}")
         sys.exit(1)
 
 

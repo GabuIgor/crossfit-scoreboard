@@ -1,6 +1,7 @@
 import json
 import mimetypes
 import shutil
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -10,6 +11,15 @@ from heats_logic import serialize_heats_for_public
 from storage import load_db, default_display_settings
 from scoring import build_ranking, build_division_overall, build_club_ranking
 from utils import display_result_value, participant_age
+
+
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 
 def ensure_docs_dirs() -> None:
@@ -128,7 +138,16 @@ def build_public_payload() -> Dict[str, Any]:
                 }
             rows.append(row)
 
-        rows.sort(key=lambda r: (int(r.get("place") or 9999), r.get("full_name", "").lower()) if r.get("place") is not None else (9999, r.get("full_name", "").lower()))
+        rows.sort(
+            key=lambda r: (
+                int(r.get("place") or 9999),
+                r.get("full_name", "").lower(),
+            ) if r.get("place") is not None else (
+                9999,
+                r.get("full_name", "").lower(),
+            )
+        )
+
         payload["divisions"][div_id] = {
             "title": d["title"],
             "rows": rows,
