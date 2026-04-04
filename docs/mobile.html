@@ -26,13 +26,13 @@
     .selector select { min-width:160px; padding:10px 12px; border:2px solid #4f8cff; border-radius:10px; background:#eef5ff; color:#111827; font-weight:700; box-shadow:0 1px 0 rgba(0,0,0,.04); }
     .selector select:focus { outline:none; border-color:#1d4ed8; background:#e0edff; box-shadow:0 0 0 3px rgba(79,140,255,.18); }
     .selector select:hover { background:#e8f0ff; }
+    .hidden { display:none !important; }
 
-    .workouts-box { display:flex; flex-direction:column; gap:8px; }
-    .wod-item { border:1px solid #e5e7eb; border-left:4px solid #9ca3af; border-radius:10px; padding:10px 12px; background:#fff; }
-    .wod-item.wod1 { border-left-color:#7aaef7; }
-    .wod-item.wod2 { border-left-color:#7cd790; }
-    .wod-item.wod3 { border-left-color:#ffb56a; }
-    .wod-item.wod4, .wod-item.wod5, .wod-item.wod6, .wod-item.wod7, .wod-item.wod8 { border-left-color:#c8b5ff; }
+    .workout-single { border:1px solid #e5e7eb; border-left:4px solid #9ca3af; border-radius:10px; padding:10px 12px; background:#fff; }
+    .workout-single.wod1 { border-left-color:#7aaef7; }
+    .workout-single.wod2 { border-left-color:#7cd790; }
+    .workout-single.wod3 { border-left-color:#ffb56a; }
+    .workout-single.wod4, .workout-single.wod5, .workout-single.wod6, .workout-single.wod7, .workout-single.wod8 { border-left-color:#c8b5ff; }
     .wod-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
     .wod-code { font-weight:700; font-size:14px; }
     .wod-type { color:#666; font-size:11px; white-space:nowrap; }
@@ -44,37 +44,38 @@
   <div class="muted" id="meta">Loading...</div>
   <div class="selectors">
     <label class="selector">
-      <span>Таблица</span>
+      <span>Раздел</span>
+      <select id="viewSel">
+        <option value="table">Таблицы</option>
+        <option value="heats">Заходы</option>
+        <option value="workouts">Комплексы</option>
+      </select>
+    </label>
+    <label class="selector" id="divWrap">
+      <span>Категория</span>
       <select id="divSel"></select>
     </label>
-    <label class="selector">
-      <span>Заходы</span>
+    <label class="selector hidden" id="wodWrap">
+      <span id="wodLabel">WOD</span>
       <select id="wodSel"></select>
     </label>
   </div>
-  <div class="box" id="tableBox"></div>
-  <div class="box" id="heatsBox"></div>
-  <div class="box" id="workoutsBox"></div>
+  <div class="box" id="contentBox"></div>
 <script>
 const DIVS = ["BEGSCAL_F","BEGSCAL_M","INT_F","INT_M","CLUBS"];
 let cache = null;
+const viewSel = document.getElementById('viewSel');
 const divSel = document.getElementById('divSel');
 const wodSel = document.getElementById('wodSel');
+const contentBox = document.getElementById('contentBox');
+const wodWrap = document.getElementById('wodWrap');
+const wodLabel = document.getElementById('wodLabel');
 
 function fmt(v){
   if(v===null||v===undefined||v==='') return '—';
   return (typeof v==='number') ? String(Number(v.toFixed ? v.toFixed(2) : v)).replace(/\.00$/,'') : String(v);
 }
 function safe(s){ return s===null||s===undefined ? '' : String(s); }
-
-function pluralResults(n){
-  const value = Number(n) || 0;
-  const mod10 = value % 10;
-  const mod100 = value % 100;
-  if(mod10 === 1 && mod100 !== 11) return 'зачётный результат';
-  if(mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'зачётных результата';
-  return 'зачётных результатов';
-}
 
 DIVS.forEach(id => {
   const opt = document.createElement('option');
@@ -83,38 +84,16 @@ DIVS.forEach(id => {
   divSel.appendChild(opt);
 });
 
-['WOD1','WOD2','WOD3'].forEach(id => {
-  const opt = document.createElement('option');
-  opt.value = id;
-  opt.textContent = id;
-  wodSel.appendChild(opt);
-});
-
 function renderTable(){
   const id = divSel.value;
-
-  if(id === 'CLUBS'){
-    renderTeamsInline();
-    return;
-  }
-
+  if(id === 'CLUBS') return renderClubs();
   const div = cache.divisions?.[id];
-  if(!div){
-    document.getElementById('tableBox').innerHTML='Нет данных';
-    return;
-  }
-
+  if(!div){ contentBox.innerHTML='Нет данных'; return; }
   let html = `<h3>${safe(div.title)}</h3><div class="muted">ПР — место определено по приоритетному комплексу (${safe(cache.priority_score_id)})</div><table><thead><tr><th>#</th><th>Атлет</th><th class="points">W1</th><th class="points">W2A</th><th class="points">W2B</th><th class="points">W3</th><th class="points">Σ</th></tr></thead><tbody>`;
-
   (div.rows||[]).forEach(r => {
     const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : '';
     const club = (r.club || r.club_name || '').trim();
-    const metaHtml = [
-      r.age ? `${r.age}` : '',
-      safe(r.region || r.city || ''),
-      club ? `<span class="club-pill">${safe(club)}</span>` : ''
-    ].filter(Boolean).join(' · ');
-
+    const metaHtml = [r.age ? `${r.age}` : '', safe(r.region || r.city || ''), club ? `<span class="club-pill">${safe(club)}</span>` : ''].filter(Boolean).join(' · ');
     html += `<tr><td>${safe(r.place_label || fmt(r.place))}</td><td>${safe(r.full_name)}${flag}<div class="meta2">${metaHtml}</div></td>` +
       `<td class="points">${fmt(r.scores?.WOD1?.points)}<span class="res">${safe(r.scores?.WOD1?.result_text)}</span></td>` +
       `<td class="points">${fmt(r.scores?.WOD2A?.points)}<span class="res">${safe(r.scores?.WOD2A?.result_text)}</span></td>` +
@@ -122,24 +101,20 @@ function renderTable(){
       `<td class="points">${fmt(r.scores?.WOD3?.points)}<span class="res">${safe(r.scores?.WOD3?.result_text)}</span></td>` +
       `<td class="points">${fmt(r.total)}</td></tr>`;
   });
-
   html += '</tbody></table>';
-  document.getElementById('tableBox').innerHTML = html;
+  contentBox.innerHTML = html;
 }
 
-function renderTeamsInline(){
+function renderClubs(){
   const rows = cache.clubs?.rows || [];
   const scored = rows.filter(r => Number(r.points || 0) > 0);
   let html = `<h3>Клубный зачёт</h3><table><thead><tr><th>#</th><th>Клуб</th><th class="points">Очки</th><th class="points">Участ.</th><th class="points">1х</th></tr></thead><tbody>`;
-
   rows.forEach((r, idx) => {
     const clubName = r.club_name || r.club || `Клуб ${idx + 1}`;
     const flag = r.club_flag ? `<img class="flag" src="${r.club_flag}" />` : '';
     html += `<tr><td>${fmt(r.place)}</td><td>${safe(clubName)}${flag}<div class="meta2">${safe(r.club_city || '')}</div></td><td class="points">${fmt(r.points)}</td><td class="points">${fmt(r.participants_count)}</td><td class="points">${fmt(r.first_places)}</td></tr>`;
   });
-
   html += `</tbody></table>`;
-
   if(scored.length){
     html += `<div class="muted" style="margin-top:8px;">Клубы, которые принесли очки</div>`;
     scored.forEach(team => {
@@ -149,52 +124,16 @@ function renderTeamsInline(){
       });
     });
   }
-
-  document.getElementById('tableBox').innerHTML = html;
-}
-
-function workoutClass(code){
-  const m = safe(code).match(/WOD(\d+)/);
-  return m ? `wod${m[1]}` : '';
-}
-function renderWorkouts(){
-  const divId = divSel.value;
-  const div = cache?.workouts?.divisions?.[divId];
-  if(!div || divId === 'CLUBS'){
-    document.getElementById('workoutsBox').innerHTML = '';
-    return;
-  }
-  const rows = div.rows || [];
-  let html = `<h3>Комплексы</h3><div class="muted">Все WOD текущей категории на одном экране</div>`;
-  if(!rows.length){
-    document.getElementById('workoutsBox').innerHTML = html + '<div class="muted" style="margin-top:8px;">Комплексы ещё не заполнены</div>';
-    return;
-  }
-  html += `<div class="workouts-box">`;
-  rows.forEach(row => {
-    html += `<div class="wod-item ${workoutClass(row.code)}"><div class="wod-head"><div class="wod-code">${safe(row.label || row.code)}</div><div class="wod-type">${safe(row.type || '')}</div></div>${row.time_cap ? `<div class="wod-cap">Лимит: ${safe(row.time_cap)}</div>` : ''}${row.description ? `<div class="wod-desc">${safe(row.description)}</div>` : ''}</div>`;
-  });
-  html += `</div>`;
-  document.getElementById('workoutsBox').innerHTML = html;
+  contentBox.innerHTML = html;
 }
 
 function renderHeats(){
   const divId = divSel.value;
   const wodId = wodSel.value;
-
-  if(divId === 'CLUBS'){
-    document.getElementById('heatsBox').innerHTML = '';
-    return;
-  }
-
+  if(divId === 'CLUBS'){ contentBox.innerHTML = 'Для клубного зачёта заходов нет'; return; }
   const heats = cache.heats?.[wodId]?.divisions?.[divId] || [];
   let html = `<h3>${safe(cache.heats?.[wodId]?.title || wodId)} — заходы</h3>`;
-
-  if(!heats.length){
-    document.getElementById('heatsBox').innerHTML = html + 'Нет заходов';
-    return;
-  }
-
+  if(!heats.length){ contentBox.innerHTML = html + 'Нет заходов'; return; }
   html += `<div class="heats-row">`;
   heats.forEach(h => {
     html += `<div class="heat-col"><div class="heat-title">Заход ${h.heat}</div>`;
@@ -205,7 +144,73 @@ function renderHeats(){
     html += `</div>`;
   });
   html += `</div>`;
-  document.getElementById('heatsBox').innerHTML = html;
+  contentBox.innerHTML = html;
+}
+
+function workoutClass(code){
+  const m = safe(code).match(/WOD(\d+)/);
+  return m ? `wod${m[1]}` : '';
+}
+
+function currentWorkoutRows(){
+  const divId = divSel.value;
+  return cache?.workouts?.divisions?.[divId]?.rows || [];
+}
+
+function refreshWodOptions(){
+  const view = viewSel.value;
+  wodSel.innerHTML = '';
+  if(view === 'heats'){
+    ['WOD1','WOD2','WOD3'].forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id;
+      wodSel.appendChild(opt);
+    });
+    wodLabel.textContent = 'Заходы';
+    return;
+  }
+  if(view === 'workouts'){
+    const rows = currentWorkoutRows();
+    if(!rows.length) return;
+    rows.forEach(row => {
+      const opt = document.createElement('option');
+      opt.value = row.code;
+      opt.textContent = row.label || row.code;
+      wodSel.appendChild(opt);
+    });
+    wodLabel.textContent = 'Комплекс';
+  }
+}
+
+function renderWorkoutSingle(){
+  const divId = divSel.value;
+  if(divId === 'CLUBS'){ contentBox.innerHTML = 'Для клубного зачёта комплексов нет'; return; }
+  const div = cache?.workouts?.divisions?.[divId];
+  const rows = div?.rows || [];
+  let html = `<h3>Комплексы</h3>`;
+  if(!rows.length){ contentBox.innerHTML = html + '<div class="muted">Комплексы ещё не заполнены</div>'; return; }
+  const selected = rows.find(r => r.code === wodSel.value) || rows[0];
+  html += `<div class="muted" style="margin-bottom:8px;">${safe(div.title || '')}</div>`;
+  html += `<div class="workout-single ${workoutClass(selected.code)}"><div class="wod-head"><div class="wod-code">${safe(selected.label || selected.code)}</div><div class="wod-type">${safe(selected.type || '')}</div></div>${selected.time_cap ? `<div class="wod-cap">Лимит: ${safe(selected.time_cap)}</div>` : ''}${selected.description ? `<div class="wod-desc">${safe(selected.description)}</div>` : ''}</div>`;
+  contentBox.innerHTML = html;
+}
+
+function updateControls(){
+  const view = viewSel.value;
+  wodWrap.classList.toggle('hidden', view === 'table');
+  if(view === 'table' && divSel.value === 'CLUBS'){
+    // ok
+  }
+  if(view === 'heats' || view === 'workouts') refreshWodOptions();
+}
+
+function renderCurrent(){
+  updateControls();
+  const view = viewSel.value;
+  if(view === 'table') renderTable();
+  else if(view === 'heats') renderHeats();
+  else renderWorkoutSingle();
 }
 
 function applyDisplaySettings(){
@@ -221,17 +226,23 @@ function applyDisplaySettings(){
 }
 
 async function load(){
+  const currentView = viewSel.value;
+  const currentDiv = divSel.value;
+  const currentWod = wodSel.value;
   const res = await fetch(`results.json?ts=${Date.now()}`);
   cache = await res.json();
   document.getElementById('meta').textContent = `Обновлено: ${cache.generated_at}`;
   applyDisplaySettings();
-  renderTable();
-  renderHeats();
-  renderWorkouts();
+  if(currentDiv) divSel.value = currentDiv;
+  if(currentView) viewSel.value = currentView;
+  refreshWodOptions();
+  if([...wodSel.options].some(o => o.value === currentWod)) wodSel.value = currentWod;
+  renderCurrent();
 }
 
-divSel.onchange = () => { if(cache){ renderTable(); renderHeats(); renderWorkouts(); } };
-wodSel.onchange = () => { if(cache){ renderHeats(); } };
+viewSel.onchange = renderCurrent;
+divSel.onchange = renderCurrent;
+wodSel.onchange = renderCurrent;
 
 load();
 setInterval(load, 5000);
