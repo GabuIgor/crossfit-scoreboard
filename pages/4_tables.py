@@ -13,7 +13,6 @@ st.title("📊 Tables (админ-панель)")
 db = load_db()
 settings = db["settings"]
 scores = settings["scores"]
-club_settings = settings.get("club_settings", {}) if isinstance(settings.get("club_settings"), dict) else {}
 team_scoring = settings.get("team_scoring", {})
 
 
@@ -36,18 +35,68 @@ def esc(value):
     return html.escape(str(value))
 
 
+st.markdown(
+    """
+    <style>
+    .admin-results-table-wrap{overflow-x:auto;margin-bottom:8px;}
+    .admin-results-table{
+        width:100%;
+        border-collapse:collapse;
+        font-size:14px;
+        background:transparent;
+    }
+    .admin-results-table th,
+    .admin-results-table td{
+        border-bottom:1px solid rgba(255,255,255,0.10);
+        padding:6px 8px;
+        text-align:left;
+        vertical-align:top;
+        white-space:nowrap;
+        background:transparent !important;
+        color:#f3f4f6;
+    }
+    .admin-results-table th{
+        background:rgba(255,255,255,0.04) !important;
+        font-weight:700;
+        color:#ffffff;
+    }
+    .admin-results-table tbody tr,
+    .admin-results-table tbody tr:hover{
+        background:transparent !important;
+    }
+    .admin-results-table td.club-cell,
+    .admin-results-table td.total-cell{
+        font-weight:700;
+        color:#ffffff;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+def render_html_table(headers, body_rows):
+    head_html = "<tr>" + "".join(f"<th>{esc(h)}</th>" for h in headers) + "</tr>"
+    table_html = (
+        '<div class="admin-results-table-wrap"><table class="admin-results-table"><thead>'
+        + head_html
+        + "</thead><tbody>"
+        + "".join(body_rows)
+        + "</tbody></table></div>"
+    )
+    st.markdown(table_html, unsafe_allow_html=True)
+
+
 def render_admin_table(rows, score_ids):
     if not rows:
         st.info("Нет данных")
         return
 
-    head = ["<tr>", "<th>Место</th>", "<th>ФИО</th>", "<th>Возраст</th>", "<th>DIV</th>", "<th>Регион</th>", "<th>Клуб</th>", "<th>Флаг</th>"]
+    headers = ["#", "Участник", "Возраст", "Категория", "Город / регион", "Клуб", "Флаг"]
     for sid in score_ids:
-        head.append(f"<th>{esc(sid)}</th>")
-        head.append(f"<th>{esc(sid)} рез.</th>")
-    head.append("<th>Приоритет</th>")
-    head.append("<th>ИТОГО</th>")
-    head.append("</tr>")
+        headers.append(f"{sid} очки")
+        headers.append(f"{sid} результат")
+    headers.extend(["Приоритет", "Итого"])
 
     body_rows = []
     for row in rows:
@@ -58,30 +107,18 @@ def render_admin_table(rows, score_ids):
             f"<td>{esc(row.get('Возраст', ''))}</td>",
             f"<td>{esc(row.get('DIV', ''))}</td>",
             f"<td>{esc(row.get('Регион', ''))}</td>",
-            f"<td><strong>{esc(row.get('Клуб', ''))}</strong></td>",
+            f"<td class='club-cell'>{esc(row.get('Клуб', ''))}</td>",
             f"<td>{esc(row.get('Флаг', '—'))}</td>",
         ]
         for sid in score_ids:
             parts.append(f"<td>{esc(row.get(sid, '—'))}</td>")
             parts.append(f"<td>{esc(row.get(f'{sid}_res', '—'))}</td>")
         parts.append(f"<td>{esc(row.get('Приоритет', '—'))}</td>")
-        parts.append(f"<td><strong>{esc(row.get('ИТОГО', '—'))}</strong></td>")
+        parts.append(f"<td class='total-cell'>{esc(row.get('ИТОГО', '—'))}</td>")
         parts.append("</tr>")
-        body_rows.append(''.join(parts))
+        body_rows.append("".join(parts))
 
-    st.markdown("""
-        <style>
-        .admin-results-table-wrap{overflow-x:auto;margin-bottom:8px;}
-        .admin-results-table{width:100%;border-collapse:collapse;font-size:14px;}
-        .admin-results-table th,.admin-results-table td{border-bottom:1px solid #e9eef5;padding:6px 8px;text-align:left;vertical-align:top;white-space:nowrap;}
-        .admin-results-table th{background:#f7f9fc;font-weight:700;}
-        .admin-results-table tbody tr:hover{background:#fafcff;}
-        .admin-results-table td:nth-child(7){font-weight:700;color:#111827;}
-        </style>
-        """, unsafe_allow_html=True)
-
-    html_table = '<div class="admin-results-table-wrap"><table class="admin-results-table"><thead>' + ''.join(head) + '</thead><tbody>' + ''.join(body_rows) + '</tbody></table></div>'
-    st.markdown(html_table, unsafe_allow_html=True)
+    render_html_table(headers, body_rows)
 
 
 for div in DIVISIONS:
@@ -126,7 +163,14 @@ for div in DIVISIONS:
         table_rows.append(row)
 
     if has_live_places:
-        table_rows.sort(key=lambda r: (0 if isinstance(r["ИТОГО"], (int, float)) else 1, -float(r["ИТОГО"] if isinstance(r["ИТОГО"], (int, float)) else 0.0), -float(r["Приоритет"]) if isinstance(r["Приоритет"], (int, float)) else 1, r["ФИО"].lower()))
+        table_rows.sort(
+            key=lambda r: (
+                0 if isinstance(r["ИТОГО"], (int, float)) else 1,
+                -float(r["ИТОГО"] if isinstance(r["ИТОГО"], (int, float)) else 0.0),
+                -float(r["Приоритет"]) if isinstance(r["Приоритет"], (int, float)) else 1,
+                r["ФИО"].lower(),
+            )
+        )
     else:
         table_rows.sort(key=lambda r: r["ФИО"].lower())
 
@@ -151,7 +195,25 @@ for row in club_payload.get("rows", []):
         "Приоритет": row.get("priority_sum"),
     })
 if club_rows:
-    st.dataframe(club_rows, use_container_width=True, hide_index=True)
+    club_headers = ["#", "Клуб", "Город", "Флаг", "Очки", "Участников", "Зачётных мест", "1 мест", "2 мест", "3 мест", "Приоритет"]
+    club_body = []
+    for row in club_rows:
+        club_body.append(
+            "<tr>"
+            f"<td>{esc(row.get('Место', '—'))}</td>"
+            f"<td class='club-cell'>{esc(row.get('Клуб', ''))}</td>"
+            f"<td>{esc(row.get('Город', ''))}</td>"
+            f"<td>{esc(row.get('Флаг', '—'))}</td>"
+            f"<td class='total-cell'>{esc(row.get('Очки', '—'))}</td>"
+            f"<td>{esc(row.get('Участников', '—'))}</td>"
+            f"<td>{esc(row.get('Зачётных мест', '—'))}</td>"
+            f"<td>{esc(row.get('1 мест', '—'))}</td>"
+            f"<td>{esc(row.get('2 мест', '—'))}</td>"
+            f"<td>{esc(row.get('3 мест', '—'))}</td>"
+            f"<td>{esc(row.get('Приоритет', '—'))}</td>"
+            "</tr>"
+        )
+    render_html_table(club_headers, club_body)
 else:
     st.info("Клубный зачёт появится после полного ввода хотя бы одного комплекса в зачётном дивизионе.")
 
