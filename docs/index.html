@@ -107,7 +107,8 @@
   </div>
 
 <script>
-const DEFAULT_SCENE_DURATION_MS = 10000;
+let sceneDurationMs = 10000;
+let nextSceneTimer = null;
 const DATA_REFRESH_MS = 5000;
 const SCENES = [
   { id: 'scene-begscal-f', label: 'Women BEG/SCAL', divId: 'BEGSCAL_F' },
@@ -124,7 +125,6 @@ const DIV_SHORT = {
 };
 let cache = null;
 let sceneIndex = 0;
-let sceneTimer = null;
 
 function safe(v) { return v === null || v === undefined ? '' : String(v); }
 function fmt(v) {
@@ -132,27 +132,22 @@ function fmt(v) {
   return (typeof v === 'number') ? String(Number(v.toFixed ? v.toFixed(2) : v)).replace(/\.00$/, '') : String(v);
 }
 function metaLine(parts) { return parts.filter(Boolean).join(' · '); }
-function buildMetaHtml(parts) {
-  return parts.filter(Boolean).join(' · ');
-}
 function athleteCell(r) {
   const flag = r.flag ? `<img class="flag" src="${r.flag}" alt="flag" />` : '';
   const club = (r.club || '').trim();
-  const meta = buildMetaHtml([
-    r.age ? safe(r.age) : '',
-    safe(r.region || r.city || ''),
-    club ? `<span class="club-strong">${safe(club)}</span>` : ''
-  ]);
-  return `<div class="athlete-line"><span>${safe(r.full_name)}</span>${flag}</div><div class="athlete-meta">${meta}</div>`;
+  const bits = [];
+  if (r.age) bits.push(safe(r.age));
+  if (safe(r.region || r.city || '')) bits.push(safe(r.region || r.city || ''));
+  if (club) bits.push(`<span class="club-pill">${safe(club)}</span>`);
+  return `<div class="athlete-line"><span>${safe(r.full_name)}</span>${flag}</div><div class="athlete-meta">${bits.join(' · ')}</div>`;
 }
 function heatAthleteCell(a) {
   const flag = a.flag ? `<img class="flag" src="${a.flag}" alt="flag" />` : '';
   const club = (a.club || '').trim();
-  const meta = buildMetaHtml([
-    safe(a.region || a.city || ''),
-    club ? `<span class="club-strong">${safe(club)}</span>` : ''
-  ]);
-  return `<div class="athlete-line"><span>${safe(a.full_name)}</span>${flag}</div><div class="athlete-meta">${meta}</div>`;
+  const bits = [];
+  if (safe(a.region || a.city || '')) bits.push(safe(a.region || a.city || ''));
+  if (club) bits.push(`<span class="club-pill">${safe(club)}</span>`);
+  return `<div class="athlete-line"><span>${safe(a.full_name)}</span>${flag}</div><div class="athlete-meta">${bits.join(' · ')}</div>`;
 }
 function scoreCell(scoreObj) {
   return `<div class="score-main">${fmt(scoreObj?.points)}</div><div class="score-sub">${safe(scoreObj?.result_text || '')}</div>`;
@@ -171,7 +166,6 @@ function renderDivisionTable(div) {
   return `
     <div class="card">
       <div class="card-head">
-        <h3>${safe(div.title)}</h3>
         <div class="caption">Флаг · возраст · регион · клуб</div>
       </div>
       <div class="table-wrap">
@@ -250,7 +244,7 @@ function renderDivisionScene(sceneId, divId) {
   root.innerHTML = `
     <div class="scene-header">
       <h2>${safe(DIV_SHORT[divId])}</h2>
-      <div class="scene-sub">Таблица слева, заходы справа</div>
+      <div class="scene-sub">Таблица и заходы</div>
     </div>
     <div class="scene-split">${renderDivisionTable(div)}${renderDivisionHeats(divId)}</div>`;
 }
@@ -345,16 +339,17 @@ function renderSceneState() {
   document.getElementById('sceneMeta').textContent = `${SCENES[sceneIndex].label} · экран ${sceneIndex + 1} из ${SCENES.length}`;
 }
 function nextScene() { sceneIndex = (sceneIndex + 1) % SCENES.length; renderSceneState(); }
-function restartSceneRotation() {
-  const durationMs = Math.max(3000, Number(cache?.tv_scene_duration_sec || 0) * 1000 || DEFAULT_SCENE_DURATION_MS);
-  if (sceneTimer) clearInterval(sceneTimer);
-  sceneTimer = setInterval(nextScene, durationMs);
+function applySceneDuration() {
+  const sec = Number(cache?.tv_scene_duration_sec || cache?.display?.main?.scene_duration_sec || 10);
+  sceneDurationMs = Math.max(3, sec) * 1000;
+  if (nextSceneTimer) clearInterval(nextSceneTimer);
+  nextSceneTimer = setInterval(nextScene, sceneDurationMs);
 }
 async function load() {
   const res = await fetch(`results.json?ts=${Date.now()}`);
   cache = await res.json();
+  applySceneDuration();
   renderAll();
-  restartSceneRotation();
 }
 load();
 setInterval(load, DATA_REFRESH_MS);

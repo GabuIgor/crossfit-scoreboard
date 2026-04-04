@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import streamlit as st
 
@@ -9,6 +11,7 @@ st.set_page_config(page_title="Results Entry", layout="wide")
 compact_page_style()
 st.title("🧾 Results Entry")
 
+
 db = load_db()
 settings = db["settings"]
 scores = settings["scores"]
@@ -17,6 +20,7 @@ div_titles = {d["title"]: d["id"] for d in DIVISIONS}
 score_titles = {f"{s['id']} — {s['title']}": s["id"] for s in scores}
 STATUS_LABELS = {"ok": "Зачтено", "capped": "CAP", "wd": "Снялся"}
 LABEL_TO_STATUS = {v: k for k, v in STATUS_LABELS.items()}
+TIME_RE = re.compile(r"^\d+:\d{2}$")
 
 
 def display_result_for_entry(score_def, res):
@@ -30,6 +34,21 @@ def display_result_for_entry(score_def, res):
         reps_text = display_result_value({"type": "reps"}, value)
         return f"CAP {reps_text}" if reps_text else "CAP"
     return display_result_value(score_def, value)
+
+
+def normalize_time_input(value):
+    if value is None:
+        return ""
+    raw = str(value).strip()
+    if not raw:
+        return ""
+    total = parse_time_mmss(raw)
+    if total is None:
+        return None
+    pretty = format_time_mmss(total)
+    if not TIME_RE.match(pretty):
+        return None
+    return pretty
 
 
 colA, colB = st.columns(2)
@@ -68,87 +87,66 @@ st.subheader("Ввод результата через форму")
 ath_label = st.selectbox("Атлет", options)
 ath_id = id_by_label[ath_label]
 existing = db.get("results", {}).get(str(ath_id), {}).get(score_id) or {}
+existing_time = format_time_mmss(existing.get("value")) if existing.get("status") == "ok" and stype == "time" else ""
 
-
-def _time_key():
-    return f"time_input_{division_id}_{score_id}_{ath_id}"
-
-
-def _time_context_key():
-    return f"time_input_context_{division_id}_{score_id}"
-
-
-time_key = _time_key()
-time_context_key = _time_context_key()
-current_context = f"{division_id}|{score_id}|{ath_id}"
-
-if stype == "time":
-    previous_context = st.session_state.get(time_context_key)
-    if previous_context != current_context or time_key not in st.session_state:
-        st.session_state[time_key] = (
-            format_time_mmss(existing.get("value"))
-            if existing.get("status") == "ok"
-            else ""
+with st.form(key=f"single_result_form_{division_id}_{score_id}_{ath_id}"):
+    col1, col2 = st.columns(2)
+    with col1:
+        withdrawn = st.checkbox("Снялся", value=existing.get("status") == "wd")
+    with col2:
+        capped = st.checkbox(
+            "CAP",
+            value=existing.get("status") == "capped",
+            disabled=not (stype == "time" and cap_enabled),
         )
-        st.session_state[time_context_key] = current_context
 
-col1, col2 = st.columns(2)
-with col1:
-    withdrawn = st.checkbox("Снялся", value=existing.get("status") == "wd")
-with col2:
-    capped = st.checkbox(
-        "CAP",
-        value=existing.get("status") == "capped",
-        disabled=not (stype == "time" and cap_enabled),
-    )
+    disabled_input = withdrawn
+    value = None
+    raw_time_value = ""
 
-disabled_input = withdrawn
-value = None
-raw_time_value = ""
-
-if stype == "time":
-    if capped and cap_enabled:
+    if stype == "time":
+        if capped and cap_enabled:
+            value = st.number_input(
+                "Повторы при CAP",
+                min_value=0,
+                step=1,
+                value=int(existing.get("value") or 0) if existing.get("status") == "capped" else 0,
+                disabled=disabled_input,
+            )
+            st.caption("Для CAP время не вводится — только повторения.")
+        else:
+            raw_time_value = st.text_input(
+                "Время",
+                value=existing_time,
+                placeholder="00:00",
+                disabled=disabled_input,
+                help="Строго в формате мм:сс. Например: 05:34 или 12:08",
+            )
+            preview_time = normalize_time_input(raw_time_value)
+            if raw_time_value and preview_time is None:
+                st.caption("Вводи только в формате мм:сс. Например: 05:34")
+            else:
+                st.caption(f"Формат: мм:сс{f' · будет сохранено как {preview_time}' if preview_time else ''}")
+    elif stype == "reps":
         value = st.number_input(
-            "Повторы при CAP",
+            "Повторы",
             min_value=0,
             step=1,
-            value=int(existing.get("value") or 0) if existing.get("status") == "capped" else 0,
+            value=int(existing.get("value") or 0) if existing.get("status") == "ok" else 0,
             disabled=disabled_input,
         )
-        st.caption("Для CAP время рядом не показывается — только CAP и повторения.")
-    else:
-        raw_time_value = st.text_input(
-            "Время (mm:ss)",
-            key=time_key,
-            placeholder="Например: 534 или 5:34",
+    elif stype == "weight":
+        value = st.number_input(
+            "Вес (кг)",
+            min_value=0.0,
+            step=0.5,
+            value=float(existing.get("value") or 0.0) if existing.get("status") == "ok" else 0.0,
             disabled=disabled_input,
         )
-        parsed_preview = parse_time_mmss(raw_time_value)
-        if raw_time_value:
-            if parsed_preview is not None:
-                st.caption(f"Будет сохранено как: {format_time_mmss(parsed_preview)}")
-            else:
-                st.caption("Введи время как mm:ss или просто цифрами, например 534 → 5:34")
-        else:
-            st.caption("Можно вводить без двоеточия: 534 → 5:34, 6214 → 62:14")
-elif stype == "reps":
-    value = st.number_input(
-        "Повторы",
-        min_value=0,
-        step=1,
-        value=int(existing.get("value") or 0) if existing.get("status") == "ok" else 0,
-        disabled=disabled_input,
-    )
-elif stype == "weight":
-    value = st.number_input(
-        "Вес (кг)",
-        min_value=0.0,
-        step=0.5,
-        value=float(existing.get("value") or 0.0) if existing.get("status") == "ok" else 0.0,
-        disabled=disabled_input,
-    )
 
-if st.button("✅ Ввести результат", type="primary"):
+    submitted_single = st.form_submit_button("✅ Ввести результат", type="primary")
+
+if submitted_single:
     db.setdefault("results", {})
     db["results"].setdefault(str(ath_id), {})
 
@@ -159,11 +157,11 @@ if st.button("✅ Ввести результат", type="primary"):
             db["results"][str(ath_id)][score_id] = {"status": "capped", "value": int(value)}
         else:
             if stype == "time":
-                parsed_time = parse_time_mmss(raw_time_value)
-                if parsed_time is None:
-                    st.error("Для TIME введи корректное значение в формате mm:ss.")
+                normalized = normalize_time_input(raw_time_value)
+                if normalized is None:
+                    st.error("Для TIME введи значение строго в формате мм:сс. Например: 05:34")
                     st.stop()
-                db["results"][str(ath_id)][score_id] = {"status": "ok", "value": int(parsed_time)}
+                db["results"][str(ath_id)][score_id] = {"status": "ok", "value": int(parse_time_mmss(normalized))}
             elif stype == "reps":
                 db["results"][str(ath_id)][score_id] = {"status": "ok", "value": int(value)}
             else:
@@ -175,7 +173,8 @@ if st.button("✅ Ввести результат", type="primary"):
 
 st.divider()
 st.subheader("Ввод результата через таблицу")
-st.caption("Для TIME можно вводить как mm:ss, так и без двоеточия: 534 → 5:34, 6214 → 62:14")
+if stype == "time":
+    st.caption("TIME вводится одной строкой строго в формате мм:сс. Например: 05:34")
 
 status_options = [STATUS_LABELS["ok"], STATUS_LABELS["wd"]]
 if stype == "time" and cap_enabled:
@@ -203,13 +202,14 @@ for p in participants:
 editor_df = pd.DataFrame(rows)
 value_column = st.column_config.NumberColumn("Значение", step=0.5 if stype == "weight" else 1)
 if stype == "time":
+    value_column = st.column_config.TextColumn("Время")
+elif stype == "time" and cap_enabled:
     value_column = st.column_config.TextColumn("Время / повторы")
 
-editor_key = f"results_editor_{division_id}_{score_id}"
-with st.form(key=f"results_editor_form_{division_id}_{score_id}"):
+with st.form(key=f"results_table_form_{division_id}_{score_id}"):
     edited_df = st.data_editor(
         editor_df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         disabled=["athlete_id", "athlete", "club", "region", "preview"],
         column_config={
@@ -221,14 +221,17 @@ with st.form(key=f"results_editor_form_{division_id}_{score_id}"):
             "value": value_column,
             "preview": st.column_config.TextColumn("Будет показано"),
         },
-        key=editor_key,
+        key=f"results_editor_{division_id}_{score_id}",
     )
-    save_table = st.form_submit_button("💾 Сохранить таблицу результатов", type="primary")
+    submitted_table = st.form_submit_button("💾 Сохранить таблицу результатов")
 
-if save_table:
+if submitted_table:
     db.setdefault("results", {})
+    errors = []
+
     for _, row in edited_df.iterrows():
         athlete_id = int(row["athlete_id"])
+        athlete_name = str(row["athlete"] or athlete_id)
         status_label = str(row["status"] or "Зачтено")
         status = LABEL_TO_STATUS.get(status_label, "ok")
         raw_value = row["value"]
@@ -247,19 +250,26 @@ if save_table:
             value_to_save = float(raw_value)
         elif stype == "time":
             if status == "capped":
-                value_to_save = int(float(raw_value))
+                try:
+                    value_to_save = int(float(raw_value))
+                except (TypeError, ValueError):
+                    errors.append(f"{athlete_name}: для CAP введи целое число повторов")
+                    continue
             else:
-                parsed_time = parse_time_mmss(raw_value)
-                if parsed_time is None:
-                    st.error(f"Некорректное TIME-значение у athlete_id={athlete_id}. Используй mm:ss или ввод без двоеточия.")
-                    st.stop()
-                value_to_save = int(parsed_time)
+                normalized = normalize_time_input(raw_value)
+                if normalized is None:
+                    errors.append(f"{athlete_name}: время должно быть в формате мм:сс")
+                    continue
+                value_to_save = int(parse_time_mmss(normalized))
         else:
             value_to_save = int(float(raw_value))
 
         db["results"][str(athlete_id)][score_id] = {"status": status, "value": value_to_save}
 
+    if errors:
+        st.error("Не сохранил таблицу. Исправь ошибки:\n- " + "\n- ".join(errors[:12]))
+        st.stop()
+
     save_db(db)
     st.success("Таблица результатов сохранена.")
-    st.rerun()
     st.rerun()
