@@ -284,7 +284,7 @@ def ranking_for_wod2(db: Dict[str, Any], division_id: str) -> List[int]:
         return (
             points,
             -prev_heat,
-            -age_value,
+            age_value,
             prev_lane,
             aid,
         )
@@ -317,7 +317,7 @@ def ranking_for_wod3(db: Dict[str, Any], division_id: str) -> List[int]:
         return (
             totals.get(aid, 0.0),
             -prev_heat,
-            -age_value,
+            age_value,
             prev_lane,
             aid,
         )
