@@ -149,7 +149,12 @@ function renderTable(){
     return;
   }
 
-  let html = `<h3>${safe(div.title)}</h3><div class="muted">ПР — место определено по приоритетному комплексу (${safe(cache.priority_score_id)})</div><table><thead><tr><th>#</th><th>Атлет</th><th class="points">W1</th><th class="points">W2A</th><th class="points">W2B</th><th class="points">W3</th><th class="points">Σ</th></tr></thead><tbody>`;
+  const notes = [];
+  if (cache.priority_score_id) notes.push(`* место определено по приоритетному комплексу (${safe(cache.priority_score_id)})`);
+  (div.tie_break_notes || []).forEach(item => notes.push(safe(item)));
+  const notesHtml = notes.length ? `<div class="muted">${notes.join(' · ')}</div>` : '';
+
+  let html = `<h3>${safe(div.title)}</h3>${notesHtml}<table><thead><tr><th>#</th><th>Атлет</th><th class="points">W1</th><th class="points">W2A</th><th class="points">W2B</th><th class="points">W3</th><th class="points">Σ</th></tr></thead><tbody>`;
 
   (div.rows||[]).forEach(r => {
     const flag = r.flag ? `<img class="flag" src="${r.flag}" />` : '';

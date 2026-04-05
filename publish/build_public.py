@@ -143,6 +143,8 @@ def build_public_payload() -> Dict[str, Any]:
                 "place_label": overall.get("display_place_label") or overall.get("place_label"),
                 "sport_place": overall.get("place"),
                 "sport_place_label": overall.get("place_label"),
+                "tie_break_code": overall.get("tie_break_code"),
+                "tie_break_marker": overall.get("tie_break_marker"),
                 "id": aid,
                 "full_name": p.get("full_name", ""),
                 "age": participant_age(p),
@@ -176,9 +178,19 @@ def build_public_payload() -> Dict[str, Any]:
             )
         )
 
+        tie_break_notes = []
+        row_codes = {str(r.get("tie_break_code") or "") for r in rows if r.get("tie_break_code")}
+        if "priority" in row_codes:
+            tie_break_notes.append("* место определено по приоритетному комплексу")
+        if "heat" in row_codes:
+            tie_break_notes.append("** место определено по заходу")
+        if "age" in row_codes:
+            tie_break_notes.append("*** место определено по возрасту")
+
         payload["divisions"][div_id] = {
             "title": d["title"],
             "rows": rows,
+            "tie_break_notes": tie_break_notes,
         }
 
     club_payload = build_club_ranking(db)

@@ -229,11 +229,28 @@ def _priority_points_for_athlete(db: Dict[str, Any], athlete_id: int, priority_s
     return -1.0
 
 
+
+
+def _heat_for_athlete(db: Dict[str, Any], division_id: str, score_id: str, athlete_id: int) -> Optional[int]:
+    score_heats = db.get("heats", {}).get(str(score_id), {})
+    division_heats = score_heats.get(str(division_id), []) if isinstance(score_heats, dict) else []
+    for heat_block in division_heats:
+        heat_num = heat_block.get("heat")
+        for assignment in heat_block.get("assignments", []):
+            if int(assignment.get("athlete_id") or 0) == int(athlete_id):
+                try:
+                    return int(heat_num)
+                except (TypeError, ValueError):
+                    return None
+    return None
+
+
+def _place_marker(code: Optional[str]) -> str:
+    return {"priority": "*", "heat": "**", "age": "***"}.get(str(code or ""), "")
 def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[str, Any]]:
     participants = _active_division_participants(db, division_id)
     team_scoring = db.get("settings", {}).get("team_scoring", {})
     priority_score_id = str(team_scoring.get("priority_score_id") or "").strip()
-    completed_score_ids = completed_score_ids_for_division(db, division_id)
 
     rows = []
     for p in participants:
@@ -245,12 +262,14 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             if raw_priority_points >= 0:
                 priority_points = round(raw_priority_points, 2)
 
+        heat_value = _heat_for_athlete(db, division_id, priority_score_id, aid) if priority_score_id else None
+        age_value = participant_age(p)
         rows.append({
             "id": aid,
             "athlete_id": aid,
             "full_name": p.get("full_name", ""),
             "sex": p.get("sex", ""),
-            "age": participant_age(p),
+            "age": age_value,
             "category": p.get("category", ""),
             "division_id": division_id,
             "region": p.get("region", "") or p.get("city", ""),
@@ -259,20 +278,50 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             "flag_path": p.get("flag_path"),
             "total": total,
             "priority_points": priority_points,
+            "priority_heat": heat_value,
             "place": None,
             "place_label": None,
             "display_place": None,
             "display_place_label": None,
+            "tie_break_code": None,
+            "tie_break_marker": "",
         })
 
-    rows.sort(
-        key=lambda r: (
+    def sort_key(r: Dict[str, Any]) -> Tuple:
+        return (
             0 if r["total"] is not None else 1,
             -float(r["total"] or 0.0),
-            -float(r["priority_points"] or -1),
+            -float(r["priority_points"] if r["priority_points"] is not None else -1.0),
+            int(r["priority_heat"] if r["priority_heat"] is not None else 9999),
+            -int(r["age"] or 0),
             r["full_name"].lower(),
         )
-    )
+
+    rows.sort(key=sort_key)
+
+    total_groups: Dict[float, List[Dict[str, Any]]] = {}
+    for row in rows:
+        if row["total"] is None:
+            continue
+        total_groups.setdefault(float(row["total"]), []).append(row)
+
+    for group in total_groups.values():
+        if len(group) <= 1:
+            continue
+        priority_keys = {float(r["priority_points"] if r["priority_points"] is not None else -1.0) for r in group}
+        if len(priority_keys) > 1:
+            for r in group:
+                r["tie_break_code"] = "priority"
+            continue
+        heat_keys = {int(r["priority_heat"] if r["priority_heat"] is not None else 9999) for r in group}
+        if len(heat_keys) > 1:
+            for r in group:
+                r["tie_break_code"] = "heat"
+            continue
+        age_keys = {int(r["age"] or 0) for r in group}
+        if len(age_keys) > 1:
+            for r in group:
+                r["tie_break_code"] = "age"
 
     place = 0
     placed_index = 0
@@ -283,13 +332,20 @@ def build_division_overall(db: Dict[str, Any], division_id: str) -> List[Dict[st
             row["place_label"] = None
             continue
         placed_index += 1
-        tie_key = (float(row["total"] or 0.0), float(row["priority_points"] or -1))
+        tie_key = (
+            float(row["total"] or 0.0),
+            float(row["priority_points"] if row["priority_points"] is not None else -1.0),
+            int(row["priority_heat"] if row["priority_heat"] is not None else 9999),
+            int(row["age"] or 0),
+        )
         if prev_key is None or tie_key != prev_key:
             place = placed_index
         row["place"] = place
-        row["place_label"] = str(place)
+        marker = _place_marker(row.get("tie_break_code"))
+        row["tie_break_marker"] = marker
+        row["place_label"] = f"{place}{marker}"
         row["display_place"] = place
-        row["display_place_label"] = str(place)
+        row["display_place_label"] = f"{place}{marker}"
         prev_key = tie_key
 
     next_display_place = placed_index

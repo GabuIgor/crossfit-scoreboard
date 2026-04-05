@@ -121,6 +121,19 @@ def render_admin_table(rows, score_ids):
     render_html_table(headers, body_rows)
 
 
+def render_tie_break_notes(rows):
+    codes = {str(r.get("TB_CODE") or "") for r in rows if r.get("TB_CODE")}
+    notes = []
+    if "priority" in codes:
+        notes.append("* место определено по приоритетному комплексу")
+    if "heat" in codes:
+        notes.append("** место определено по заходу")
+    if "age" in codes:
+        notes.append("*** место определено по возрасту")
+    if notes:
+        st.caption(" · ".join(notes))
+
+
 for div in DIVISIONS:
     div_id = div["id"]
     st.subheader(div["title"])
@@ -145,6 +158,7 @@ for div in DIVISIONS:
         priority_value = overall.get("priority_points")
         row = {
             "Место": overall.get("display_place_label") or overall.get("place_label") or "—",
+            "TB_CODE": overall.get("tie_break_code"),
             "ФИО": p.get("full_name", ""),
             "Возраст": participant_age(p),
             "DIV": p.get("category", ""),
@@ -175,6 +189,7 @@ for div in DIVISIONS:
         table_rows.sort(key=lambda r: r["ФИО"].lower())
 
     render_admin_table(table_rows, [s["id"] for s in scores])
+    render_tie_break_notes(table_rows)
     st.divider()
 
 st.subheader("Клубный зачёт")
