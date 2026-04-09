@@ -97,7 +97,7 @@ def init_table_row_state(prefix, athlete_id, existing, stype):
         st.session_state[status_key] = STATUS_LABELS.get((existing or {}).get("status", "ok"), "Зачтено")
     if value_key not in st.session_state:
         if existing is None:
-            st.session_state[value_key] = "" if stype == "time" else 0
+            st.session_state[value_key] = ""
         elif stype == "time":
             if existing.get("status") == "ok":
                 st.session_state[value_key] = format_time_mmss(existing.get("value"))
@@ -106,9 +106,11 @@ def init_table_row_state(prefix, athlete_id, existing, stype):
             else:
                 st.session_state[value_key] = ""
         elif stype == "weight":
-            st.session_state[value_key] = float(existing.get("value") or 0.0)
+            val = existing.get("value")
+            st.session_state[value_key] = "" if val in (None, "") else str(float(val)).rstrip("0").rstrip(".")
         else:
-            st.session_state[value_key] = int(existing.get("value") or 0)
+            val = existing.get("value")
+            st.session_state[value_key] = "" if val in (None, "") else str(int(val))
 
 
 colA, colB = st.columns(2)
@@ -262,23 +264,21 @@ for idx, p in enumerate(participants, start=1):
             normalized = normalize_time_input(new_text)
             preview = normalized if normalized else ("" if not new_text else "Ошибка")
     elif stype == "weight":
-        current_raw = st.session_state.get(value_key, 0.0)
+        current_text = str(st.session_state.get(value_key, "") or "")
+        new_text = cols[5].text_input("Значение", value=current_text, placeholder="0 / 52.5", key=f"{value_key}_weight", label_visibility="collapsed")
+        st.session_state[value_key] = new_text
         try:
-            current_num = float(current_raw)
+            preview = display_result_value(sdef, float(new_text)) if str(new_text).strip() else ""
         except Exception:
-            current_num = 0.0
-        new_num = cols[5].number_input("Значение", min_value=0.0, step=0.5, value=current_num, key=f"{value_key}_weight", label_visibility="collapsed")
-        st.session_state[value_key] = new_num
-        preview = display_result_value(sdef, new_num)
+            preview = "Ошибка"
     else:
-        current_raw = st.session_state.get(value_key, 0)
+        current_text = str(st.session_state.get(value_key, "") or "")
+        new_text = cols[5].text_input("Значение", value=current_text, placeholder="0", key=f"{value_key}_reps", label_visibility="collapsed")
+        st.session_state[value_key] = new_text
         try:
-            current_num = int(float(current_raw))
+            preview = display_result_value(sdef, int(float(new_text))) if str(new_text).strip() else ""
         except Exception:
-            current_num = 0
-        new_num = cols[5].number_input("Значение", min_value=0, step=1, value=current_num, key=f"{value_key}_reps", label_visibility="collapsed")
-        st.session_state[value_key] = new_num
-        preview = display_result_value(sdef, new_num)
+            preview = "Ошибка"
 
     cols[6].markdown(preview or "—")
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
