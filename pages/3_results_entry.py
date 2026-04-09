@@ -265,7 +265,7 @@ for idx, p in enumerate(participants, start=1):
             preview = normalized if normalized else ("" if not new_text else "Ошибка")
     elif stype == "weight":
         current_text = str(st.session_state.get(value_key, "") or "")
-        new_text = cols[5].text_input("Значение", value=current_text, placeholder="0 / 52.5", key=f"{value_key}_weight", label_visibility="collapsed")
+        new_text = cols[5].text_input("Значение", value=current_text, placeholder="результат", key=f"{value_key}_weight", label_visibility="collapsed")
         st.session_state[value_key] = new_text
         try:
             preview = display_result_value(sdef, float(new_text)) if str(new_text).strip() else ""
